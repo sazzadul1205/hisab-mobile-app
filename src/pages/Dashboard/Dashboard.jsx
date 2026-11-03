@@ -1,18 +1,16 @@
-import { PhoneFrame, StatusBar, ScrollArea } from '../../components/PhoneFrame'
-import { IconButton } from '../../components/IconButton'
-import { BottomNav } from '../../components/BottomNav'
+import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
+import { IconButton } from "../../components/IconButton";
+import { BottomNav } from "../../components/BottomNav";
+import { TransactionRow } from "../../components/TransactionRow";
 
-/* ----------------------------------------------------------------
-   Combined balance hero
-   ---------------------------------------------------------------- */
 function BalanceCard() {
   return (
     <div
       className="rounded-3xl p-5 text-white"
       style={{
         background:
-          'radial-gradient(120% 120% at 100% 0%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 55%), linear-gradient(150deg, #118A64 0%, #0A5A41 100%)',
-        boxShadow: '0 18px 34px -18px rgba(10,90,65,0.75)',
+          "radial-gradient(120% 120% at 100% 0%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 55%), linear-gradient(150deg, #118A64 0%, #0A5A41 100%)",
+        boxShadow: "0 18px 34px -18px rgba(10,90,65,0.75)",
       }}
     >
       <div className="text-[12px] font-semibold tracking-[0.06em] uppercase text-white/70">
@@ -27,15 +25,15 @@ function BalanceCard() {
       <div className="text-[12px] text-white/65">3 active accounts · BDT</div>
 
       <div
-        className="grid grid-cols-3 gap-2 mt-4.5 pt-4"
-        style={{ borderTop: '1px solid rgba(255,255,255,0.16)' }}
+        className="grid grid-cols-3 gap-2 mt-4.5-4"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.16)" }}
       >
         <Stat label="Income today" value="৳2,000" />
         <Stat label="Expenses today" value="৳1,970" />
         <Stat label="Net flow" value="+৳30" />
       </div>
     </div>
-  )
+  );
 }
 
 function Stat({ label, value }) {
@@ -46,19 +44,20 @@ function Stat({ label, value }) {
         {value}
       </b>
     </div>
-  )
+  );
 }
 
-/* ----------------------------------------------------------------
-   Quick actions
-   ---------------------------------------------------------------- */
 const ACTIONS = [
-  { label: 'Income',   tone: 'in',  icon: <path d="M12 5v14M5 12h14" /> },
-  { label: 'Expense',  tone: 'out', icon: <path d="M5 12h14" /> },
-  { label: 'Transfer', tone: 'tr',  icon: <path d="M4 8h13l-3-3M20 16H7l3 3" /> },
+  { label: "Income", tone: "in", icon: <path d="M12 5v14M5 12h14" /> },
+  { label: "Expense", tone: "out", icon: <path d="M5 12h14" /> },
   {
-    label: 'Import',
-    tone: 'im',
+    label: "Transfer",
+    tone: "tr",
+    icon: <path d="M4 8h13l-3-3M20 16H7l3 3" />,
+  },
+  {
+    label: "Import",
+    tone: "im",
     icon: (
       <>
         <path d="M12 15V4M8 8l4-4 4 4" />
@@ -66,14 +65,14 @@ const ACTIONS = [
       </>
     ),
   },
-]
+];
 
 const TONE_STYLES = {
-  in: 'bg-[var(--brand-soft)] text-[var(--in)]',
-  out: 'bg-[var(--danger-soft)] text-[var(--out)]',
-  tr: 'bg-[var(--tr-soft)] text-[var(--tr)]',
-  im: 'bg-[var(--warn-soft)] text-[var(--warn)]',
-}
+  in: "bg-[var(--brand-soft)] text-[var(--in)]",
+  out: "bg-[var(--danger-soft)] text-[var(--out)]",
+  tr: "bg-[var(--tr-soft)] text-[var(--tr)]",
+  im: "bg-[var(--warn-soft)] text-[var(--warn)]",
+};
 
 function QuickActions() {
   return (
@@ -101,21 +100,18 @@ function QuickActions() {
         </button>
       ))}
     </div>
-  )
+  );
 }
 
-/* ----------------------------------------------------------------
-   Weekly income vs expense chart
-   ---------------------------------------------------------------- */
 const WEEK_DATA = [
-  { day: 'Fri', in: 42, out: 30 },
-  { day: 'Sat', in: 20, out: 52 },
-  { day: 'Sun', in: 66, out: 24 },
-  { day: 'Mon', in: 34, out: 44 },
-  { day: 'Tue', in: 52, out: 18 },
-  { day: 'Wed', in: 26, out: 60 },
-  { day: 'Thu', in: 78, out: 36 },
-]
+  { day: "Fri", in: 42, out: 30 },
+  { day: "Sat", in: 20, out: 52 },
+  { day: "Sun", in: 66, out: 24 },
+  { day: "Mon", in: 34, out: 44 },
+  { day: "Tue", in: 52, out: 18 },
+  { day: "Wed", in: 26, out: 60 },
+  { day: "Thu", in: 78, out: 36 },
+];
 
 function WeeklyChart() {
   return (
@@ -142,14 +138,14 @@ function WeeklyChart() {
               className="block w-2.25 rounded-t-sm rounded-b-xs min-h-1"
               style={{
                 height: `${d.in}%`,
-                background: 'linear-gradient(180deg,#18A577,#0E7C5A)',
+                background: "linear-gradient(180deg,#18A577,#0E7C5A)",
               }}
             />
             <span
               className="block w-2.25 rounded-t-sm rounded-b-xs min-h-1"
               style={{
                 height: `${d.out}%`,
-                background: 'linear-gradient(180deg,#E2705F,#C8402F)',
+                background: "linear-gradient(180deg,#E2705F,#C8402F)",
                 opacity: 0.85,
               }}
             />
@@ -168,36 +164,35 @@ function WeeklyChart() {
         ))}
       </div>
 
-      <div className="flex gap-3.5 mt-3 pt-3 border-t border-(--line-2)
-                      text-[11px] text-(--muted) font-semibold">
+      <div
+        className="flex gap-3.5 mt-3 pt-3 border-t border-(--line-2)
+                      text-[11px] text-(--muted) font-semibold"
+      >
         <span className="flex items-center gap-1.5">
           <i
             className="w-2 h-2 rounded-[3px] inline-block"
-            style={{ background: 'var(--in)' }}
+            style={{ background: "var(--in)" }}
           />
           Income ৳58,000
         </span>
         <span className="flex items-center gap-1.5">
           <i
             className="w-2 h-2 rounded-[3px] inline-block"
-            style={{ background: 'var(--out)' }}
+            style={{ background: "var(--out)" }}
           />
           Expense ৳21,340
         </span>
       </div>
     </div>
-  )
+  );
 }
 
-/* ----------------------------------------------------------------
-   Category breakdown
-   ---------------------------------------------------------------- */
 const CATEGORIES = [
-  { name: 'Groceries', amount: '৳8,450', width: 76, color: '#0E7C5A' },
-  { name: 'Rent', amount: '৳6,000', width: 54, color: '#2E9C7A' },
-  { name: 'Transport', amount: '৳3,290', width: 29, color: '#61B79B' },
-  { name: 'Utilities', amount: '৳2,400', width: 21, color: '#9CD2C1' },
-]
+  { name: "Groceries", amount: "৳8,450", width: 76, color: "#0E7C5A" },
+  { name: "Rent", amount: "৳6,000", width: 54, color: "#2E9C7A" },
+  { name: "Transport", amount: "৳3,290", width: 29, color: "#61B79B" },
+  { name: "Utilities", amount: "৳2,400", width: 21, color: "#9CD2C1" },
+];
 
 function CategoryBreakdown() {
   return (
@@ -233,19 +228,16 @@ function CategoryBreakdown() {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
-/* ----------------------------------------------------------------
-   Recent activity
-   ---------------------------------------------------------------- */
 const RECENT = [
   {
     id: 1,
-    title: 'Groceries',
-    meta: 'Cash · Today, 9:12 AM',
-    amount: '−৳850.00',
-    tone: 'out',
+    title: "Groceries",
+    meta: "Cash · Today, 9:12 AM",
+    amount: "−৳850.00",
+    tone: "out",
     icon: (
       <>
         <path d="M6 7h12l-1 13H7z" />
@@ -255,32 +247,21 @@ const RECENT = [
   },
   {
     id: 2,
-    title: 'Salary — October',
-    meta: 'City Bank · Today, 8:00 AM',
-    amount: '+৳45,000.00',
-    tone: 'in',
+    title: "Salary — October",
+    meta: "City Bank · Today, 8:00 AM",
+    amount: "+৳45,000.00",
+    tone: "in",
     icon: <path d="M12 4v16M8 8h6a3 3 0 0 1 0 6H8" />,
   },
   {
     id: 3,
-    title: 'Transfer to bKash',
-    meta: 'City Bank → bKash · Yesterday',
-    amount: '৳5,000.00',
-    tone: 'tr',
+    title: "Transfer to bKash",
+    meta: "City Bank → bKash · Yesterday",
+    amount: "৳5,000.00",
+    tone: "tr",
     icon: <path d="M4 8h13l-3-3M20 16H7l3 3" />,
   },
-]
-
-const ICO_BG = {
-  in: 'bg-[var(--brand-soft)] text-[var(--in)]',
-  out: 'bg-[var(--danger-soft)] text-[var(--out)]',
-  tr: 'bg-[var(--tr-soft)] text-[var(--tr)]',
-}
-const AMT_COLOR = {
-  in: 'text-[var(--in)]',
-  out: 'text-[var(--out)]',
-  tr: 'text-[var(--tr)]',
-}
+];
 
 function RecentActivity() {
   return (
@@ -297,53 +278,26 @@ function RecentActivity() {
 
       <div>
         {RECENT.map((r, idx) => (
-          <div
+          <TransactionRow
             key={r.id}
-            className={
-              'flex items-center gap-3 py-2.75 cursor-pointer ' +
-              (idx < RECENT.length - 1 ? 'border-b border-(--line-2)' : '')
-            }
-          >
-            <div
-              className={`w-9.5 h-9.5 rounded-xl flex-none grid place-items-center ${ICO_BG[r.tone]}`}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                className="w-4.25 h-4.25 stroke-current fill-none stroke-[1.9]
-                           [stroke-linecap:round] [stroke-linejoin:round]"
-              >
-                {r.icon}
-              </svg>
-            </div>
-            <div className="flex-1 min-w-0">
-              <b className="block text-[13.5px] font-semibold tracking-[-0.1px] truncate">
-                {r.title}
-              </b>
-              <small className="block text-[11.5px] text-(--muted) mt-0.5 truncate">
-                {r.meta}
-              </small>
-            </div>
-            <div
-              className={`text-[13.5px] font-bold num whitespace-nowrap tracking-[-0.2px] ${AMT_COLOR[r.tone]}`}
-            >
-              {r.amount}
-            </div>
-          </div>
+            title={r.title}
+            meta={r.meta}
+            amount={r.amount}
+            tone={r.tone}
+            icon={r.icon}
+            last={idx === RECENT.length - 1}
+          />
         ))}
       </div>
     </div>
-  )
+  );
 }
 
-/* ----------------------------------------------------------------
-   Page
-   ---------------------------------------------------------------- */
 export default function Dashboard() {
   return (
     <PhoneFrame>
       <StatusBar />
       <ScrollArea>
-        {/* Custom header: subtitle above title, lock button on the right */}
         <div className="flex items-center justify-between gap-3 py-1.5 pb-3.5">
           <div>
             <div className="text-[12.5px] text-(--muted)">
@@ -372,5 +326,5 @@ export default function Dashboard() {
       </ScrollArea>
       <BottomNav active="home" />
     </PhoneFrame>
-  )
+  );
 }

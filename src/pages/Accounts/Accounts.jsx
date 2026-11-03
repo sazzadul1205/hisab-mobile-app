@@ -1,8 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { IconButton } from "../../components/IconButton";
 import { BottomNav } from "../../components/BottomNav";
 import { SectionLabel } from "../../components/SectionLabel";
-import { useNavigate } from "react-router-dom";
+import { Note } from "../../components/Note";
 
 function AccountCard({
   initial,
@@ -11,9 +12,11 @@ function AccountCard({
   subtitle,
   balance,
   faded = false,
+  onClick,
 }) {
   return (
     <div
+      onClick={onClick}
       className={
         "flex items-center gap-3.25 bg-white border border-(--line) " +
         "rounded-[18px] px-3.75 py-3.5 mb-2.5 cursor-pointer " +
@@ -43,6 +46,7 @@ function AccountCard({
 
 export default function Accounts() {
   const navigate = useNavigate();
+  const goToDetail = () => navigate("/accounts/citybank");
 
   return (
     <PhoneFrame>
@@ -86,6 +90,7 @@ export default function Accounts() {
           name="Cash"
           subtitle="Cash · opened ৳5,000.00"
           balance="৳8,250.00"
+          onClick={goToDetail}
         />
         <AccountCard
           initial="b"
@@ -93,6 +98,7 @@ export default function Accounts() {
           name="bKash"
           subtitle="Mobile wallet · opened ৳1,200.00"
           balance="৳24,650.00"
+          onClick={goToDetail}
         />
 
         <SectionLabel>Bank</SectionLabel>
@@ -102,6 +108,7 @@ export default function Accounts() {
           name="City Bank — Savings"
           subtitle="Bank · opened ৳40,000.00"
           balance="৳91,600.00"
+          onClick={goToDetail}
         />
 
         <SectionLabel>Archived</SectionLabel>
@@ -112,16 +119,13 @@ export default function Accounts() {
           subtitle="Mobile wallet · archived"
           balance="৳0.00"
           faded
+          onClick={goToDetail}
         />
 
-        <div
-          className="text-[11.5px] leading-[1.6] text-(--muted)
-                     bg-(--app) border border-dashed border-(--line)
-                     rounded-[14px] px-3.25 py-2.75 mt-3"
-        >
+        <Note>
           Balances are always recalculated from the opening balance and saved
           transactions — never stored as a fixed number.
-        </div>
+        </Note>
       </ScrollArea>
       <BottomNav active="accounts" />
     </PhoneFrame>

@@ -1,12 +1,18 @@
 export function Button({
   variant = "primary",
+  size = "md",
   className = "",
   children,
   ...props
 }) {
   const base =
-    "flex items-center justify-center gap-2 w-full p-[15px] rounded-[14px] " +
-    "font-bold text-[14.5px] tracking-[-0.1px] border-0 cursor-pointer font-[inherit]";
+    "flex items-center justify-center gap-2 w-full font-bold " +
+    "tracking-[-0.1px] border-0 cursor-pointer font-[inherit]";
+
+  const sizes = {
+    md: "p-[15px] text-[14.5px] rounded-[14px]",
+    sm: "p-3 text-[13px] rounded-[12px]",
+  };
 
   const variants = {
     primary:
@@ -19,7 +25,10 @@ export function Button({
   };
 
   return (
-    <button className={`${base} ${variants[variant]} ${className}`} {...props}>
+    <button
+      className={`${base} ${sizes[size]} ${variants[variant]} ${className}`}
+      {...props}
+    >
       {children}
     </button>
   );

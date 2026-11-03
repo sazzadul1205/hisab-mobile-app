@@ -5,6 +5,7 @@ import Security from "./pages/Security/Security";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Accounts from "./pages/Accounts/Accounts";
 import AddAccount from "./pages/AddAccount/AddAccount";
+import AccountDetail from "./pages/AccountDetail/AccountDetail";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/accounts/new" element={<AddAccount />} />
+        <Route path="/accounts/:id" element={<AccountDetail />} />
       </Routes>
     </BrowserRouter>
   );
