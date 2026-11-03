@@ -18,7 +18,7 @@ function Bullet({ icon, title, subtitle }) {
     <div className="flex gap-[11px] items-start">
       <div
         className="w-[30px] h-[30px] rounded-[9px] flex-none grid place-items-center
-                      bg-white border border-[var(--line)] text-[var(--brand)]"
+                   bg-white border border-[var(--line)] text-[var(--brand)]"
       >
         <svg
           viewBox="0 0 24 24"
@@ -66,7 +66,7 @@ export default function WelcomePin() {
           </p>
         </div>
 
-        {/* PIN dots — mock state: 4 filled, awaiting re-enter to confirm */}
+        {/* PIN dots — static mock: 4 filled, awaiting re-enter to confirm */}
         <div className="flex gap-[15px] justify-center mt-[26px]">
           <PinDot filled />
           <PinDot filled />
@@ -108,9 +108,10 @@ export default function WelcomePin() {
         </div>
       </ScrollArea>
 
-      {/* Footer */}
+      {/* Footer — respects iOS home indicator on real devices */}
       <div
-        className="flex-none px-[18px] pt-3 pb-5"
+        className="flex-none px-[18px] pt-3
+                   pb-[calc(20px+env(safe-area-inset-bottom))] md:pb-5"
         style={{
           background:
             "linear-gradient(180deg, rgba(247,249,248,0) 0%, var(--app) 34%)",
