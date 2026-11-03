@@ -33,9 +33,9 @@ const NAV_ITEMS = [
     ),
   },
   {
-    // Route doesn't exist yet — kept inert until /reports is built
     id: "reports",
     label: "Reports",
+    to: "/reports",
     icon: <path d="M5 19V11M11 19V5M17 19v-9" />,
   },
   {

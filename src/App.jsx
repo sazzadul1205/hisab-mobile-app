@@ -11,6 +11,8 @@ import AddIncome from "./pages/AddIncome/AddIncome";
 import AddExpense from "./pages/AddExpense/AddExpense";
 import AddTransfer from "./pages/AddTransfer/AddTransfer";
 import TransactionDetail from "./pages/TransactionDetail/TransactionDetail";
+import Categories from "./pages/Categories/Categories";
+import Reports from "./pages/Reports/Reports";
 
 export default function App() {
   return (
@@ -29,6 +31,8 @@ export default function App() {
         <Route path="/income/new" element={<AddIncome />} />
         <Route path="/expense/new" element={<AddExpense />} />
         <Route path="/transfer/new" element={<AddTransfer />} />
+        <Route path="/categories" element={<Categories />} />
+        <Route path="/reports" element={<Reports />} />
       </Routes>
     </BrowserRouter>
   );
