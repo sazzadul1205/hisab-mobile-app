@@ -82,6 +82,7 @@ const EXPENSE_CATEGORIES = [
 
 export default function AddExpense() {
   const navigate = useNavigate();
+  const close = () => navigate("/dashboard");
 
   return (
     <PhoneFrame>
@@ -95,7 +96,7 @@ export default function AddExpense() {
             <IconButton
               label="Close"
               icon={<path d="M6 6l12 12M18 6L6 18" />}
-              onClick={() => navigate(-1)}
+              onClick={close}
             />
           }
         />
@@ -123,19 +124,14 @@ export default function AddExpense() {
           <TextInput placeholder="Weekly groceries — Karwan Bazar" />
         </Field>
 
-        <div
-          className="text-[11.5px] leading-[1.6] text-(--muted)
-                     bg-(--app) border border-dashed border-(--line)
-                     rounded-[14px] px-3.25 py-2.75"
-        >
+        <div className="text-[11.5px] leading-[1.6] text-(--muted) bg-(--app) border border-dashed border-(--line) rounded-[14px] px-3.25 py-2.75">
           Validation: amount must be positive and must not exceed the source
           account balance. Errors appear directly beneath the field.
         </div>
       </ScrollArea>
 
       <div
-        className="flex-none px-4.5 pt-3
-                   pb-[calc(20px+env(safe-area-inset-bottom))] md:pb-5"
+        className="flex-none px-4.5 pt-3 pb-[calc(20px+env(safe-area-inset-bottom))] md:pb-5"
         style={{
           background:
             "linear-gradient(180deg, rgba(247,249,248,0) 0%, var(--app) 34%)",
@@ -145,7 +141,7 @@ export default function AddExpense() {
           <Button
             variant="secondary"
             className="flex-[0_0_34%]"
-            onClick={() => navigate(-1)}
+            onClick={close}
           >
             Cancel
           </Button>

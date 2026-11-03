@@ -48,6 +48,7 @@ const INCOME_CATEGORIES = [
 
 export default function AddIncome() {
   const navigate = useNavigate();
+  const close = () => navigate("/dashboard");
 
   return (
     <PhoneFrame>
@@ -61,7 +62,7 @@ export default function AddIncome() {
             <IconButton
               label="Close"
               icon={<path d="M6 6l12 12M18 6L6 18" />}
-              onClick={() => navigate(-1)}
+              onClick={close}
             />
           }
         />
@@ -92,8 +93,7 @@ export default function AddIncome() {
       </ScrollArea>
 
       <div
-        className="flex-none px-4.5 pt-3
-                   pb-[calc(20px+env(safe-area-inset-bottom))] md:pb-5"
+        className="flex-none px-4.5 pt-3 pb-[calc(20px+env(safe-area-inset-bottom))] md:pb-5"
         style={{
           background:
             "linear-gradient(180deg, rgba(247,249,248,0) 0%, var(--app) 34%)",
@@ -103,7 +103,7 @@ export default function AddIncome() {
           <Button
             variant="secondary"
             className="flex-[0_0_34%]"
-            onClick={() => navigate(-1)}
+            onClick={close}
           >
             Cancel
           </Button>

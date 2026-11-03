@@ -18,6 +18,7 @@ import ReviewImport from "./pages/ReviewImport/ReviewImport";
 import Reconcile from "./pages/Reconcile/Reconcile";
 import Backup from "./pages/Backup/Backup";
 import Settings from "./pages/Settings/Settings";
+import DeleteAll from "./pages/DeleteAll/DeleteAll";
 
 export default function App() {
   return (
@@ -43,6 +44,7 @@ export default function App() {
         <Route path="/import/review" element={<ReviewImport />} />
         <Route path="/backup" element={<Backup />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/delete-all" element={<DeleteAll />} />
       </Routes>
     </BrowserRouter>
   );

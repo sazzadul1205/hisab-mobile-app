@@ -21,13 +21,14 @@ export function Field({ label, hint, children }) {
 }
 
 /* ----------------------------------------------------------------
-   TextInput — type defaults to "text"; pass "password" for backups/PIN
+   TextInput — type defaults to "text"; className extends the base
    ---------------------------------------------------------------- */
 export function TextInput({
   defaultValue,
   placeholder,
   inputMode,
   type = "text",
+  className = "",
 }) {
   return (
     <input
@@ -35,10 +36,13 @@ export function TextInput({
       inputMode={inputMode}
       defaultValue={defaultValue}
       placeholder={placeholder}
-      className="w-full bg-white border border-(--line) rounded-[14px]
-                 px-3.5 py-3.25 text-[14px] text-(--ink)
-                 placeholder:text-(--muted) outline-none font-[inherit]
-                 focus:border-(--brand)"
+      className={
+        "w-full bg-white border border-(--line) rounded-[14px] " +
+        "px-3.5 py-3.25 text-[14px] text-(--ink) " +
+        "placeholder:text-(--muted) outline-none font-[inherit] " +
+        "focus:border-(--brand) " +
+        className
+      }
     />
   );
 }
@@ -78,7 +82,9 @@ export function MoneyInput({ defaultValue, size = "md" }) {
         (isSmall ? "px-3.5 py-3" : "px-3.5 py-3.75")
       }
     >
-      <span className="text-[14px] font-medium text-(--muted) mr-1">৳</span>
+      <span className="text-[14px] font-medium text-(--muted) mr-1">
+        ৳
+      </span>
       <input
         type="text"
         inputMode="decimal"

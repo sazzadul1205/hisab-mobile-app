@@ -117,7 +117,8 @@ export default function Settings() {
         <SectionLabel>Danger zone</SectionLabel>
         <div
           className="bg-white border border-(--line) rounded-[18px]
-                        overflow-hidden mb-4"
+             overflow-hidden mb-4"
+          onClick={() => navigate("/delete-all")}
         >
           <ListItem
             danger
