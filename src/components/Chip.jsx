@@ -1,15 +1,18 @@
-export function Chip({ children, on = false, ghost = false }) {
+export function Chip({ children, on = false, ghost = false, onClick }) {
   const base =
     "flex-none text-[12px] font-semibold px-[13px] py-[7px] rounded-full " +
     "cursor-pointer whitespace-nowrap font-[inherit] transition-colors ";
 
-  let skin = "bg-white border border-[var(--line)] text-[var(--ink-2)]";
-  if (on) skin = "bg-[var(--brand)] border border-[var(--brand)] text-white";
+  let skin = "bg-white border border-(--line) text-(--ink-2)";
+  if (on) skin = "bg-(--brand) border border-(--brand) text-white";
   else if (ghost)
-    skin =
-      "bg-transparent border border-dashed border-[var(--line)] text-[var(--muted)]";
+    skin = "bg-transparent border border-dashed border-(--line) text-(--muted)";
 
-  return <button className={`${base} ${skin}`}>{children}</button>;
+  return (
+    <button type="button" onClick={onClick} className={`${base} ${skin}`}>
+      {children}
+    </button>
+  );
 }
 
 export function ChipStrip({ children, className = "" }) {

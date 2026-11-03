@@ -5,9 +5,11 @@ export function ListItem({
   badge,
   trailing,
   danger = false,
+  onClick,
 }) {
   return (
     <div
+      onClick={onClick}
       className="flex items-center gap-3 px-3.75 py-3.5
                  border-b border-(--line-2) last:border-b-0 cursor-pointer"
     >
@@ -22,8 +24,7 @@ export function ListItem({
         >
           <svg
             viewBox="0 0 24 24"
-            className="w-4 h-4 stroke-current fill-none stroke-[1.9]
-                       [stroke-linecap:round] [stroke-linejoin:round]"
+            className="w-4 h-4 stroke-current fill-none stroke-[1.9] [stroke-linecap:round] [stroke-linejoin:round]"
           >
             {icon}
           </svg>

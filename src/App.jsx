@@ -21,6 +21,7 @@ import Settings from "./pages/Settings/Settings";
 import DeleteAll from "./pages/DeleteAll/DeleteAll";
 import ArchiveAccount from "./pages/ArchiveAccount/ArchiveAccount";
 import EditTransaction from "./pages/EditTransaction/EditTransaction";
+import AddCategory from "./pages/AddCategory/AddCategory";
 
 export default function App() {
   return (
@@ -44,6 +45,11 @@ export default function App() {
         <Route path="/expense/new" element={<AddExpense />} />
         <Route path="/transfer/new" element={<AddTransfer />} />
         <Route path="/categories" element={<Categories />} />
+        <Route path="/categories/new" element={<AddCategory />} />
+        <Route
+          path="/categories/:id/edit"
+          element={<AddCategory mode="edit" />}
+        />
         <Route path="/reports" element={<Reports />} />
         <Route path="/import" element={<ImportStatement />} />
         <Route path="/import/review" element={<ReviewImport />} />

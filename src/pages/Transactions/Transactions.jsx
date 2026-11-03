@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { IconButton } from "../../components/IconButton";
@@ -105,9 +106,30 @@ const GROUPS = [
   },
 ];
 
+// Maps a row's `tone` to a filter chip's value
+const TONE_TO_TYPE = { in: "income", out: "expense", tr: "transfer" };
+
+const FILTERS = [
+  { value: "all", label: "All" },
+  { value: "income", label: "Income" },
+  { value: "expense", label: "Expense" },
+  { value: "transfer", label: "Transfer" },
+];
+
 export default function Transactions() {
   const navigate = useNavigate();
   const openDetail = (id) => navigate(`/transactions/${id}`);
+  const [activeType, setActiveType] = useState("all");
+
+  // Filter groups by type. Groups with no surviving rows are dropped
+  // so their section label doesn't linger with nothing underneath.
+  const filteredGroups = GROUPS.map((g) => ({
+    ...g,
+    rows:
+      activeType === "all"
+        ? g.rows
+        : g.rows.filter((r) => TONE_TO_TYPE[r.tone] === activeType),
+  })).filter((g) => g.rows.length > 0);
 
   return (
     <PhoneFrame>
@@ -131,14 +153,19 @@ export default function Transactions() {
         <SearchBar placeholder="Search notes and descriptions" />
 
         <ChipStrip>
-          <Chip on>All</Chip>
-          <Chip>Income</Chip>
-          <Chip>Expense</Chip>
-          <Chip>Transfer</Chip>
+          {FILTERS.map((f) => (
+            <Chip
+              key={f.value}
+              on={activeType === f.value}
+              onClick={() => setActiveType(f.value)}
+            >
+              {f.label}
+            </Chip>
+          ))}
           <Chip ghost>Filters</Chip>
         </ChipStrip>
 
-        {GROUPS.map((g, gi) => (
+        {filteredGroups.map((g, gi) => (
           <div key={g.label} className={gi === 0 ? "mt-3" : "mt-1"}>
             <SectionLabel>{g.label}</SectionLabel>
             <div className="bg-white border border-(--line) rounded-[18px] py-1 px-3.5">
