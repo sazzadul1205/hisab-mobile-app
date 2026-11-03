@@ -1,1 +1,34 @@
 @import "tailwindcss";
+
+:root {
+  /* surfaces */
+  --bg: #EEF2F0;
+  --app: #F7F9F8;
+  --card: #FFFFFF;
+  --line: #E4EAE7;
+  --line-2: #EFF3F1;
+  /* ink */
+  --ink: #0E1A16;
+  --ink-2: #41544C;
+  --muted: #7C8B85;
+  /* brand */
+  --brand: #0E7C5A;
+  --brand-dk: #0A5A41;
+  --brand-soft: #E6F4EE;
+  /* semantics */
+  --in: #0E8A5F;      --in-soft: #E6F5EE;
+  --out: #C8402F;     --out-soft: #FDECEA;
+  --tr: #3355C4;      --tr-soft: #EAF0FF;
+  --warn: #9A6200;    --warn-soft: #FFF4E2;
+  --danger: #C0392B;  --danger-soft: #FDECEA;
+}
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
