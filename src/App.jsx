@@ -19,6 +19,7 @@ import Reconcile from "./pages/Reconcile/Reconcile";
 import Backup from "./pages/Backup/Backup";
 import Settings from "./pages/Settings/Settings";
 import DeleteAll from "./pages/DeleteAll/DeleteAll";
+import ArchiveAccount from "./pages/ArchiveAccount/ArchiveAccount";
 
 export default function App() {
   return (
@@ -32,7 +33,9 @@ export default function App() {
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/accounts/new" element={<AddAccount />} />
         <Route path="/accounts/:id" element={<AccountDetail />} />
+        <Route path="/accounts/:id/edit" element={<AddAccount mode="edit" />} />
         <Route path="/accounts/:id/reconcile" element={<Reconcile />} />
+        <Route path="/accounts/:id/archive" element={<ArchiveAccount />} />
         <Route path="/transactions" element={<Transactions />} />
         <Route path="/transactions/:id" element={<TransactionDetail />} />
         <Route path="/income/new" element={<AddIncome />} />

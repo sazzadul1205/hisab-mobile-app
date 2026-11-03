@@ -29,6 +29,7 @@ export default function AccountDetail() {
                   <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
                 </>
               }
+              onClick={() => navigate(`/accounts/${id}/edit`)}
             />
           }
         />
@@ -56,7 +57,11 @@ export default function AccountDetail() {
           >
             Reconcile
           </Button>
-          <Button variant="secondary" size="sm">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => navigate(`/accounts/${id}/archive`)}
+          >
             Archive
           </Button>
         </div>

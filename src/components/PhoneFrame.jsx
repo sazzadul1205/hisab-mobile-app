@@ -4,12 +4,12 @@
 
 export function PhoneFrame({ children }) {
   return (
-    <div className="min-h-dvh bg-[var(--bg)] md:flex md:justify-center md:items-start md:p-6">
+    <div className="min-h-dvh bg-(--bg) md:flex md:justify-center md:items-start md:p-6">
       <div
         className="
-          w-full h-dvh bg-[var(--app)] flex flex-col overflow-hidden
+          w-full h-dvh bg-(--app) flex flex-col overflow-hidden
           pt-[env(safe-area-inset-top)]
-          md:w-[410px] md:h-[864px] md:pt-0 md:border-[10px] md:border-[#101B17]
+          md:w-102.5 md:h-216 md:pt-0 md:border-10 md:border-[#101B17]
           md:rounded-[48px] md:relative
           md:shadow-[0_32px_64px_-28px_rgba(14,26,22,0.42)]
         "
@@ -25,14 +25,14 @@ export function PhoneFrame({ children }) {
 export function StatusBar() {
   return (
     <div
-      className="hidden md:flex items-center justify-between px-[26px] pt-[14px] pb-[6px]
+      className="hidden md:flex items-center justify-between px-6.5 pt-3.5 pb-1.5
                  text-[12.5px] font-semibold flex-none"
     >
       <span>9:41</span>
-      <div className="flex items-center gap-[5px]">
-        <i className="block w-[15px] h-[9px] bg-[var(--ink)] rounded-sm" />
-        <i className="block w-[11px] h-[11px] bg-[var(--ink)] rounded-full" />
-        <i className="block w-[20px] h-[10px] bg-[var(--ink)] rounded-sm" />
+      <div className="flex items-center gap-1.25">
+        <i className="block w-3.75 h-2.25 bg-(--ink) rounded-sm" />
+        <i className="block w-2.75 h-2.75 bg-(--ink) rounded-full" />
+        <i className="block w-5 h-2.5 bg-(--ink) rounded-sm" />
       </div>
     </div>
   );
@@ -41,8 +41,8 @@ export function StatusBar() {
 export function ScrollArea({ children }) {
   return (
     <div
-      className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-[18px] pb-5
-                 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-4.5 pb-5
+                 scrollbar-none [&::-webkit-scrollbar]:hidden"
     >
       {children}
     </div>
