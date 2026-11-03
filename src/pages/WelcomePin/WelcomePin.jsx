@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 
 function PinDot({ filled }) {
@@ -117,14 +118,15 @@ export default function WelcomePin() {
             "linear-gradient(180deg, rgba(247,249,248,0) 0%, var(--app) 34%)",
         }}
       >
-        <button
+        <Link
+          to="/unlock"
           className="flex items-center justify-center w-full p-[15px] rounded-[14px]
                      font-bold text-[14.5px] tracking-[-0.1px] border-0 cursor-pointer
-                     bg-[var(--brand)] text-white
+                     bg-[var(--brand)] text-white no-underline
                      shadow-[0_10px_20px_-12px_rgba(14,124,90,0.9)]"
         >
           Continue
-        </button>
+        </Link>
         <div className="text-center mt-3">
           <span className="text-[11.5px] text-[var(--muted)]">
             PIN does not encrypt data on its own
