@@ -3,6 +3,10 @@ import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { IconButton } from "../../components/IconButton";
 import { BottomNav } from "../../components/BottomNav";
 import { TransactionRow } from "../../components/TransactionRow";
+import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
+import { IconButton } from "../../components/IconButton";
+import { BottomNav } from "../../components/BottomNav";
+import { TransactionRow } from "../../components/TransactionRow";
 
 function BalanceCard() {
   return (
@@ -10,6 +14,8 @@ function BalanceCard() {
       className="rounded-3xl p-5 text-white"
       style={{
         background:
+          "radial-gradient(120% 120% at 100% 0%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 55%), linear-gradient(150deg, #118A64 0%, #0A5A41 100%)",
+        boxShadow: "0 18px 34px -18px rgba(10,90,65,0.75)",
           "radial-gradient(120% 120% at 100% 0%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 55%), linear-gradient(150deg, #118A64 0%, #0A5A41 100%)",
         boxShadow: "0 18px 34px -18px rgba(10,90,65,0.75)",
       }}
@@ -27,12 +33,14 @@ function BalanceCard() {
       <div
         className="grid grid-cols-3 gap-2 mt-4.5 pt-4"
         style={{ borderTop: "1px solid rgba(255,255,255,0.16)" }}
+        style={{ borderTop: "1px solid rgba(255,255,255,0.16)" }}
       >
         <Stat label="Income today" value="৳2,000" />
         <Stat label="Expenses today" value="৳1,970" />
         <Stat label="Net flow" value="+৳30" />
       </div>
     </div>
+  );
   );
 }
 
@@ -45,9 +53,28 @@ function Stat({ label, value }) {
       </b>
     </div>
   );
+  );
 }
 
 const ACTIONS = [
+  {
+    label: "Income",
+    tone: "in",
+    to: "/income/new",
+    icon: <path d="M12 5v14M5 12h14" />,
+  },
+  {
+    label: "Expense",
+    tone: "out",
+    to: "/expense/new",
+    icon: <path d="M5 12h14" />,
+  },
+  {
+    label: "Transfer",
+    tone: "tr",
+    to: "/transfer/new",
+    icon: <path d="M4 8h13l-3-3M20 16H7l3 3" />,
+  },
   {
     label: "Income",
     tone: "in",
@@ -78,6 +105,7 @@ const ACTIONS = [
     ),
   },
 ];
+];
 
 const TONE_STYLES = {
   in: "bg-[var(--brand-soft)] text-[var(--in)]",
@@ -85,8 +113,14 @@ const TONE_STYLES = {
   tr: "bg-[var(--tr-soft)] text-[var(--tr)]",
   im: "bg-[var(--warn-soft)] text-[var(--warn)]",
 };
+  in: "bg-[var(--brand-soft)] text-[var(--in)]",
+  out: "bg-[var(--danger-soft)] text-[var(--out)]",
+  tr: "bg-[var(--tr-soft)] text-[var(--tr)]",
+  im: "bg-[var(--warn-soft)] text-[var(--warn)]",
+};
 
 function QuickActions() {
+  const navigate = useNavigate();
   const navigate = useNavigate();
   return (
     <div className="grid grid-cols-4 gap-2 mt-3">
@@ -115,9 +149,18 @@ function QuickActions() {
       ))}
     </div>
   );
+  );
 }
 
 const WEEK_DATA = [
+  { day: "Fri", in: 42, out: 30 },
+  { day: "Sat", in: 20, out: 52 },
+  { day: "Sun", in: 66, out: 24 },
+  { day: "Mon", in: 34, out: 44 },
+  { day: "Tue", in: 52, out: 18 },
+  { day: "Wed", in: 26, out: 60 },
+  { day: "Thu", in: 78, out: 36 },
+];
   { day: "Fri", in: 42, out: 30 },
   { day: "Sat", in: 20, out: 52 },
   { day: "Sun", in: 66, out: 24 },
@@ -138,12 +181,24 @@ function WeeklyChart() {
           to="/reports"
           className="text-[12px] font-semibold text-(--brand) no-underline"
         >
+        <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">
+          This week
+        </h3>
+        <Link
+          to="/reports"
+          className="text-[12px] font-semibold text-(--brand) no-underline"
+        >
           Reports
+        </Link>
         </Link>
       </div>
 
       <div className="flex items-end gap-2.5 h-26 pt-1.5">
         {WEEK_DATA.map((d) => (
+          <div
+            key={d.day}
+            className="flex-1 flex items-end justify-center gap-0.75 h-full"
+          >
           <div
             key={d.day}
             className="flex-1 flex items-end justify-center gap-0.75 h-full"
@@ -154,9 +209,18 @@ function WeeklyChart() {
                 height: `${d.in}%`,
                 background: "linear-gradient(180deg,#18A577,#0E7C5A)",
               }}
+              style={{
+                height: `${d.in}%`,
+                background: "linear-gradient(180deg,#18A577,#0E7C5A)",
+              }}
             />
             <span
               className="block w-2.25 rounded-t-sm rounded-b-xs min-h-1"
+              style={{
+                height: `${d.out}%`,
+                background: "linear-gradient(180deg,#E2705F,#C8402F)",
+                opacity: 0.85,
+              }}
               style={{
                 height: `${d.out}%`,
                 background: "linear-gradient(180deg,#E2705F,#C8402F)",
@@ -173,6 +237,10 @@ function WeeklyChart() {
             key={d.day}
             className="flex-1 text-center text-[10px] text-(--muted) font-semibold"
           >
+          <div
+            key={d.day}
+            className="flex-1 text-center text-[10px] text-(--muted) font-semibold"
+          >
             {d.day}
           </div>
         ))}
@@ -182,7 +250,15 @@ function WeeklyChart() {
         className="flex gap-3.5 mt-3 pt-3 border-t border-(--line-2)
                       text-[11px] text-(--muted) font-semibold"
       >
+      <div
+        className="flex gap-3.5 mt-3 pt-3 border-t border-(--line-2)
+                      text-[11px] text-(--muted) font-semibold"
+      >
         <span className="flex items-center gap-1.5">
+          <i
+            className="w-2 h-2 rounded-[3px] inline-block"
+            style={{ background: "var(--in)" }}
+          />
           <i
             className="w-2 h-2 rounded-[3px] inline-block"
             style={{ background: "var(--in)" }}
@@ -194,14 +270,24 @@ function WeeklyChart() {
             className="w-2 h-2 rounded-[3px] inline-block"
             style={{ background: "var(--out)" }}
           />
+          <i
+            className="w-2 h-2 rounded-[3px] inline-block"
+            style={{ background: "var(--out)" }}
+          />
           Expense ৳21,340
         </span>
       </div>
     </div>
   );
+  );
 }
 
 const CATEGORIES = [
+  { name: "Groceries", amount: "৳8,450", width: 76, color: "#0E7C5A" },
+  { name: "Rent", amount: "৳6,000", width: 54, color: "#2E9C7A" },
+  { name: "Transport", amount: "৳3,290", width: 29, color: "#61B79B" },
+  { name: "Utilities", amount: "৳2,400", width: 21, color: "#9CD2C1" },
+];
   { name: "Groceries", amount: "৳8,450", width: 76, color: "#0E7C5A" },
   { name: "Rent", amount: "৳6,000", width: 54, color: "#2E9C7A" },
   { name: "Transport", amount: "৳3,290", width: 29, color: "#61B79B" },
@@ -212,6 +298,15 @@ function CategoryBreakdown() {
   return (
     <div className="bg-white border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
       <div className="flex items-center justify-between mb-3.5">
+        <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">
+          Expense breakdown
+        </h3>
+        <a
+          href="#"
+          className="text-[12px] font-semibold text-(--brand) no-underline"
+        >
+          All
+        </a>
         <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">
           Expense breakdown
         </h3>
@@ -234,17 +329,32 @@ function CategoryBreakdown() {
                 className="block h-full rounded-full"
                 style={{ width: `${c.width}%`, background: c.color }}
               />
+              <i
+                className="block h-full rounded-full"
+                style={{ width: `${c.width}%`, background: c.color }}
+              />
             </div>
           </div>
         ))}
       </div>
     </div>
   );
+  );
 }
 
 const RECENT = [
   {
     id: 1,
+    title: "Groceries",
+    meta: "Cash · Today, 9:12 AM",
+    amount: "−৳850.00",
+    tone: "out",
+    icon: (
+      <>
+        <path d="M6 7h12l-1 13H7z" />
+        <path d="M9 7V5a3 3 0 0 1 6 0v2" />
+      </>
+    ),
     title: "Groceries",
     meta: "Cash · Today, 9:12 AM",
     amount: "−৳850.00",
@@ -262,6 +372,10 @@ const RECENT = [
     meta: "City Bank · Today, 8:00 AM",
     amount: "+৳45,000.00",
     tone: "in",
+    title: "Salary — October",
+    meta: "City Bank · Today, 8:00 AM",
+    amount: "+৳45,000.00",
+    tone: "in",
     icon: <path d="M12 4v16M8 8h6a3 3 0 0 1 0 6H8" />,
   },
   {
@@ -270,16 +384,26 @@ const RECENT = [
     meta: "City Bank → bKash · Yesterday",
     amount: "৳5,000.00",
     tone: "tr",
+    title: "Transfer to bKash",
+    meta: "City Bank → bKash · Yesterday",
+    amount: "৳5,000.00",
+    tone: "tr",
     icon: <path d="M4 8h13l-3-3M20 16H7l3 3" />,
   },
 ];
+];
 
 function RecentActivity() {
+  const navigate = useNavigate();
   const navigate = useNavigate();
   return (
     <div className="bg-white border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
       <div className="flex items-center justify-between mb-3.5">
         <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">Recent</h3>
+        <Link
+          to="/transactions"
+          className="text-[12px] font-semibold text-(--brand) no-underline"
+        >
         <Link
           to="/transactions"
           className="text-[12px] font-semibold text-(--brand) no-underline"
@@ -303,6 +427,7 @@ function RecentActivity() {
       </div>
     </div>
   );
+  );
 }
 
 export default function Dashboard() {
@@ -315,12 +440,21 @@ export default function Dashboard() {
             <div className="text-[12.5px] text-(--muted)">
               Thursday, 29 October
             </div>
+            <div className="text-[12.5px] text-(--muted)">
+              Thursday, 29 October
+            </div>
             <h2 className="m-0 mt-0.5 text-[23px] font-bold tracking-[-0.5px] leading-tight">
               Good morning
             </h2>
           </div>
           <IconButton
             label="Lock app"
+            icon={
+              <>
+                <rect x="4" y="10.5" width="16" height="10.5" rx="3" />
+                <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+              </>
+            }
             icon={
               <>
                 <rect x="4" y="10.5" width="16" height="10.5" rx="3" />
@@ -338,4 +472,6 @@ export default function Dashboard() {
       <BottomNav active="home" />
     </PhoneFrame>
   );
+  );
 }
+
