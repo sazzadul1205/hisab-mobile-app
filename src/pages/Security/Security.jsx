@@ -4,14 +4,7 @@ import { ListItem } from "../../components/ListItem";
 import { Chevron } from "../../components/Chevron";
 import { Toggle } from "../../components/Toggle";
 import { Alert } from "../../components/Alert";
-
-function SectionLabel({ children }) {
-  return (
-    <div className="text-[11px] font-bold tracking-[0.09em] uppercase text-[var(--muted)] mb-2">
-      {children}
-    </div>
-  );
-}
+import { SectionLabel } from "../../components/SectionLabel";
 
 export default function Security() {
   return (
@@ -20,8 +13,8 @@ export default function Security() {
       <ScrollArea>
         <AppBar title="Security" />
 
-        <SectionLabel>Access protection</SectionLabel>
-        <div className="bg-white border border-[var(--line)] rounded-[18px] overflow-hidden mb-4">
+        <SectionLabel className="mt-0">Access protection</SectionLabel>
+        <div className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-4">
           <ListItem
             icon={
               <>
@@ -58,7 +51,7 @@ export default function Security() {
         </div>
 
         <SectionLabel>Actions</SectionLabel>
-        <div className="bg-white border border-[var(--line)] rounded-[18px] overflow-hidden mb-4">
+        <div className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-4">
           <ListItem
             icon={
               <>
