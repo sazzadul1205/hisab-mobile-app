@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { AppBar } from "../../components/AppBar";
 import { IconButton } from "../../components/IconButton";
@@ -19,9 +19,11 @@ const DEMO_AMOUNT = "5,000.00";
 const DEMO_AVAILABLE = "৳91,600.00";
 const DEMO_TOTAL_DEBIT = "৳5,025.00";
 
-export default function AddTransfer() {
+export default function AddTransfer({ mode = "new" }) {
   const navigate = useNavigate();
-  const close = () => navigate("/dashboard");
+  const { id } = useParams();
+  const isEdit = mode === "edit";
+  const close = () => navigate(isEdit ? `/transactions/${id}` : "/dashboard");
 
   const hasFee = parseFloat(DEMO_FEE) > 0;
   const amountHint = hasFee
@@ -33,7 +35,7 @@ export default function AddTransfer() {
       <StatusBar />
       <ScrollArea>
         <AppBar
-          title="New transfer"
+          title={isEdit ? "Edit transfer" : "New transfer"}
           subtitle="Between your accounts"
           showBack={false}
           right={
@@ -45,7 +47,7 @@ export default function AddTransfer() {
           }
         />
 
-        <TransactionTypeSegments active="transfer" />
+        {!isEdit && <TransactionTypeSegments active="transfer" />}
 
         <AmountDisplay value={DEMO_AMOUNT} hint={amountHint} />
 
@@ -80,8 +82,20 @@ export default function AddTransfer() {
         </Field>
 
         <Field label="Note" hint="optional">
-          <TextInput placeholder="Moving to bKash for online payments" />
+          <TextInput
+            placeholder="Moving to bKash for online payments"
+            defaultValue={
+              isEdit ? "Moving to bKash for online payments" : undefined
+            }
+          />
         </Field>
+
+        {isEdit && (
+          <div className="text-[11.5px] leading-[1.6] text-(--muted) bg-(--app) border border-dashed border-(--line) rounded-[14px] px-3.25 py-2.75">
+            Saving updates this record and adjusts both account balances. The
+            transaction type cannot be changed after creation.
+          </div>
+        )}
       </ScrollArea>
 
       <div
@@ -99,7 +113,7 @@ export default function AddTransfer() {
           >
             Cancel
           </Button>
-          <Button>Save transfer</Button>
+          <Button>{isEdit ? "Save changes" : "Save transfer"}</Button>
         </ButtonRow>
       </div>
     </PhoneFrame>

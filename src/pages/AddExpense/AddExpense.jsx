@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { AppBar } from "../../components/AppBar";
 import { IconButton } from "../../components/IconButton";
@@ -80,16 +80,18 @@ const EXPENSE_CATEGORIES = [
   },
 ];
 
-export default function AddExpense() {
+export default function AddExpense({ mode = "new" }) {
   const navigate = useNavigate();
-  const close = () => navigate("/dashboard");
+  const { id } = useParams();
+  const isEdit = mode === "edit";
+  const close = () => navigate(isEdit ? `/transactions/${id}` : "/dashboard");
 
   return (
     <PhoneFrame>
       <StatusBar />
       <ScrollArea>
         <AppBar
-          title="New expense"
+          title={isEdit ? "Edit expense" : "New expense"}
           subtitle="Saved only on confirm"
           showBack={false}
           right={
@@ -101,7 +103,7 @@ export default function AddExpense() {
           }
         />
 
-        <TransactionTypeSegments active="expense" />
+        {!isEdit && <TransactionTypeSegments active="expense" />}
 
         <AmountDisplay value="850.00" hint="Available in Cash: ৳8,250.00" />
 
@@ -121,12 +123,18 @@ export default function AddExpense() {
         </Field>
 
         <Field label="Note" hint="optional">
-          <TextInput placeholder="Weekly groceries — Karwan Bazar" />
+          <TextInput
+            placeholder="Weekly groceries — Karwan Bazar"
+            defaultValue={
+              isEdit ? "Weekly groceries — Karwan Bazar" : undefined
+            }
+          />
         </Field>
 
         <div className="text-[11.5px] leading-[1.6] text-(--muted) bg-(--app) border border-dashed border-(--line) rounded-[14px] px-3.25 py-2.75">
-          Validation: amount must be positive and must not exceed the source
-          account balance. Errors appear directly beneath the field.
+          {isEdit
+            ? "Saving updates this record and recalculates the source account balance. Errors appear directly beneath the field."
+            : "Validation: amount must be positive and must not exceed the source account balance. Errors appear directly beneath the field."}
         </div>
       </ScrollArea>
 
@@ -145,7 +153,7 @@ export default function AddExpense() {
           >
             Cancel
           </Button>
-          <Button>Save expense</Button>
+          <Button>{isEdit ? "Save changes" : "Save expense"}</Button>
         </ButtonRow>
       </div>
     </PhoneFrame>

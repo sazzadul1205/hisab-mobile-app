@@ -20,6 +20,7 @@ import Backup from "./pages/Backup/Backup";
 import Settings from "./pages/Settings/Settings";
 import DeleteAll from "./pages/DeleteAll/DeleteAll";
 import ArchiveAccount from "./pages/ArchiveAccount/ArchiveAccount";
+import EditTransaction from "./pages/EditTransaction/EditTransaction";
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
         <Route path="/accounts/:id/archive" element={<ArchiveAccount />} />
         <Route path="/transactions" element={<Transactions />} />
         <Route path="/transactions/:id" element={<TransactionDetail />} />
+        <Route path="/transactions/:id/edit" element={<EditTransaction />} />
         <Route path="/income/new" element={<AddIncome />} />
         <Route path="/expense/new" element={<AddExpense />} />
         <Route path="/transfer/new" element={<AddTransfer />} />

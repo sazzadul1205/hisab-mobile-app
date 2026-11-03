@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { AppBar } from "../../components/AppBar";
 import { IconButton } from "../../components/IconButton";
@@ -46,16 +46,18 @@ const INCOME_CATEGORIES = [
   },
 ];
 
-export default function AddIncome() {
+export default function AddIncome({ mode = "new" }) {
   const navigate = useNavigate();
-  const close = () => navigate("/dashboard");
+  const { id } = useParams();
+  const isEdit = mode === "edit";
+  const close = () => navigate(isEdit ? `/transactions/${id}` : "/dashboard");
 
   return (
     <PhoneFrame>
       <StatusBar />
       <ScrollArea>
         <AppBar
-          title="New income"
+          title={isEdit ? "Edit income" : "New income"}
           subtitle="Recorded only on save"
           showBack={false}
           right={
@@ -67,7 +69,7 @@ export default function AddIncome() {
           }
         />
 
-        <TransactionTypeSegments active="income" />
+        {!isEdit && <TransactionTypeSegments active="income" />}
 
         <AmountDisplay value="45,000.00" />
 
@@ -88,8 +90,18 @@ export default function AddIncome() {
         </Field>
 
         <Field label="Note" hint="optional">
-          <TextInput placeholder="October salary credit" />
+          <TextInput
+            placeholder="October salary credit"
+            defaultValue={isEdit ? "October salary credit" : undefined}
+          />
         </Field>
+
+        {isEdit && (
+          <div className="text-[11.5px] leading-[1.6] text-(--muted) bg-(--app) border border-dashed border-(--line) rounded-[14px] px-3.25 py-2.75">
+            Saving updates this record and recalculates all affected balances.
+            The transaction type cannot be changed after creation.
+          </div>
+        )}
       </ScrollArea>
 
       <div
@@ -107,7 +119,7 @@ export default function AddIncome() {
           >
             Cancel
           </Button>
-          <Button>Save income</Button>
+          <Button>{isEdit ? "Save changes" : "Save income"}</Button>
         </ButtonRow>
       </div>
     </PhoneFrame>

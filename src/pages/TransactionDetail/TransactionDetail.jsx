@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { AppBar } from "../../components/AppBar";
 import { IconButton } from "../../components/IconButton";
@@ -43,8 +43,9 @@ const HERO = {
 
 export default function TransactionDetail() {
   // Reserved for the real data lookup
-  // eslint-disable-next-line no-unused-vars
+
   const { id } = useParams();
+  const navigate = useNavigate();
   const meta = HERO[DEMO.type] ?? HERO.transfer;
   const hasFee = DEMO.fee != null && DEMO.fee !== "";
 
@@ -63,6 +64,7 @@ export default function TransactionDetail() {
                   <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
                 </>
               }
+              onClick={() => navigate(`/transactions/${id}/edit`)}
             />
           }
         />
@@ -89,9 +91,7 @@ export default function TransactionDetail() {
           <div className="text-[28px] font-bold tracking-[-0.8px] num mt-2.5">
             {DEMO.amount}
           </div>
-          <div className="text-[12px] text-(--muted) mt-1">
-            {DEMO.date}
-          </div>
+          <div className="text-[12px] text-(--muted) mt-1">{DEMO.date}</div>
         </div>
 
         {/* Details */}
