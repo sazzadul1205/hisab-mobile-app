@@ -2,11 +2,8 @@ import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { IconButton } from "../../components/IconButton";
 import { BottomNav } from "../../components/BottomNav";
 import { SectionLabel } from "../../components/SectionLabel";
+import { useNavigate } from "react-router-dom";
 
-/* ----------------------------------------------------------------
-   Account card (specific to this list — details page uses a
-   different layout, so keeping it local)
-   ---------------------------------------------------------------- */
 function AccountCard({
   initial,
   color,
@@ -44,15 +41,13 @@ function AccountCard({
   );
 }
 
-/* ----------------------------------------------------------------
-   Page
-   ---------------------------------------------------------------- */
 export default function Accounts() {
+  const navigate = useNavigate();
+
   return (
     <PhoneFrame>
       <StatusBar />
       <ScrollArea>
-        {/* Header */}
         <div className="flex items-center justify-between gap-3 py-1.5 pb-3.5">
           <div>
             <h2 className="m-0 text-[23px] font-bold tracking-[-0.5px] leading-tight">
@@ -65,10 +60,10 @@ export default function Accounts() {
           <IconButton
             label="Add account"
             icon={<path d="M12 5v14M5 12h14" />}
+            onClick={() => navigate("/accounts/new")}
           />
         </div>
 
-        {/* Total balance hero */}
         <div
           className="rounded-[18px] p-5 text-white"
           style={{ background: "linear-gradient(150deg, #118A64, #0A5A41)" }}
@@ -84,7 +79,6 @@ export default function Accounts() {
           </div>
         </div>
 
-        {/* Cash & mobile wallets */}
         <SectionLabel className="mt-5">Cash &amp; mobile wallets</SectionLabel>
         <AccountCard
           initial="C"
@@ -101,7 +95,6 @@ export default function Accounts() {
           balance="৳24,650.00"
         />
 
-        {/* Bank */}
         <SectionLabel>Bank</SectionLabel>
         <AccountCard
           initial="CB"
@@ -111,7 +104,6 @@ export default function Accounts() {
           balance="৳91,600.00"
         />
 
-        {/* Archived */}
         <SectionLabel>Archived</SectionLabel>
         <AccountCard
           initial="N"
@@ -122,7 +114,6 @@ export default function Accounts() {
           faded
         />
 
-        {/* Note */}
         <div
           className="text-[11.5px] leading-[1.6] text-(--muted)
                      bg-(--app) border border-dashed border-(--line)
