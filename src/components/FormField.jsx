@@ -6,7 +6,7 @@ export function Field({ label, hint, children }) {
     <div className="mb-3.5">
       <label
         className="block text-[11.5px] font-bold tracking-wider
-                        uppercase text-(--muted)7px]"
+                        uppercase text-(--muted) mb-1.75"
       >
         {label}
         {hint && (
@@ -60,13 +60,19 @@ export function SelectInput({ value, placeholder }) {
 }
 
 /* ----------------------------------------------------------------
-   MoneyInput — ৳ prefix + large bold tabular amount
+   MoneyInput — ৳ prefix + tabular amount
+   size: "md" (default, big bold, for the main amount)
+         "sm" (secondary, e.g. fee field)
    ---------------------------------------------------------------- */
-export function MoneyInput({ defaultValue }) {
+export function MoneyInput({ defaultValue, size = "md" }) {
+  const isSmall = size === "sm";
   return (
     <div
-      className="flex items-center gap-2.5 bg-white border border-(--line)
-                    rounded-[14px] px-3.5 py-3.75"
+      className={
+        "flex items-center gap-2.5 bg-white border border-(--line) " +
+        "rounded-[14px] " +
+        (isSmall ? "px-3.5 py-3" : "px-3.5 py-3.75")
+      }
     >
       <span className="text-[14px] font-medium text-(--muted) mr-1">
         ৳
@@ -75,8 +81,11 @@ export function MoneyInput({ defaultValue }) {
         type="text"
         inputMode="decimal"
         defaultValue={defaultValue}
-        className="flex-1 min-w-0 bg-transparent border-0 outline-none
-                   text-[22px] font-bold num text-(--ink) font-[inherit]"
+        className={
+          "flex-1 min-w-0 bg-transparent border-0 outline-none num " +
+          "text-(--ink) font-[inherit] " +
+          (isSmall ? "text-[14px] font-semibold" : "text-[22px] font-bold")
+        }
       />
     </div>
   );

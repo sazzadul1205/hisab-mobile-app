@@ -1,3 +1,4 @@
+import { Link, useNavigate } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { IconButton } from "../../components/IconButton";
 import { BottomNav } from "../../components/BottomNav";
@@ -25,7 +26,7 @@ function BalanceCard() {
       <div className="text-[12px] text-white/65">3 active accounts · BDT</div>
 
       <div
-        className="grid grid-cols-3 gap-2 mt-4.5-4"
+        className="grid grid-cols-3 gap-2 mt-4.5 pt-4"
         style={{ borderTop: "1px solid rgba(255,255,255,0.16)" }}
       >
         <Stat label="Income today" value="৳2,000" />
@@ -48,16 +49,28 @@ function Stat({ label, value }) {
 }
 
 const ACTIONS = [
-  { label: "Income", tone: "in", icon: <path d="M12 5v14M5 12h14" /> },
-  { label: "Expense", tone: "out", icon: <path d="M5 12h14" /> },
+  {
+    label: "Income",
+    tone: "in",
+    to: "/income/new",
+    icon: <path d="M12 5v14M5 12h14" />,
+  },
+  {
+    label: "Expense",
+    tone: "out",
+    to: "/expense/new",
+    icon: <path d="M5 12h14" />,
+  },
   {
     label: "Transfer",
     tone: "tr",
+    to: "/transfer/new",
     icon: <path d="M4 8h13l-3-3M20 16H7l3 3" />,
   },
   {
     label: "Import",
     tone: "im",
+    to: null, // wires when page #15 lands
     icon: (
       <>
         <path d="M12 15V4M8 8l4-4 4 4" />
@@ -75,11 +88,13 @@ const TONE_STYLES = {
 };
 
 function QuickActions() {
+  const navigate = useNavigate();
   return (
     <div className="grid grid-cols-4 gap-2 mt-3">
       {ACTIONS.map((a) => (
         <button
           key={a.label}
+          onClick={a.to ? () => navigate(a.to) : undefined}
           className="flex flex-col items-center gap-1.75 pt-3.25 pb-2.75 px-1
                      bg-white border border-(--line) rounded-[14px]
                      text-[10.5px] font-semibold text-(--ink-2)
@@ -268,12 +283,12 @@ function RecentActivity() {
     <div className="bg-white border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
       <div className="flex items-center justify-between mb-3.5">
         <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">Recent</h3>
-        <a
-          href="#"
+        <Link
+          to="/transactions"
           className="text-[12px] font-semibold text-(--brand) no-underline"
         >
           See all
-        </a>
+        </Link>
       </div>
 
       <div>

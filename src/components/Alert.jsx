@@ -5,11 +5,16 @@ const TONES = {
   ok:     { bg: 'var(--in-soft)',     fg: 'var(--in)' },
 }
 
-export function Alert({ tone = 'info', icon, title, children }) {
+export function Alert({ tone = 'info', icon, title, children, className = '' }) {
   const t = TONES[tone] ?? TONES.info
   return (
-    <div className="flex items-start gap-[11px] p-[13px] pr-[14px]
-                    rounded-[14px] border border-[var(--line)] bg-white">
+    <div
+      className={
+        'flex items-start gap-2.75 p-3.25 pr-3.5 ' +
+        'rounded-[14px] border border-(--line) bg-white ' +
+        className
+      }
+    >
       <span
         className="w-8 h-8 rounded-[10px] flex-none grid place-items-center"
         style={{ background: t.bg, color: t.fg }}
@@ -24,7 +29,7 @@ export function Alert({ tone = 'info', icon, title, children }) {
       </span>
       <div>
         <b className="block text-[13px] font-semibold mb-0.5">{title}</b>
-        <small className="text-[11.5px] text-[var(--muted)] leading-[1.5]">
+        <small className="text-[11.5px] text-(--muted) leading-normal">
           {children}
         </small>
       </div>
