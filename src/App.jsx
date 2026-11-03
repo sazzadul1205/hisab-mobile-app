@@ -13,6 +13,8 @@ import AddTransfer from "./pages/AddTransfer/AddTransfer";
 import TransactionDetail from "./pages/TransactionDetail/TransactionDetail";
 import Categories from "./pages/Categories/Categories";
 import Reports from "./pages/Reports/Reports";
+import ImportStatement from "./pages/ImportStatement/ImportStatement";
+import ReviewImport from "./pages/ReviewImport/ReviewImport";
 
 export default function App() {
   return (
@@ -33,6 +35,8 @@ export default function App() {
         <Route path="/transfer/new" element={<AddTransfer />} />
         <Route path="/categories" element={<Categories />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/import" element={<ImportStatement />} />
+        <Route path="/import/review" element={<ReviewImport />} />
       </Routes>
     </BrowserRouter>
   );

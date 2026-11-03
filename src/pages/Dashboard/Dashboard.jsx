@@ -69,7 +69,7 @@ const ACTIONS = [
   {
     label: "Import",
     tone: "im",
-    to: null,
+    to: "/import",
     icon: (
       <>
         <path d="M12 15V4M8 8l4-4 4 4" />
