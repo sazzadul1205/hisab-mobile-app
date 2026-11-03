@@ -21,12 +21,17 @@ export function Field({ label, hint, children }) {
 }
 
 /* ----------------------------------------------------------------
-   TextInput
+   TextInput — type defaults to "text"; pass "password" for backups/PIN
    ---------------------------------------------------------------- */
-export function TextInput({ defaultValue, placeholder, inputMode }) {
+export function TextInput({
+  defaultValue,
+  placeholder,
+  inputMode,
+  type = "text",
+}) {
   return (
     <input
-      type="text"
+      type={type}
       inputMode={inputMode}
       defaultValue={defaultValue}
       placeholder={placeholder}
@@ -61,8 +66,7 @@ export function SelectInput({ value, placeholder }) {
 
 /* ----------------------------------------------------------------
    MoneyInput — ৳ prefix + tabular amount
-   size: "md" (default, big bold, for the main amount)
-         "sm" (secondary, e.g. fee field)
+   size: "md" (default, big bold) | "sm" (secondary, e.g. fee)
    ---------------------------------------------------------------- */
 export function MoneyInput({ defaultValue, size = "md" }) {
   const isSmall = size === "sm";
@@ -74,9 +78,7 @@ export function MoneyInput({ defaultValue, size = "md" }) {
         (isSmall ? "px-3.5 py-3" : "px-3.5 py-3.75")
       }
     >
-      <span className="text-[14px] font-medium text-(--muted) mr-1">
-        ৳
-      </span>
+      <span className="text-[14px] font-medium text-(--muted) mr-1">৳</span>
       <input
         type="text"
         inputMode="decimal"

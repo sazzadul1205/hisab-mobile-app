@@ -39,9 +39,9 @@ const NAV_ITEMS = [
     icon: <path d="M5 19V11M11 19V5M17 19v-9" />,
   },
   {
-    // Route doesn't exist yet — kept inert until /settings is built
     id: "settings",
     label: "Settings",
+    to: "/settings",
     icon: (
       <>
         <circle cx="12" cy="12" r="3" />
@@ -82,14 +82,10 @@ export function BottomNav({ active = "home" }) {
           </>
         );
 
-        return it.to ? (
+        return (
           <Link key={it.id} to={it.to} className={cls}>
             {content}
           </Link>
-        ) : (
-          <a key={it.id} href="#" className={cls}>
-            {content}
-          </a>
         );
       })}
     </nav>

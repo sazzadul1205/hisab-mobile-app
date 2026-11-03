@@ -9,7 +9,6 @@ import { Note } from "../../components/Note";
 import { Button } from "../../components/Button";
 
 export default function AccountDetail() {
-  // eslint-disable-next-line no-unused-vars
   const { id } = useParams();
   const navigate = useNavigate();
   const openDetail = (txId) => navigate(`/transactions/${txId}`);
@@ -50,7 +49,11 @@ export default function AccountDetail() {
         </div>
 
         <div className="grid grid-cols-2 gap-2.5 mt-3">
-          <Button variant="secondary" size="sm">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => navigate(`/accounts/${id}/reconcile`)}
+          >
             Reconcile
           </Button>
           <Button variant="secondary" size="sm">

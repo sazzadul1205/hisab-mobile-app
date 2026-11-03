@@ -15,6 +15,9 @@ import Categories from "./pages/Categories/Categories";
 import Reports from "./pages/Reports/Reports";
 import ImportStatement from "./pages/ImportStatement/ImportStatement";
 import ReviewImport from "./pages/ReviewImport/ReviewImport";
+import Reconcile from "./pages/Reconcile/Reconcile";
+import Backup from "./pages/Backup/Backup";
+import Settings from "./pages/Settings/Settings";
 
 export default function App() {
   return (
@@ -28,6 +31,7 @@ export default function App() {
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/accounts/new" element={<AddAccount />} />
         <Route path="/accounts/:id" element={<AccountDetail />} />
+        <Route path="/accounts/:id/reconcile" element={<Reconcile />} />
         <Route path="/transactions" element={<Transactions />} />
         <Route path="/transactions/:id" element={<TransactionDetail />} />
         <Route path="/income/new" element={<AddIncome />} />
@@ -37,6 +41,8 @@ export default function App() {
         <Route path="/reports" element={<Reports />} />
         <Route path="/import" element={<ImportStatement />} />
         <Route path="/import/review" element={<ReviewImport />} />
+        <Route path="/backup" element={<Backup />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </BrowserRouter>
   );
