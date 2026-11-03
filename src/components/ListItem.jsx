@@ -1,16 +1,23 @@
-export function ListItem({ icon, title, subtitle, trailing, danger = false }) {
+export function ListItem({
+  icon,
+  title,
+  subtitle,
+  badge,
+  trailing,
+  danger = false,
+}) {
   return (
     <div
-      className="flex items-center gap-3 px-[15px] py-[14px]
-                 border-b border-[var(--line-2)] last:border-b-0 cursor-pointer"
+      className="flex items-center gap-3 px-3.75 py-3.5
+                 border-b border-(--line-2) last:border-b-0 cursor-pointer"
     >
       {icon && (
         <span
           className={
             "w-8 h-8 rounded-[10px] flex-none grid place-items-center " +
             (danger
-              ? "bg-[var(--danger-soft)] text-[var(--danger)]"
-              : "bg-[var(--app)] text-[var(--ink-2)]")
+              ? "bg-(--danger-soft) text-(--danger)"
+              : "bg-(--app) text-(--ink-2)")
           }
         >
           <svg
@@ -25,16 +32,17 @@ export function ListItem({ icon, title, subtitle, trailing, danger = false }) {
       <b
         className={
           "flex-1 text-[13.5px] font-semibold tracking-[-0.1px] " +
-          (danger ? "text-[var(--danger)]" : "")
+          (danger ? "text-(--danger)" : "")
         }
       >
         {title}
       </b>
       {subtitle && (
-        <small className="text-[12px] text-[var(--muted)] font-medium">
+        <small className="text-[12px] text-(--muted) font-medium">
           {subtitle}
         </small>
       )}
+      {badge}
       {trailing}
     </div>
   );
