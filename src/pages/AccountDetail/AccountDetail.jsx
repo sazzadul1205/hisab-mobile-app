@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { AppBar } from "../../components/AppBar";
 import { IconButton } from "../../components/IconButton";
@@ -9,9 +9,10 @@ import { Note } from "../../components/Note";
 import { Button } from "../../components/Button";
 
 export default function AccountDetail() {
-  // Reserved for later — same component will serve all accounts when data is wired.
   // eslint-disable-next-line no-unused-vars
   const { id } = useParams();
+  const navigate = useNavigate();
+  const openDetail = (txId) => navigate(`/transactions/${txId}`);
 
   return (
     <PhoneFrame>
@@ -33,7 +34,6 @@ export default function AccountDetail() {
           }
         />
 
-        {/* Hero */}
         <div
           className="rounded-[18px] p-5 text-white"
           style={{ background: "linear-gradient(150deg, #118A64, #0A5A41)" }}
@@ -49,7 +49,6 @@ export default function AccountDetail() {
           </div>
         </div>
 
-        {/* Actions */}
         <div className="grid grid-cols-2 gap-2.5 mt-3">
           <Button variant="secondary" size="sm">
             Reconcile
@@ -59,7 +58,6 @@ export default function AccountDetail() {
           </Button>
         </div>
 
-        {/* Filter chips */}
         <div className="mt-3.5">
           <ChipStrip>
             <Chip on>All</Chip>
@@ -70,7 +68,6 @@ export default function AccountDetail() {
           </ChipStrip>
         </div>
 
-        {/* Today */}
         <SectionLabel className="mt-5">Today</SectionLabel>
         <div className="bg-white border border-(--line) rounded-[18px] py-1 px-3.5">
           <TransactionRow
@@ -79,6 +76,7 @@ export default function AccountDetail() {
             title="Salary — October"
             meta="Income · Today 8:00 AM"
             amount="+৳45,000.00"
+            onClick={() => openDetail("a1")}
           />
           <TransactionRow
             tone="tr"
@@ -87,10 +85,10 @@ export default function AccountDetail() {
             meta="Transfer · Today 9:30 AM"
             amount="৳5,000.00"
             last
+            onClick={() => openDetail("a2")}
           />
         </div>
 
-        {/* 28 Oct */}
         <SectionLabel>28 Oct</SectionLabel>
         <div className="bg-white border border-(--line) rounded-[18px] py-1 px-3.5">
           <TransactionRow
@@ -105,6 +103,7 @@ export default function AccountDetail() {
             meta="Utilities · Yesterday"
             amount="−৳1,200.00"
             last
+            onClick={() => openDetail("a3")}
           />
         </div>
 

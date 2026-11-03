@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { IconButton } from "../../components/IconButton";
 import { BottomNav } from "../../components/BottomNav";
@@ -6,9 +7,6 @@ import { SearchBar } from "../../components/SearchBar";
 import { Chip, ChipStrip } from "../../components/Chip";
 import { TransactionRow } from "../../components/TransactionRow";
 
-/* ----------------------------------------------------------------
-   Icon set for this page (reused across rows)
-   ---------------------------------------------------------------- */
 const ICONS = {
   salary: <path d="M12 4v16M8 8h6a3 3 0 0 1 0 6H8" />,
   bag: (
@@ -33,9 +31,6 @@ const ICONS = {
   ),
 };
 
-/* ----------------------------------------------------------------
-   Data groups
-   ---------------------------------------------------------------- */
 const GROUPS = [
   {
     label: "Today · 29 Oct",
@@ -111,11 +106,13 @@ const GROUPS = [
 ];
 
 export default function Transactions() {
+  const navigate = useNavigate();
+  const openDetail = (id) => navigate(`/transactions/${id}`);
+
   return (
     <PhoneFrame>
       <StatusBar />
       <ScrollArea>
-        {/* Header */}
         <div className="flex items-center justify-between gap-3 py-1.5 pb-3.5">
           <div>
             <h2 className="m-0 text-[23px] font-bold tracking-[-0.5px] leading-tight">
@@ -131,10 +128,8 @@ export default function Transactions() {
           />
         </div>
 
-        {/* Search */}
         <SearchBar placeholder="Search notes and descriptions" />
 
-        {/* Filter chips */}
         <ChipStrip>
           <Chip on>All</Chip>
           <Chip>Income</Chip>
@@ -143,14 +138,10 @@ export default function Transactions() {
           <Chip ghost>Filters</Chip>
         </ChipStrip>
 
-        {/* Grouped transactions */}
         {GROUPS.map((g, gi) => (
           <div key={g.label} className={gi === 0 ? "mt-3" : "mt-1"}>
             <SectionLabel>{g.label}</SectionLabel>
-            <div
-              className="bg-white border border-(--line) rounded-[18px]
-                            py-1 px-3.5"
-            >
+            <div className="bg-white border border-(--line) rounded-[18px] py-1 px-3.5">
               {g.rows.map((r, ri) => (
                 <TransactionRow
                   key={r.id}
@@ -160,6 +151,7 @@ export default function Transactions() {
                   meta={r.meta}
                   amount={r.amount}
                   last={ri === g.rows.length - 1}
+                  onClick={() => openDetail(r.id)}
                 />
               ))}
             </div>

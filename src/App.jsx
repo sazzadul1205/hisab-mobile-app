@@ -10,11 +10,12 @@ import Transactions from "./pages/Transactions/Transactions";
 import AddIncome from "./pages/AddIncome/AddIncome";
 import AddExpense from "./pages/AddExpense/AddExpense";
 import AddTransfer from "./pages/AddTransfer/AddTransfer";
+import TransactionDetail from "./pages/TransactionDetail/TransactionDetail";
 
 export default function App() {
   return (
     <BrowserRouter>
-     <Routes>
+      <Routes>
         <Route path="/" element={<Navigate to="/welcome" replace />} />
         <Route path="/welcome" element={<WelcomePin />} />
         <Route path="/unlock" element={<Unlock />} />
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/accounts/new" element={<AddAccount />} />
         <Route path="/accounts/:id" element={<AccountDetail />} />
         <Route path="/transactions" element={<Transactions />} />
+        <Route path="/transactions/:id" element={<TransactionDetail />} />
         <Route path="/income/new" element={<AddIncome />} />
         <Route path="/expense/new" element={<AddExpense />} />
         <Route path="/transfer/new" element={<AddTransfer />} />
