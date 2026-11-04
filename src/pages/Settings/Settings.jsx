@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { BottomNav } from "../../components/BottomNav";
@@ -7,10 +8,24 @@ import { Chevron } from "../../components/Chevron";
 import { Note } from "../../components/Note";
 import { useAuth } from "../../auth/authContext";
 import { formatAutoLock } from "../../services/settings";
+import { getStorageEstimate, formatBytes } from "../../services/storage";
 
 export default function Settings() {
   const navigate = useNavigate();
   const { autoLockMs } = useAuth();
+  const [storageLabel, setStorageLabel] = useState("—");
+
+  useEffect(() => {
+    let cancelled = false;
+    getStorageEstimate().then((est) => {
+      if (cancelled) return;
+      if (est.supported) setStorageLabel(`${formatBytes(est.usage)} used`);
+      else setStorageLabel("Estimate unavailable");
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <PhoneFrame>
@@ -76,16 +91,19 @@ export default function Settings() {
               trailing={<Chevron />}
             />
           </div>
-          <ListItem
-            icon={
-              <>
-                <path d="M12 3v12M8 11l4 4 4-4" />
-                <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
-              </>
-            }
-            title="Export financial data"
-            trailing={<Chevron />}
-          />
+          <div onClick={() => navigate("/settings/export")}>
+            <ListItem
+              icon={
+                <>
+                  <path d="M12 3v12M8 11l4 4 4-4" />
+                  <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+                </>
+              }
+              title="Export financial data"
+              subtitle="CSV for spreadsheets"
+              trailing={<Chevron />}
+            />
+          </div>
           <div onClick={() => navigate("/backup")}>
             <ListItem
               icon={
@@ -99,17 +117,19 @@ export default function Settings() {
               trailing={<Chevron />}
             />
           </div>
-          <ListItem
-            icon={
-              <>
-                <ellipse cx="12" cy="6" rx="8" ry="3" />
-                <path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6" />
-              </>
-            }
-            title="Storage"
-            subtitle="Used on this device"
-            trailing={<Chevron />}
-          />
+          <div onClick={() => navigate("/settings/storage")}>
+            <ListItem
+              icon={
+                <>
+                  <ellipse cx="12" cy="6" rx="8" ry="3" />
+                  <path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6" />
+                </>
+              }
+              title="Storage"
+              subtitle={storageLabel}
+              trailing={<Chevron />}
+            />
+          </div>
         </div>
 
         <SectionLabel>Danger zone</SectionLabel>
