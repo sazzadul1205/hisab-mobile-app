@@ -59,7 +59,7 @@ function KeypadButton({ children, ghost = false, disabled = false, ...props }) {
     "flex items-center justify-center transition-colors font-[inherit] ";
   const skin = ghost
     ? "bg-transparent border-transparent text-(--muted) hover:bg-(--line-2)"
-    : "bg-white border-(--line) text-(--ink) hover:bg-(--line-2)";
+    : "bg-(--card) border-(--line) text-(--ink) hover:bg-(--line-2)";
   const disabledStyles = disabled
     ? " opacity-40 cursor-not-allowed hover:bg-transparent"
     : "";

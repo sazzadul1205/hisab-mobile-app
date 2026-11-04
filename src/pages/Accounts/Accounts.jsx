@@ -30,7 +30,7 @@ function AccountCard({ account, balance, faded, onClick }) {
     <div
       onClick={onClick}
       className={
-        "flex items-center gap-3 bg-white border border-(--line) " +
+        "flex items-center gap-3 bg-(--card) border border-(--line) " +
         "rounded-[18px] px-3.75 py-3.5 mb-2.5 cursor-pointer " +
         "shadow-[0_1px_2px_rgba(14,26,22,0.06)] " +
         (faded ? "opacity-60" : "")

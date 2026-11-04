@@ -8,7 +8,7 @@ export function AppBar({ title, subtitle, showBack = true, right = null }) {
         <button
           onClick={() => navigate(-1)}
           className="w-[38px] h-[38px] rounded-[12px] flex-none grid place-items-center
-                     bg-white border border-[var(--line)] cursor-pointer"
+                     bg-(--card) border border-[var(--line)] cursor-pointer"
           aria-label="Back"
         >
           <svg

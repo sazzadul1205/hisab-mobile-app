@@ -73,7 +73,7 @@ export default function Storage() {
         </div>
 
         <SectionLabel>Records</SectionLabel>
-        <div className="bg-white border border-(--line) rounded-[18px] px-4 py-1 mb-3">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] px-4 py-1 mb-3">
           <InfoRow label="Accounts" value={counts.accounts} />
           <InfoRow label="Transactions" value={counts.transactions} />
           <InfoRow label="Categories" value={counts.categories} />

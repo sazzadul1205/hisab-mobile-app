@@ -309,7 +309,7 @@ function RestoreTab({ onRestored }) {
         <>
           <SectionLabel className="mt-0">Restore from file</SectionLabel>
 
-          <div className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-3">
+          <div className="bg-(--card) border border-(--line) rounded-[18px] overflow-hidden mb-3">
             <div onClick={() => fileRef.current?.click()}>
               <ListItem
                 icon={
@@ -376,7 +376,7 @@ function RestoreTab({ onRestored }) {
 
       {stage === "preview" && decrypted && (
         <>
-          <div className="bg-white border border-(--line) rounded-[18px] p-4 mb-3">
+          <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mb-3">
             <div className="flex items-center justify-between mb-3">
               <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">
                 Backup contents
@@ -574,7 +574,7 @@ function HistoryTab({ log }) {
   return (
     <>
       <SectionLabel className="mt-0">Recent backups</SectionLabel>
-      <div className="bg-white border border-(--line) rounded-[18px] px-3.5 py-1.5">
+      <div className="bg-(--card) border border-(--line) rounded-[18px] px-3.5 py-1.5">
         {log.map((entry, i) => (
           <div
             key={entry.id}

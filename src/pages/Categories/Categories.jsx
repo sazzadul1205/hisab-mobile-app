@@ -22,7 +22,7 @@ const TABS = [
 
 function CategoryList({ categories, onSelect }) {
   return (
-    <div className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-3">
+    <div className="bg-(--card) border border-(--line) rounded-[18px] overflow-hidden mb-3">
       {categories.map((c) => (
         <ListItem
           key={c.id}

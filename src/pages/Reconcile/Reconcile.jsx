@@ -27,7 +27,7 @@ function initials(name) {
 function ReconPanel({ calculated, actual }) {
   return (
     <div className="grid grid-cols-2 gap-2.5 mb-3">
-      <div className="bg-white border border-(--line) rounded-[14px] p-3">
+      <div className="bg-(--card) border border-(--line) rounded-[14px] p-3">
         <small className="block text-[10.5px] text-(--muted) font-semibold uppercase tracking-wider">
           Calculated
         </small>
@@ -35,7 +35,7 @@ function ReconPanel({ calculated, actual }) {
           {calculated}
         </b>
       </div>
-      <div className="bg-white border border-(--line) rounded-[14px] p-3">
+      <div className="bg-(--card) border border-(--line) rounded-[14px] p-3">
         <small className="block text-[10.5px] text-(--muted) font-semibold uppercase tracking-wider">
           Actual (you enter)
         </small>

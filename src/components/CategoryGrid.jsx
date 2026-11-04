@@ -18,7 +18,7 @@ export function CategoryGrid({ categories, selected, onSelect }) {
               "border text-[10px] font-semibold font-[inherit] cursor-pointer " +
               (isOn
                 ? "bg-(--brand-soft) border-(--brand) text-(--brand-dk)"
-                : "bg-white border-(--line) text-(--ink-2)")
+                : "bg-(--card) border-(--line) text-(--ink-2)")
             }
           >
             <span
@@ -46,7 +46,7 @@ export function CategoryGrid({ categories, selected, onSelect }) {
         onClick={() => navigate("/categories")}
         className="flex flex-col items-center gap-1.5 py-2.75 px-0.5 rounded-[14px]
                    border border-dashed border-(--line) text-[10px] font-semibold
-                   font-[inherit] cursor-pointer bg-white text-(--ink-2)"
+                   font-[inherit] cursor-pointer bg-(--card) text-(--ink-2)"
       >
         <span className="w-7.5 h-7.5 rounded-[9px] grid place-items-center bg-(--app) text-(--ink-2)">
           <svg

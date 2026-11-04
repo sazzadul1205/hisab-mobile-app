@@ -70,7 +70,7 @@ function CategoryForm({ isEdit, id, initial, initialType, fromTab }) {
 
         {isEdit ? (
           <Field label="Type">
-            <div className="flex items-center justify-between bg-white border border-(--line) rounded-[14px] px-3.5 py-3.25 text-[14px] text-(--ink)">
+            <div className="flex items-center justify-between bg-(--card) border border-(--line) rounded-[14px] px-3.5 py-3.25 text-[14px] text-(--ink)">
               <span className="font-semibold">{TYPE_LABEL[initial?.type]}</span>
               <span className="text-[10.5px] font-bold tracking-wider uppercase text-(--muted)">
                 Locked

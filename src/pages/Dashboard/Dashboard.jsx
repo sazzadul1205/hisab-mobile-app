@@ -195,7 +195,7 @@ function QuickActions() {
           key={a.label}
           onClick={() => navigate(a.to)}
           className="flex flex-col items-center gap-1.75 pt-3.25 pb-2.75 px-1
-                     bg-white border border-(--line) rounded-[14px]
+                     bg-(--card) border border-(--line) rounded-[14px]
                      text-[10.5px] font-semibold text-(--ink-2)
                      cursor-pointer font-[inherit]"
         >
@@ -223,7 +223,7 @@ function WeeklyChart({ data }) {
   const isEmpty = totalIncome === 0 && totalExpense === 0;
 
   return (
-    <div className="bg-white border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
+    <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
       <div className="flex items-center justify-between mb-3.5">
         <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">
           This week
@@ -303,7 +303,7 @@ function WeeklyChart({ data }) {
 
 function CategoryBreakdown({ categories }) {
   return (
-    <div className="bg-white border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
+    <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
       <div className="flex items-center justify-between mb-3.5">
         <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">
           Expense breakdown
@@ -344,7 +344,7 @@ function CategoryBreakdown({ categories }) {
 function RecentActivity({ items, accountMap, categoryMap }) {
   const navigate = useNavigate();
   return (
-    <div className="bg-white border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
+    <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
       <div className="flex items-center justify-between mb-3.5">
         <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">Recent</h3>
         <Link
@@ -523,7 +523,7 @@ export default function Dashboard() {
             categoryMap={categoryMap}
           />
         ) : (
-          <div className="bg-white border border-(--line) rounded-[18px] p-4 mt-3 text-center">
+          <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mt-3 text-center">
             <small className="text-[12px] text-(--muted)">
               No transactions yet. Tap Income or Expense to record your first.
             </small>

@@ -8,7 +8,7 @@ export function CategoryPicker({ categories, selected }) {
           : isOn
             ? "border-[var(--brand)]"
             : "border-[var(--line)]";
-        const bg = isOn ? "bg-[var(--brand-soft)]" : "bg-white";
+        const bg = isOn ? "bg-[var(--brand-soft)]" : "bg-(--card)";
         const text = isOn ? "text-[var(--brand-dk)]" : "text-[var(--ink-2)]";
         const icoBg = isOn
           ? "bg-[var(--brand)] text-white"
@@ -27,8 +27,7 @@ export function CategoryPicker({ categories, selected }) {
           >
             <span
               className={
-                "w-7.5 h-7.5 rounded-[9px] grid place-items-center " +
-                icoBg
+                "w-7.5 h-7.5 rounded-[9px] grid place-items-center " + icoBg
               }
             >
               <svg

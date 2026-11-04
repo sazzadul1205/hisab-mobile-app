@@ -17,7 +17,7 @@ export function Button({
   const variants = {
     primary:
       "bg-[var(--brand)] text-white shadow-[0_10px_20px_-12px_rgba(14,124,90,0.9)]",
-    secondary: "bg-white text-[var(--ink)] border border-[var(--line)]",
+    secondary: "bg-(--card) text-[var(--ink)] border border-[var(--line)]",
     danger:
       "bg-[var(--danger)] text-white shadow-[0_10px_20px_-12px_rgba(192,57,43,0.9)]",
     ghost:

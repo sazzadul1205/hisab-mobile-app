@@ -6,7 +6,7 @@ export function SearchBar({
 }) {
   return (
     <div
-      className="flex items-center gap-2.25 bg-white border border-(--line)
+      className="flex items-center gap-2.25 bg-(--card) border border-(--line)
                     rounded-[14px] px-3.25 py-2.75 mb-3"
     >
       <svg

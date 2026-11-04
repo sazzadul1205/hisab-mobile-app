@@ -25,7 +25,7 @@ export default function Security() {
         <AppBar title="Security" />
 
         <SectionLabel className="mt-0">Access protection</SectionLabel>
-        <div className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-4">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] overflow-hidden mb-4">
           <div onClick={() => navigate("/security/change-pin")}>
             <ListItem
               icon={
@@ -66,7 +66,7 @@ export default function Security() {
         </div>
 
         <SectionLabel>Actions</SectionLabel>
-        <div className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-4">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] overflow-hidden mb-4">
           <div onClick={handleLockNow}>
             <ListItem
               icon={

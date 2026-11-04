@@ -32,7 +32,7 @@ export function AccountPicker({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between bg-white
+        className="w-full flex items-center justify-between bg-(--card)
                    border border-(--line) rounded-[14px]
                    px-3.5 py-3.25 text-[14px] text-(--ink)
                    cursor-pointer font-[inherit] text-left
@@ -62,7 +62,7 @@ export function AccountPicker({
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div
             className="absolute left-0 right-0 top-full mt-1 z-50
-                       bg-white border border-(--line) rounded-[14px]
+                       bg-(--card) border border-(--line) rounded-[14px]
                        shadow-[0_10px_30px_-10px_rgba(14,26,22,0.25)]
                        overflow-hidden max-h-72 overflow-y-auto"
           >

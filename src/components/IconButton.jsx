@@ -4,7 +4,7 @@ export function IconButton({ icon, label, onClick }) {
       onClick={onClick}
       aria-label={label}
       className="w-9.5 h-9.5 rounded-xl flex-none grid place-items-center
-                 bg-white border border-(--line) text-(--ink-2) cursor-pointer"
+                 bg-(--card) border border-(--line) text-(--ink-2) cursor-pointer"
     >
       <svg
         viewBox="0 0 24 24"
@@ -14,5 +14,5 @@ export function IconButton({ icon, label, onClick }) {
         {icon}
       </svg>
     </button>
-  )
+  );
 }

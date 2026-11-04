@@ -44,7 +44,7 @@ function EmptyState() {
 
 function FileChosenState({ fileName, parsed, onClear }) {
   return (
-    <div className="bg-white border border-(--line) rounded-[18px] p-4 mb-3">
+    <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mb-3">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-[10px] flex-none grid place-items-center bg-(--brand-soft) text-(--brand-dk)">
           <svg

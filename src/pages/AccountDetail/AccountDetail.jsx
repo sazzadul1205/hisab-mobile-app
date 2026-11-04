@@ -223,7 +223,7 @@ export default function AccountDetail() {
               <SectionLabel className={gi === 0 ? "mt-5" : ""}>
                 {g.label}
               </SectionLabel>
-              <div className="bg-white border border-(--line) rounded-[18px] py-1 px-3.5">
+              <div className="bg-(--card) border border-(--line) rounded-[18px] py-1 px-3.5">
                 {g.rows.map((r, ri) => {
                   const display = rowFor(r);
                   return (

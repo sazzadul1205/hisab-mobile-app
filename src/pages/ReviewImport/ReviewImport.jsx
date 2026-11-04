@@ -33,7 +33,7 @@ function ImportCheckbox({ checked, disabled, onChange }) {
           ? "bg-(--app) border border-dashed border-[#C9D4CF] opacity-60 cursor-not-allowed"
           : checked
             ? "bg-(--brand) border border-(--brand) cursor-pointer"
-            : "bg-white border border-[#C9D4CF] cursor-pointer")
+            : "bg-(--card) border border-[#C9D4CF] cursor-pointer")
       }
     >
       {checked && !disabled && (
@@ -119,7 +119,7 @@ function ImportRow({ row, categories, onChange }) {
           <select
             value={row.categoryId ?? ""}
             onChange={(e) => onChange({ categoryId: e.target.value || null })}
-            className="mt-2 w-full bg-white border border-(--line)
+            className="mt-2 w-full bg-(--card) border border-(--line)
                        rounded-[10px] px-2.5 py-1.5 text-[12px]
                        text-(--ink) font-[inherit] outline-none
                        focus:border-(--brand)"
@@ -271,7 +271,7 @@ export default function ReviewImport() {
           subtitle={`${initial.formatName} statement → ${initial.fileName}`}
         />
 
-        <div className="grid grid-cols-3 bg-white border border-(--line) rounded-[14px] overflow-hidden mb-3.5">
+        <div className="grid grid-cols-3 bg-(--card) border border-(--line) rounded-[14px] overflow-hidden mb-3.5">
           {[
             { label: "Parsed", value: summary.parsed, cls: "text-(--ink)" },
             { label: "Flagged", value: summary.flagged, cls: "text-(--warn)" },
@@ -316,7 +316,7 @@ export default function ReviewImport() {
           </Chip>
         </ChipStrip>
 
-        <div className="bg-white border border-(--line) rounded-[18px] py-1 px-3.5 mt-3">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] py-1 px-3.5 mt-3">
           {filteredRows.length === 0 && (
             <div className="text-center py-6 text-[12px] text-(--muted)">
               No rows match this filter.

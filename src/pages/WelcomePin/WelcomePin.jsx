@@ -10,7 +10,7 @@ import { hasWebCrypto, InsecureContextError } from "../../lib/webcrypto";
 function Bullet({ icon, title, subtitle }) {
   return (
     <div className="flex gap-2.75 items-start">
-      <div className="w-7.5 h-7.5 rounded-[9px] flex-none grid place-items-center bg-white border border-(--line) text-(--brand)">
+      <div className="w-7.5 h-7.5 rounded-[9px] flex-none grid place-items-center bg-(--card) border border-(--line) text-(--brand)">
         <svg
           viewBox="0 0 24 24"
           className="w-3.75 h-3.75 stroke-current fill-none stroke-[1.9] [stroke-linecap:round] [stroke-linejoin:round]"

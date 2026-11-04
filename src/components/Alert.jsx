@@ -1,17 +1,23 @@
 const TONES = {
-  info:   { bg: 'var(--tr-soft)',     fg: 'var(--tr)' },
-  warn:   { bg: 'var(--warn-soft)',   fg: 'var(--warn)' },
-  danger: { bg: 'var(--danger-soft)', fg: 'var(--danger)' },
-  ok:     { bg: 'var(--in-soft)',     fg: 'var(--in)' },
-}
+  info: { bg: "var(--tr-soft)", fg: "var(--tr)" },
+  warn: { bg: "var(--warn-soft)", fg: "var(--warn)" },
+  danger: { bg: "var(--danger-soft)", fg: "var(--danger)" },
+  ok: { bg: "var(--in-soft)", fg: "var(--in)" },
+};
 
-export function Alert({ tone = 'info', icon, title, children, className = '' }) {
-  const t = TONES[tone] ?? TONES.info
+export function Alert({
+  tone = "info",
+  icon,
+  title,
+  children,
+  className = "",
+}) {
+  const t = TONES[tone] ?? TONES.info;
   return (
     <div
       className={
-        'flex items-start gap-2.75 p-3.25 pr-3.5 ' +
-        'rounded-[14px] border border-(--line) bg-white ' +
+        "flex items-start gap-2.75 p-3.25 pr-3.5 " +
+        "rounded-[14px] border border-(--line) bg-(--card) " +
         className
       }
     >
@@ -34,5 +40,5 @@ export function Alert({ tone = 'info', icon, title, children, className = '' }) 
         </small>
       </div>
     </div>
-  )
+  );
 }

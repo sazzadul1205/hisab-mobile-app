@@ -17,7 +17,7 @@ export function DateTimeInput({ value, onChange }) {
       type="datetime-local"
       value={toLocalInput(value)}
       onChange={(e) => onChange(fromLocalInput(e.target.value))}
-      className="w-full bg-white border border-(--line) rounded-[14px]
+      className="w-full bg-(--card) border border-(--line) rounded-[14px]
                  px-3.5 py-3.25 text-[14px] text-(--ink)
                  outline-none font-[inherit] focus:border-(--brand)"
     />

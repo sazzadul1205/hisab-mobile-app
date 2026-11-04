@@ -61,7 +61,7 @@ function DetailField({ label, value, valueClass = "" }) {
 function DeleteModal({ onCancel, onConfirm, busy, error }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-94.5 bg-white rounded-[20px] p-5 shadow-2xl">
+      <div className="w-full max-w-94.5 bg-(--card) rounded-[20px] p-5 shadow-2xl">
         <div className="w-12 h-12 rounded-[14px] mx-auto mb-4 grid place-items-center bg-(--danger-soft) text-(--danger)">
           <svg
             viewBox="0 0 24 24"
@@ -173,7 +173,7 @@ export default function TransactionDetail() {
           }
         />
 
-        <div className="bg-white border border-(--line) rounded-[18px] shadow-[0_1px_2px_rgba(14,26,22,0.06)] text-center p-5.5 px-4">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] shadow-[0_1px_2px_rgba(14,26,22,0.06)] text-center p-5.5 px-4">
           <div
             className={`w-13 h-13 rounded-2xl mx-auto mb-3 grid place-items-center ${meta.bg} ${meta.fg}`}
           >
@@ -196,7 +196,7 @@ export default function TransactionDetail() {
           </div>
         </div>
 
-        <div className="bg-white border border-(--line) rounded-[18px] shadow-[0_1px_2px_rgba(14,26,22,0.06)] p-4 mt-3">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] shadow-[0_1px_2px_rgba(14,26,22,0.06)] p-4 mt-3">
           {transaction.type === "transfer" ? (
             <>
               <div className="grid grid-cols-2 gap-3 text-[12.5px]">

@@ -100,7 +100,7 @@ export default function ArchiveAccount() {
           </p>
         </div>
 
-        <div className="bg-white border border-(--line) rounded-[18px] p-4 mb-3">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mb-3">
           <InfoRow label="Account" value={account.name} />
           <InfoRow label="Balance" value={formatBDT(balance)} />
           <InfoRow

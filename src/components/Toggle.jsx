@@ -10,7 +10,7 @@ export function Toggle({ on = false }) {
     >
       <span
         className={
-          "absolute top-[3px] left-[3px] w-5 h-5 rounded-full bg-white " +
+          "absolute top-[3px] left-[3px] w-5 h-5 rounded-full bg-(--card) " +
           "shadow-[0_1px_3px_rgba(0,0,0,0.15)] transition-transform " +
           (on ? "translate-x-[18px]" : "")
         }

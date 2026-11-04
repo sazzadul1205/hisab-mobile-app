@@ -161,7 +161,7 @@ export default function Transactions() {
           groups.map((g, gi) => (
             <div key={g.day} className={gi === 0 ? "mt-3" : "mt-1"}>
               <SectionLabel>{g.label}</SectionLabel>
-              <div className="bg-white border border-(--line) rounded-[18px] py-1 px-3.5">
+              <div className="bg-(--card) border border-(--line) rounded-[18px] py-1 px-3.5">
                 {g.rows.map((tx, ri) => {
                   const fromName = accountMap.get(tx.accountId)?.name ?? "—";
                   const toName =

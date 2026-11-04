@@ -66,7 +66,7 @@ export default function KeyInfo() {
         </div>
 
         <SectionLabel>How it works</SectionLabel>
-        <div className="bg-white border border-(--line) rounded-[18px] px-4 py-1 mb-3">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] px-4 py-1 mb-3">
           <Step
             number="1"
             title="PIN derives a master key"
@@ -85,7 +85,7 @@ export default function KeyInfo() {
         </div>
 
         <SectionLabel>What is encrypted vs. visible</SectionLabel>
-        <div className="bg-white border border-(--line) rounded-[18px] px-4 py-1 mb-3">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] px-4 py-1 mb-3">
           <DataRow
             label="Account names, opening balances"
             value="Encrypted"
@@ -123,7 +123,7 @@ export default function KeyInfo() {
         </Note>
 
         <SectionLabel className="mt-5">Changing your PIN</SectionLabel>
-        <div className="bg-white border border-(--line) rounded-[18px] p-4 mb-3">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mb-3">
           <p className="m-0 text-[12.5px] leading-[1.65] text-(--ink-2)">
             Changing your PIN re-wraps the DEK with a new master key. It does
             not re-encrypt any records, because the DEK itself never changes.
@@ -152,7 +152,7 @@ export default function KeyInfo() {
         </div>
 
         <SectionLabel>Backups</SectionLabel>
-        <div className="bg-white border border-(--line) rounded-[18px] p-4 mb-3">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mb-3">
           <p className="m-0 text-[12.5px] leading-[1.65] text-(--ink-2)">
             Backup files use a <b>separate password</b>, not your PIN. This lets
             you restore a backup on a fresh device with a new PIN — records

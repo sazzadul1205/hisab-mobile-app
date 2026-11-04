@@ -40,7 +40,7 @@ export function TextInput({
       {...(controlled ? { value, onChange } : { defaultValue })}
       placeholder={placeholder}
       className={
-        "w-full bg-white border border-(--line) rounded-[14px] " +
+        "w-full bg-(--card) border border-(--line) rounded-[14px] " +
         "px-3.5 py-3.25 text-[14px] text-(--ink) " +
         "placeholder:text-(--muted) outline-none font-[inherit] " +
         "focus:border-(--brand) " +
@@ -71,7 +71,7 @@ export function SelectInput({
           value={value}
           defaultValue={defaultValue}
           onChange={onChange}
-          className="w-full appearance-none bg-white border border-(--line) rounded-[14px]
+          className="w-full appearance-none bg-(--card) border border-(--line) rounded-[14px]
                      px-3.5 py-3.25 text-[14px] cursor-pointer font-[inherit]
                      text-left text-(--ink) outline-none focus:border-(--brand)
                      pr-10"
@@ -93,7 +93,7 @@ export function SelectInput({
   return (
     <button
       type="button"
-      className="w-full flex items-center justify-between bg-white border border-(--line) rounded-[14px] px-3.5 py-3.25 text-[14px] cursor-pointer font-[inherit] text-left"
+      className="w-full flex items-center justify-between bg-(--card) border border-(--line) rounded-[14px] px-3.5 py-3.25 text-[14px] cursor-pointer font-[inherit] text-left"
     >
       <span className={hasValue ? "text-(--ink)" : "text-(--muted)"}>
         {hasValue ? value : placeholder}
@@ -118,7 +118,7 @@ export function MoneyInput({
   return (
     <div
       className={
-        "flex items-center gap-2.5 bg-white border border-(--line) " +
+        "flex items-center gap-2.5 bg-(--card) border border-(--line) " +
         "rounded-[14px] focus-within:border-(--brand) " +
         (isSmall ? "px-3.5 py-3" : "px-3.5 py-3.75")
       }

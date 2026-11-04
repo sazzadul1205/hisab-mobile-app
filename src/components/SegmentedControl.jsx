@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export function SegmentedControl({ options, value, onChange }) {
   return (
     <div
-      className="grid gap-1 bg-white border border-(--line) rounded-[14px] p-1 mb-4.5"
+      className="grid gap-1 bg-(--card) border border-(--line) rounded-[14px] p-1 mb-4.5"
       style={{
         gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
       }}

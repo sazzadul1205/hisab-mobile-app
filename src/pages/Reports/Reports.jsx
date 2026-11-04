@@ -134,7 +134,7 @@ function NetCashFlowCard({ flow }) {
   }
 
   return (
-    <div className="bg-white border border-(--line) rounded-[18px] p-4 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
+    <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
       <div className="text-[11.5px] font-bold tracking-[0.06em] uppercase text-(--muted)">
         Net cash flow
       </div>
@@ -171,7 +171,7 @@ function SpendingTrendCard({ trend, label }) {
   const isEmpty = trend.every((t) => t.expenses === 0);
 
   return (
-    <div className="bg-white border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
+    <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
       <div className="flex items-center justify-between mb-3.5">
         <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">
           Spending trend
@@ -219,7 +219,7 @@ function SpendingTrendCard({ trend, label }) {
 
 function ByCategoryCard({ categories }) {
   return (
-    <div className="bg-white border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
+    <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
       <div className="flex items-center justify-between mb-3.5">
         <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">
           By category
@@ -278,7 +278,7 @@ function AccountBalancesCard({ accounts, balances }) {
   const active = accounts.filter((a) => !a.isArchived);
 
   return (
-    <div className="bg-white border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
+    <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
       <div className="flex items-center justify-between mb-2">
         <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">
           Account balances

@@ -45,7 +45,7 @@ export default function AutoLock() {
 
         <SectionLabel className="mt-1">Lock after</SectionLabel>
 
-        <div className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-3">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] overflow-hidden mb-3">
           {AUTO_LOCK_OPTIONS.map((opt, i) => {
             const isSelected = opt.value === autoLockMs;
             return (
@@ -57,7 +57,7 @@ export default function AutoLock() {
                 className={
                   "w-full flex items-center justify-between " +
                   "px-3.75 py-3.5 text-left font-[inherit] " +
-                  "bg-white border-0 cursor-pointer " +
+                  "bg-(--card) border-0 cursor-pointer " +
                   (i < AUTO_LOCK_OPTIONS.length - 1
                     ? "border-b border-(--line-2) "
                     : "") +

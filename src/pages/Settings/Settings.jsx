@@ -41,7 +41,7 @@ export default function Settings() {
         </div>
 
         <SectionLabel className="mt-1">Security</SectionLabel>
-        <div className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-4">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] overflow-hidden mb-4">
           <div onClick={() => navigate("/security/change-pin")}>
             <ListItem
               icon={
@@ -82,8 +82,25 @@ export default function Settings() {
           </div>
         </div>
 
+        <SectionLabel>App Preferences</SectionLabel>
+        <div className="bg-(--card) border border-(--line) rounded-[18px] overflow-hidden mb-4">
+          <div onClick={() => navigate("/settings/theme")}>
+            <ListItem
+              icon={
+                <>
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                </>
+              }
+              title="App Theme"
+              subtitle="Colors and appearance"
+              trailing={<Chevron />}
+            />
+          </div>
+        </div>
+
         <SectionLabel>Data</SectionLabel>
-        <div className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-4">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] overflow-hidden mb-4">
           <div onClick={() => navigate("/categories")}>
             <ListItem
               icon={<path d="M4 5h7l2 2h7v12H4z" />}
@@ -134,7 +151,7 @@ export default function Settings() {
 
         <SectionLabel>Danger zone</SectionLabel>
         <div
-          className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-4"
+          className="bg-(--card) border border-(--line) rounded-[18px] overflow-hidden mb-4"
           onClick={() => navigate("/delete-all")}
         >
           <ListItem
