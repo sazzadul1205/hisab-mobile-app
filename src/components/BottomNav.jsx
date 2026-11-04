@@ -55,9 +55,9 @@ export function BottomNav({ active = "home" }) {
   return (
     <nav
       className="flex-none grid grid-cols-5 px-1.5 pt-2.5
-                 pb-[calc(16px+env(safe-area-inset-bottom))]
-                 bg-[rgba(255,255,255,0.94)] backdrop-blur-[14px]
-                 border-t border-(--line)"
+           pb-[calc(16px+env(safe-area-inset-bottom))]
+           bg-(--card)/90 backdrop-blur-[14px]
+           border-t border-(--line)"
     >
       {NAV_ITEMS.map((it) => {
         const isOn = it.id === active;
