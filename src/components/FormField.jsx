@@ -4,10 +4,7 @@
 export function Field({ label, hint, children }) {
   return (
     <div className="mb-3.5">
-      <label
-        className="block text-[11.5px] font-bold tracking-wider
-                        uppercase text-(--muted) mb-1.75"
-      >
+      <label className="block text-[11.5px] font-bold tracking-wider uppercase text-(--muted) mb-1.75">
         {label}
         {hint && (
           <span className="normal-case tracking-normal font-medium ml-1">
@@ -21,7 +18,8 @@ export function Field({ label, hint, children }) {
 }
 
 /* ----------------------------------------------------------------
-   TextInput — type defaults to "text"; className extends the base
+   TextInput — uncontrolled via `defaultValue` or `inputRef`,
+   controlled via `value` + `onChange`
    ---------------------------------------------------------------- */
 export function TextInput({
   defaultValue,
@@ -29,12 +27,17 @@ export function TextInput({
   inputMode,
   type = "text",
   className = "",
+  inputRef,
+  value,
+  onChange,
 }) {
+  const controlled = value !== undefined;
   return (
     <input
+      ref={inputRef}
       type={type}
       inputMode={inputMode}
-      defaultValue={defaultValue}
+      {...(controlled ? { value, onChange } : { defaultValue })}
       placeholder={placeholder}
       className={
         "w-full bg-white border border-(--line) rounded-[14px] " +
@@ -48,17 +51,49 @@ export function TextInput({
 }
 
 /* ----------------------------------------------------------------
-   SelectInput — looks like an input, opens a sheet later
+   SelectInput — two modes:
+     - options array  → native <select> (interactive)
+     - no options     → static display button (existing behavior)
    ---------------------------------------------------------------- */
-export function SelectInput({ value, placeholder }) {
+export function SelectInput({
+  value,
+  onChange,
+  defaultValue,
+  inputRef,
+  options,
+  placeholder,
+}) {
+  if (Array.isArray(options)) {
+    return (
+      <div className="relative">
+        <select
+          ref={inputRef}
+          value={value}
+          defaultValue={defaultValue}
+          onChange={onChange}
+          className="w-full appearance-none bg-white border border-(--line) rounded-[14px]
+                     px-3.5 py-3.25 text-[14px] cursor-pointer font-[inherit]
+                     text-left text-(--ink) outline-none focus:border-(--brand)
+                     pr-10"
+        >
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-(--muted) text-[16px] leading-none">
+          ›
+        </span>
+      </div>
+    );
+  }
+
   const hasValue = value != null && value !== "";
   return (
     <button
       type="button"
-      className="w-full flex items-center justify-between bg-white
-                 border border-(--line) rounded-[14px]
-                 px-3.5 py-3.25 text-[14px] cursor-pointer font-[inherit]
-                 text-left"
+      className="w-full flex items-center justify-between bg-white border border-(--line) rounded-[14px] px-3.5 py-3.25 text-[14px] cursor-pointer font-[inherit] text-left"
     >
       <span className={hasValue ? "text-(--ink)" : "text-(--muted)"}>
         {hasValue ? value : placeholder}
@@ -70,25 +105,30 @@ export function SelectInput({ value, placeholder }) {
 
 /* ----------------------------------------------------------------
    MoneyInput — ৳ prefix + tabular amount
-   size: "md" (default, big bold) | "sm" (secondary, e.g. fee)
    ---------------------------------------------------------------- */
-export function MoneyInput({ defaultValue, size = "md" }) {
+export function MoneyInput({
+  defaultValue,
+  size = "md",
+  inputRef,
+  value,
+  onChange,
+}) {
+  const controlled = value !== undefined;
   const isSmall = size === "sm";
   return (
     <div
       className={
         "flex items-center gap-2.5 bg-white border border-(--line) " +
-        "rounded-[14px] " +
+        "rounded-[14px] focus-within:border-(--brand) " +
         (isSmall ? "px-3.5 py-3" : "px-3.5 py-3.75")
       }
     >
-      <span className="text-[14px] font-medium text-(--muted) mr-1">
-        ৳
-      </span>
+      <span className="text-[14px] font-medium text-(--muted) mr-1">৳</span>
       <input
+        ref={inputRef}
         type="text"
         inputMode="decimal"
-        defaultValue={defaultValue}
+        {...(controlled ? { value, onChange } : { defaultValue })}
         className={
           "flex-1 min-w-0 bg-transparent border-0 outline-none num " +
           "text-(--ink) font-[inherit] " +

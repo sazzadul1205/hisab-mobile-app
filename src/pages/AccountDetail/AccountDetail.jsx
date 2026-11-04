@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { format } from "date-fns";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { AppBar } from "../../components/AppBar";
 import { IconButton } from "../../components/IconButton";
@@ -8,48 +9,8 @@ import { TransactionRow } from "../../components/TransactionRow";
 import { Chip, ChipStrip } from "../../components/Chip";
 import { Note } from "../../components/Note";
 import { Button } from "../../components/Button";
-
-const GROUPS = [
-  {
-    label: "Today",
-    rows: [
-      {
-        id: "a1",
-        tone: "in",
-        icon: <path d="M12 4v16M8 8h6a3 3 0 0 1 0 6H8" />,
-        title: "Salary — October",
-        meta: "Income · Today 8:00 AM",
-        amount: "+৳45,000.00",
-      },
-      {
-        id: "a2",
-        tone: "tr",
-        icon: <path d="M4 8h13l-3-3M20 16H7l3 3" />,
-        title: "Transfer to bKash",
-        meta: "Transfer · Today 9:30 AM",
-        amount: "৳5,000.00",
-      },
-    ],
-  },
-  {
-    label: "28 Oct",
-    rows: [
-      {
-        id: "a3",
-        tone: "out",
-        icon: (
-          <>
-            <path d="M5 12h14" />
-            <circle cx="12" cy="12" r="9" />
-          </>
-        ),
-        title: "Internet bill",
-        meta: "Utilities · Yesterday",
-        amount: "−৳1,200.00",
-      },
-    ],
-  },
-];
+import { useAccount } from "../../hooks/useAccounts";
+import { formatBDT } from "../../lib/money";
 
 const TONE_TO_TYPE = { in: "income", out: "expense", tr: "transfer" };
 
@@ -60,27 +21,130 @@ const FILTERS = [
   { value: "transfer", label: "Transfer" },
 ];
 
+/* Icons chosen by transaction type */
+const TYPE_ICON = {
+  income: <path d="M12 4v16M8 8h6a3 3 0 0 1 0 6H8" />,
+  expense: (
+    <>
+      <path d="M5 12h14" />
+      <circle cx="12" cy="12" r="9" />
+    </>
+  ),
+  transfer: <path d="M4 8h13l-3-3M20 16H7l3 3" />,
+};
+
+const TYPE_TONE = { income: "in", expense: "out", transfer: "tr" };
+
+function rowFor(tx) {
+  return {
+    id: tx.id,
+    tone: TYPE_TONE[tx.type],
+    icon: TYPE_ICON[tx.type],
+    title: tx.note || tx.categoryId || tx.type,
+    meta: `${tx.type.charAt(0).toUpperCase() + tx.type.slice(1)} · ${format(new Date(tx.date), "d MMM, h:mm a")}`,
+    amount: formatAmount(tx),
+  };
+}
+
+function formatAmount(tx) {
+  if (tx.type === "income") return `+${formatBDT(tx.amount)}`;
+  if (tx.type === "expense") return `−${formatBDT(tx.amount)}`;
+  return formatBDT(tx.amount);
+}
+
+function groupByDay(transactions) {
+  const map = new Map();
+  for (const tx of transactions) {
+    const day = tx.date.slice(0, 10);
+    if (!map.has(day)) map.set(day, []);
+    map.get(day).push(tx);
+  }
+  return [...map.entries()]
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([day, rows]) => ({
+      day,
+      label: formatGroupLabel(day),
+      rows: rows.sort((a, b) => b.date.localeCompare(a.date)),
+    }));
+}
+
+function formatGroupLabel(isoDay) {
+  const today = new Date().toISOString().slice(0, 10);
+  const y = new Date();
+  y.setDate(y.getDate() - 1);
+  const yesterday = y.toISOString().slice(0, 10);
+  const d = new Date(isoDay + "T00:00:00");
+  if (isoDay === today) return `Today · ${format(d, "d MMM")}`;
+  if (isoDay === yesterday) return `Yesterday · ${format(d, "d MMM")}`;
+  return format(d, "d MMM");
+}
+
 export default function AccountDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const openDetail = (txId) => navigate(`/transactions/${txId}`);
+  const { account, transactions, balance, loading } = useAccount(id);
   const [activeType, setActiveType] = useState("all");
+  const openDetail = (txId) => navigate(`/transactions/${txId}`);
 
-  const filteredGroups = GROUPS.map((g) => ({
-    ...g,
-    rows:
-      activeType === "all"
-        ? g.rows
-        : g.rows.filter((r) => TONE_TO_TYPE[r.tone] === activeType),
-  })).filter((g) => g.rows.length > 0);
+  if (loading) {
+    return (
+      <PhoneFrame>
+        <StatusBar />
+        <ScrollArea>
+          <div className="p-4">
+            <div className="h-8 bg-(--line-2) rounded w-40 mb-2 animate-pulse" />
+            <div className="h-4 bg-(--line-2) rounded w-48 mb-6 animate-pulse" />
+            <div className="h-24 bg-(--line-2) rounded-[18px] animate-pulse" />
+          </div>
+        </ScrollArea>
+      </PhoneFrame>
+    );
+  }
+
+  if (!account) {
+    return (
+      <PhoneFrame>
+        <StatusBar />
+        <ScrollArea>
+          <AppBar title="Not found" />
+          <div className="text-center py-10 px-4">
+            <b className="block text-[13.5px] font-semibold mb-2">
+              Account not found
+            </b>
+            <small className="block text-[12px] text-(--muted) mb-4">
+              It may have been deleted.
+            </small>
+            <Button onClick={() => navigate("/accounts")}>
+              Back to accounts
+            </Button>
+          </div>
+        </ScrollArea>
+      </PhoneFrame>
+    );
+  }
+
+  const groups = groupByDay(transactions);
+  const filteredGroups = groups
+    .map((g) => ({
+      ...g,
+      rows:
+        activeType === "all"
+          ? g.rows
+          : g.rows.filter((r) => TONE_TO_TYPE[rowFor(r).tone] === activeType),
+    }))
+    .filter((g) => g.rows.length > 0);
 
   return (
     <PhoneFrame>
       <StatusBar />
       <ScrollArea>
         <AppBar
-          title="City Bank — Savings"
-          subtitle="Bank account · active"
+          title={account.name}
+          subtitle={
+            account.isArchived
+              ? "Archived"
+              : `${ACCOUNT_TYPE_LABEL_FALLBACK[account.type] ?? "Account"} · active`
+          }
           right={
             <IconButton
               label="Edit account"
@@ -103,29 +167,32 @@ export default function AccountDetail() {
             Calculated balance
           </div>
           <div className="num text-[29px] font-bold tracking-[-1px] mt-1.5">
-            ৳91,600.00
+            {formatBDT(balance)}
           </div>
           <div className="text-[11.5px] text-white/65 mt-1">
-            Opening ৳40,000.00 · 12 transactions
+            Opening {formatBDT(account.openingBalance)} · {transactions.length}{" "}
+            {transactions.length === 1 ? "transaction" : "transactions"}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5 mt-3">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => navigate(`/accounts/${id}/reconcile`)}
-          >
-            Reconcile
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => navigate(`/accounts/${id}/archive`)}
-          >
-            Archive
-          </Button>
-        </div>
+        {!account.isArchived && (
+          <div className="grid grid-cols-2 gap-2.5 mt-3">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => navigate(`/accounts/${id}/reconcile`)}
+            >
+              Reconcile
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => navigate(`/accounts/${id}/archive`)}
+            >
+              Archive
+            </Button>
+          </div>
+        )}
 
         <div className="mt-3.5">
           <ChipStrip>
@@ -142,33 +209,54 @@ export default function AccountDetail() {
           </ChipStrip>
         </div>
 
-        {filteredGroups.map((g, gi) => (
-          <div key={g.label}>
-            <SectionLabel className={gi === 0 ? "mt-5" : ""}>
-              {g.label}
-            </SectionLabel>
-            <div className="bg-white border border-(--line) rounded-[18px] py-1 px-3.5">
-              {g.rows.map((r, ri) => (
-                <TransactionRow
-                  key={r.id}
-                  tone={r.tone}
-                  icon={r.icon}
-                  title={r.title}
-                  meta={r.meta}
-                  amount={r.amount}
-                  last={ri === g.rows.length - 1}
-                  onClick={() => openDetail(r.id)}
-                />
-              ))}
-            </div>
+        {filteredGroups.length === 0 ? (
+          <div className="text-center py-8 px-4">
+            <small className="block text-[12px] text-(--muted) leading-[1.55]">
+              {transactions.length === 0
+                ? "No transactions on this account yet."
+                : "No transactions match this filter."}
+            </small>
           </div>
-        ))}
+        ) : (
+          filteredGroups.map((g, gi) => (
+            <div key={g.day}>
+              <SectionLabel className={gi === 0 ? "mt-5" : ""}>
+                {g.label}
+              </SectionLabel>
+              <div className="bg-white border border-(--line) rounded-[18px] py-1 px-3.5">
+                {g.rows.map((r, ri) => {
+                  const display = rowFor(r);
+                  return (
+                    <TransactionRow
+                      key={r.id}
+                      tone={display.tone}
+                      icon={display.icon}
+                      title={display.title}
+                      meta={display.meta}
+                      amount={display.amount}
+                      last={ri === g.rows.length - 1}
+                      onClick={() => openDetail(r.id)}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          ))
+        )}
 
         <Note>
-          Archived accounts remain viewable for historical reference; archiving
-          never deletes data.
+          {account.isArchived
+            ? "Archived accounts remain viewable for historical reference. Data is never deleted on archive."
+            : "Archiving never deletes data. Archived accounts can be restored at any time."}
         </Note>
       </ScrollArea>
     </PhoneFrame>
   );
 }
+
+const ACCOUNT_TYPE_LABEL_FALLBACK = {
+  cash: "Cash",
+  wallet: "Mobile wallet",
+  bank: "Bank account",
+  other: "Other",
+};

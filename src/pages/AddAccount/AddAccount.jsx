@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { AppBar } from "../../components/AppBar";
@@ -9,20 +10,76 @@ import {
   SelectInput,
   MoneyInput,
 } from "../../components/FormField";
-
-const DEMO_ACCOUNT = {
-  name: "City Bank — Savings",
-  type: "Bank account",
-  openingBalance: "40,000.00",
-};
+import { useAccount } from "../../hooks/useAccounts";
+import { createAccount, updateAccount } from "../../services/accounts";
+import { parseMoney, fromMinor } from "../../lib/money";
+import { ACCOUNT_TYPES } from "../../constants/app";
+import { BootScreen } from "../../auth/RouteGuards";
 
 export default function AddAccount({ mode = "new" }) {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = mode === "edit";
 
+  const { account, loading } = useAccount(isEdit ? id : null);
+
+  const nameRef = useRef(null);
+  const typeRef = useRef(null);
+  const balanceRef = useRef(null);
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+
   const close = () => navigate(isEdit ? `/accounts/${id}` : "/accounts");
-  const cancel = close;
+
+  if (isEdit && (loading || !account)) {
+    return <BootScreen />;
+  }
+
+  // Prefill defaults
+  const defaultName = isEdit ? account.name : "";
+  const defaultType = isEdit ? account.type : "bank";
+  const defaultBalance = isEdit
+    ? fromMinor(account.openingBalance).toFixed(2)
+    : "40000.00";
+
+  const handleSave = async () => {
+    setError("");
+    const name = (nameRef.current?.value ?? "").trim();
+    const type = typeRef.current?.value ?? defaultType;
+    const balancePaisa = parseMoney(balanceRef.current?.value ?? "");
+
+    if (!name) {
+      setError("Account name is required.");
+      return;
+    }
+    if (balancePaisa == null || balancePaisa < 0) {
+      setError("Enter a valid opening balance.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      if (isEdit) {
+        await updateAccount(id, {
+          name,
+          type,
+          openingBalance: balancePaisa,
+        });
+        navigate(`/accounts/${id}`, { replace: true });
+      } else {
+        const created = await createAccount({
+          name,
+          type,
+          openingBalance: balancePaisa,
+        });
+        navigate(`/accounts/${created.id}`, { replace: true });
+      }
+    } catch (err) {
+      console.error("Account save failed:", err);
+      setError("Could not save. Try again.");
+      setSaving(false);
+    }
+  };
 
   return (
     <PhoneFrame>
@@ -32,20 +89,29 @@ export default function AddAccount({ mode = "new" }) {
 
         <Field label="Account name">
           <TextInput
+            inputRef={nameRef}
             placeholder="e.g. City Bank — Savings"
-            defaultValue={isEdit ? DEMO_ACCOUNT.name : undefined}
+            defaultValue={defaultName}
           />
         </Field>
 
         <Field label="Account type">
-          <SelectInput value={isEdit ? DEMO_ACCOUNT.type : "Bank account"} />
+          <SelectInput
+            inputRef={typeRef}
+            defaultValue={defaultType}
+            options={ACCOUNT_TYPES}
+          />
         </Field>
 
         <Field label="Opening balance">
-          <MoneyInput
-            defaultValue={isEdit ? DEMO_ACCOUNT.openingBalance : "40,000.00"}
-          />
+          <MoneyInput inputRef={balanceRef} defaultValue={defaultBalance} />
         </Field>
+
+        {error && (
+          <div className="text-[12px] font-semibold text-(--out) mb-3 text-center">
+            {error}
+          </div>
+        )}
 
         <Alert
           tone="info"
@@ -79,11 +145,14 @@ export default function AddAccount({ mode = "new" }) {
           <Button
             variant="secondary"
             className="flex-[0_0_34%]"
-            onClick={cancel}
+            onClick={close}
+            disabled={saving}
           >
             Cancel
           </Button>
-          <Button>{isEdit ? "Save changes" : "Save account"}</Button>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? "Saving…" : isEdit ? "Save changes" : "Save account"}
+          </Button>
         </ButtonRow>
       </div>
     </PhoneFrame>

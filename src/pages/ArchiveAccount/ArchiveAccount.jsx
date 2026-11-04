@@ -1,17 +1,13 @@
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { AppBar } from "../../components/AppBar";
 import { Alert } from "../../components/Alert";
 import { Button, ButtonRow } from "../../components/Button";
 import { Note } from "../../components/Note";
-
-// Demo data — replaced by a store lookup on :id when the DB wires in
-const DEMO = {
-  name: "City Bank — Savings",
-  type: "Bank account",
-  balance: "৳91,600.00",
-  transactionCount: 12,
-};
+import { useAccount } from "../../hooks/useAccounts";
+import { setArchived } from "../../services/accounts";
+import { formatBDT } from "../../lib/money";
 
 function InfoRow({ label, value, last = false }) {
   return (
@@ -24,9 +20,7 @@ function InfoRow({ label, value, last = false }) {
       <span className="text-[11px] text-(--muted) font-semibold uppercase tracking-wider">
         {label}
       </span>
-      <span className="text-[13px] font-semibold text-(--ink)">
-        {value}
-      </span>
+      <span className="text-[13px] font-semibold text-(--ink)">{value}</span>
     </div>
   );
 }
@@ -34,16 +28,55 @@ function InfoRow({ label, value, last = false }) {
 export default function ArchiveAccount() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { account, balance, transactions, loading } = useAccount(id);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
   const cancel = () => navigate(`/accounts/${id}`);
+
+  if (loading || !account) {
+    return (
+      <PhoneFrame>
+        <StatusBar />
+        <ScrollArea>
+          <AppBar title="Archive account" />
+          <div className="text-center py-10">
+            <small className="text-(--muted)">Loading…</small>
+          </div>
+        </ScrollArea>
+      </PhoneFrame>
+    );
+  }
+
+  const isAlreadyArchived = account.isArchived;
+  const action = isAlreadyArchived ? "Unarchive" : "Archive";
+
+  const handleSave = async () => {
+    setError("");
+    setSaving(true);
+    try {
+      await setArchived(id, !isAlreadyArchived);
+      navigate(`/accounts/${id}`, { replace: true });
+    } catch (err) {
+      console.error("Archive failed:", err);
+      setError("Could not update. Try again.");
+      setSaving(false);
+    }
+  };
 
   return (
     <PhoneFrame>
       <StatusBar />
       <ScrollArea>
-        <AppBar title="Archive account" />
+        <AppBar title={`${action} account`} />
 
-        {/* Warn badge */}
-        <div className="w-16 h-16 rounded-[22px] mx-auto mt-3 mb-4.5 grid place-items-center bg-(--warn-soft) text-(--warn)">
+        <div
+          className={`w-16 h-16 rounded-[22px] mx-auto mt-3 mb-4.5 grid place-items-center ${
+            isAlreadyArchived
+              ? "bg-(--brand-soft) text-(--brand-dk)"
+              : "bg-(--warn-soft) text-(--warn)"
+          }`}
+        >
           <svg
             viewBox="0 0 24 24"
             className="w-7.5 h-7.5 stroke-current fill-none stroke-[1.8] [stroke-linecap:round] [stroke-linejoin:round]"
@@ -54,23 +87,34 @@ export default function ArchiveAccount() {
           </svg>
         </div>
 
-        {/* Copy */}
         <div className="text-center mb-5">
           <h2 className="m-0 mb-2 text-[20px] font-bold tracking-[-0.4px]">
-            Archive this account?
+            {isAlreadyArchived
+              ? "Restore this account?"
+              : "Archive this account?"}
           </h2>
           <p className="m-0 mx-auto text-[13px] text-(--muted) leading-[1.6] max-w-[32ch]">
-            Hidden from your active list. All history is preserved.
+            {isAlreadyArchived
+              ? "The account will appear in your active list again."
+              : "Hidden from your active list. All history is preserved."}
           </p>
         </div>
 
-        {/* Detail card */}
         <div className="bg-white border border-(--line) rounded-[18px] p-4 mb-3">
-          <InfoRow label="Account" value={DEMO.name} />
-          <InfoRow label="Type" value={DEMO.type} />
-          <InfoRow label="Balance" value={DEMO.balance} />
-          <InfoRow label="Transactions" value={DEMO.transactionCount} last />
+          <InfoRow label="Account" value={account.name} />
+          <InfoRow label="Balance" value={formatBDT(balance)} />
+          <InfoRow
+            label="Transactions"
+            value={String(transactions.length)}
+            last
+          />
         </div>
+
+        {error && (
+          <div className="text-[12px] font-semibold text-(--out) mb-3 text-center">
+            {error}
+          </div>
+        )}
 
         <Alert
           tone="info"
@@ -81,10 +125,11 @@ export default function ArchiveAccount() {
               <path d="M12 8v4M12 16h.01" />
             </>
           }
-          title="You can undo this"
+          title={isAlreadyArchived ? "Reversible" : "You can undo this"}
         >
-          Archived accounts can be restored at any time from the Archived
-          section.
+          {isAlreadyArchived
+            ? "Un-archiving does not modify any transactions or balances."
+            : "Archived accounts can be restored at any time from the Archived section."}
         </Alert>
 
         <Note>
@@ -105,10 +150,13 @@ export default function ArchiveAccount() {
             variant="secondary"
             className="flex-[0_0_34%]"
             onClick={cancel}
+            disabled={saving}
           >
             Cancel
           </Button>
-          <Button>Archive account</Button>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? "Updating…" : `${action} account`}
+          </Button>
         </ButtonRow>
       </div>
     </PhoneFrame>
