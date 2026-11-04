@@ -104,6 +104,9 @@ export async function unlockVault(pin, metadata) {
    Records stay untouched (they're encrypted with DEK, not PIN).
    ---------------------------------------------------------------- */
 export async function changePin(oldPin, newPin, metadata) {
+    if (!oldPin || typeof oldPin !== "string") {
+        throw new Error("OLD_PIN_REQUIRED");
+    }
     if (!newPin || typeof newPin !== "string") {
         throw new Error("NEW_PIN_REQUIRED");
     }

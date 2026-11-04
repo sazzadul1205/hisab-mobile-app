@@ -7,6 +7,7 @@ import { Alert } from "../../components/Alert";
 import { Note } from "../../components/Note";
 import { buildCsvExport } from "../../services/export";
 import { formatBytes } from "../../services/storage";
+import { logger } from "../../lib/logger";
 
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
@@ -39,7 +40,7 @@ export default function Export() {
       downloadBlob(blob, filename);
       setDone({ filename, size: blob.size, counts });
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       setError("Could not export. Try again.");
     } finally {
       setBusy(false);

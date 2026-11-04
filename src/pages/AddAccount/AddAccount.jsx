@@ -15,6 +15,7 @@ import { createAccount, updateAccount } from "../../services/accounts";
 import { parseMoney, fromMinor } from "../../lib/money";
 import { ACCOUNT_TYPES } from "../../constants/app";
 import { BootScreen } from "../../auth/RouteGuards";
+import { logger } from "../../lib/logger";
 
 export default function AddAccount({ mode = "new" }) {
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ export default function AddAccount({ mode = "new" }) {
         navigate(`/accounts/${created.id}`, { replace: true });
       }
     } catch (err) {
-      console.error("Account save failed:", err);
+      logger.error("Account save failed:", err);
       setError("Could not save. Try again.");
       setSaving(false);
     }

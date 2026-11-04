@@ -6,6 +6,8 @@ import { Button } from "../../components/Button";
 import { useAuth } from "../../auth/authContext";
 import { PIN_LENGTH } from "../../constants/app";
 import { hasWebCrypto, InsecureContextError } from "../../lib/webcrypto";
+import { isWeakPin } from "../../constants/app";
+import { logger } from "../../lib/logger";
 
 function Bullet({ icon, title, subtitle }) {
   return (
@@ -149,12 +151,22 @@ export default function WelcomePin() {
       return;
     }
 
+    if (isWeakPin(pin)) {
+      setError(
+        "This PIN is easy to guess. Choose something harder if you can.",
+      );
+      setDigits("");
+      setFirstPin("");
+      setStep("enter");
+      return;
+    }
+
     setLoading(true);
     try {
       await setupVaultAndUnlock(pin);
       navigate("/dashboard", { replace: true });
     } catch (err) {
-      console.error("Vault setup failed:", err);
+      logger.error("Vault setup failed:", err);
       if (err instanceof InsecureContextError) {
         setError(
           "Browser won't allow encryption here. Use HTTPS or localhost.",

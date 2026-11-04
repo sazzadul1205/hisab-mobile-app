@@ -10,6 +10,7 @@ import { Button, ButtonRow } from "../../components/Button";
 import { BootScreen } from "../../auth/RouteGuards";
 import { useCategories } from "../../hooks/useTransactions";
 import { createCategory, updateCategory } from "../../services/categories";
+import { logger } from "../../lib/logger";
 
 const TYPE_LABEL = { expense: "Expense", income: "Income" };
 
@@ -47,7 +48,7 @@ function CategoryForm({ isEdit, id, initial, initialType, fromTab }) {
       if (err.message === "DUPLICATE_NAME") {
         setError(`A ${type} category named "${trimmed}" already exists.`);
       } else {
-        console.error(err);
+        logger.error(err);
         setError("Could not save. Try again.");
       }
       setSaving(false);

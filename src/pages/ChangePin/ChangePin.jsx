@@ -5,7 +5,9 @@ import { AppBar } from "../../components/AppBar";
 import { PinKeypad } from "../../components/PinKeypad";
 import { useAuth } from "../../auth/authContext";
 import { InvalidPinError } from "../../crypto/vault";
+import { recordFailure } from "../../auth/throttle";
 import { PIN_LENGTH } from "../../constants/app";
+import { logger } from "../../lib/logger";
 
 const STEPS = {
   verify: {
@@ -68,9 +70,10 @@ export default function ChangePin() {
         setStep("new");
       } catch (err) {
         if (err instanceof InvalidPinError) {
+          recordFailure();
           setError("Incorrect PIN. Try again.");
         } else {
-          console.error(err);
+          logger.error(err);
           setError("Could not verify. Try again.");
         }
         setDigits("");
@@ -101,7 +104,7 @@ export default function ChangePin() {
       await applyNewPin(pin);
       navigate("/security", { replace: true });
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       if (err.message === "Not unlocked") {
         setError("Session expired. Please unlock again.");
       } else {

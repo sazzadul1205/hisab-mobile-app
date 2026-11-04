@@ -13,6 +13,7 @@ import {
 import { recordSuccess } from "./throttle";
 import { AuthContext } from "./authContext";
 import { ensureEncryptedAtRest } from "../services/encryption";
+import { logger } from "../lib/logger";
 import {
   DEFAULT_AUTO_LOCK_MS,
   getAutoLockMs,
@@ -49,7 +50,7 @@ export function AuthProvider({ children }) {
         setVaultMeta(meta);
         setStatus(sessionIsUnlocked() ? "unlocked" : "locked");
       } catch (err) {
-        console.error("Vault load failed:", err);
+        logger.error("Vault load failed:", err);
         if (!cancelled) setStatus("no-vault");
       }
     })();
@@ -113,7 +114,7 @@ export function AuthProvider({ children }) {
   /* ---------- Migration kickoff (unchanged) ---------- */
   const kickMigration = useCallback(() => {
     ensureEncryptedAtRest().catch((err) =>
-      console.error("Encryption migration failed:", err),
+      logger.error("Encryption migration failed:", err),
     );
   }, []);
 
@@ -148,6 +149,7 @@ export function AuthProvider({ children }) {
     async (pin) => {
       if (!vaultMeta) throw new Error("No vault");
       await unlockVault(pin, vaultMeta);
+      recordSuccess();
     },
     [vaultMeta],
   );

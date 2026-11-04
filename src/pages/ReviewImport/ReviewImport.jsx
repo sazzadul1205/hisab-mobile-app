@@ -11,6 +11,7 @@ import { BootScreen } from "../../auth/RouteGuards";
 import { useCategories } from "../../hooks/useTransactions";
 import { commitImport } from "../../services/importCommit";
 import { formatBDT } from "../../lib/money";
+import { logger } from "../../lib/logger";
 
 /* ================================================================
    Row
@@ -256,7 +257,7 @@ export default function ReviewImport() {
       });
       navigate("/transactions", { replace: true });
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       setError("Could not save. Try again.");
       setSaving(false);
     }

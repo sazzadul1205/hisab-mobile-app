@@ -16,6 +16,7 @@ import { useTransaction } from "../../hooks/useTransactions";
 import { createTransfer, updateTransaction } from "../../services/transactions";
 import { parseMoney, fromMinor, formatBDT } from "../../lib/money";
 import { accountBalance } from "../../services/calc";
+import { logger } from "../../lib/logger";
 
 /* ================================================================
    Inner form
@@ -117,7 +118,7 @@ function TransferForm({ id, isEdit, initial, accounts, transactions }) {
       } else if (err.message === "SAME_ACCOUNT") {
         setError("Source and destination must differ.");
       } else {
-        console.error(err);
+        logger.error(err);
         setError("Could not save. Try again.");
       }
       setSaving(false);

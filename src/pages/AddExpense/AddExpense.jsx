@@ -16,6 +16,7 @@ import { useCategories, useTransaction } from "../../hooks/useTransactions";
 import { createExpense, updateTransaction } from "../../services/transactions";
 import { parseMoney, fromMinor, formatBDT } from "../../lib/money";
 import { accountBalance } from "../../services/calc";
+import { logger } from "../../lib/logger";
 
 /* ================================================================
    Inner form
@@ -106,7 +107,7 @@ function ExpenseForm({
       if (err.message === "INSUFFICIENT_BALANCE") {
         setError("Amount exceeds the account balance.");
       } else {
-        console.error(err);
+        logger.error(err);
         setError("Could not save. Try again.");
       }
       setSaving(false);

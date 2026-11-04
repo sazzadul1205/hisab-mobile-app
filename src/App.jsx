@@ -37,30 +37,8 @@ import DeleteAll from "./pages/DeleteAll/DeleteAll";
 import Export from "./pages/Export/Export";
 import Storage from "./pages/Storage/Storage";
 import ThemeSettings from "./pages/ThemeSettings/ThemeSettings";
-import { useEffect } from "react";
 
 export default function App() {
-  useEffect(() => {
-    // Prevent the context menu (right click / long press)
-    const handleContextMenu = (e) => {
-      // Check if the user is trying to paste into an input field
-      const isInput =
-        e.target.tagName === "INPUT" ||
-        e.target.tagName === "TEXTAREA" ||
-        e.target.closest("input") ||
-        e.target.closest("textarea");
-
-      if (isInput) {
-        return; // Allow default behavior for inputs
-      }
-
-      e.preventDefault(); // Block it everywhere else
-    };
-
-    document.addEventListener("contextmenu", handleContextMenu);
-    return () => document.removeEventListener("contextmenu", handleContextMenu);
-  }, []);
-
   return (
     <ThemeProvider>
       <BrowserRouter>

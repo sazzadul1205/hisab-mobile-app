@@ -13,6 +13,7 @@ import { Chevron } from "../../components/Chevron";
 import { StatusPill } from "../../components/StatusPill";
 import { Note } from "../../components/Note";
 import { db } from "../../db/db";
+import { logger } from "../../lib/logger";
 import {
   createBackupFile,
   readBackupFile,
@@ -130,7 +131,7 @@ function BackupTab({ onCreated }) {
       setPassword("");
       setConfirm("");
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       setError("Could not create backup. Try again.");
     } finally {
       setBusy(false);
@@ -257,7 +258,7 @@ function RestoreTab({ onRestored }) {
       const text = await file.text();
       setRawText(text);
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       setError("Could not read the file.");
     }
   };
@@ -297,7 +298,7 @@ function RestoreTab({ onRestored }) {
       setStage("preview");
       onRestored?.();
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       setError("Restore failed. Your existing data was not changed.");
       setStage("preview");
     }

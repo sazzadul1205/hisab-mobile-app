@@ -5,6 +5,7 @@ import { SectionLabel } from "../../components/SectionLabel";
 import { Note } from "../../components/Note";
 import { useAuth } from "../../auth/authContext";
 import { AUTO_LOCK_OPTIONS } from "../../services/settings";
+import { logger } from "../../lib/logger";
 
 function Checkmark() {
   return (
@@ -30,7 +31,7 @@ export default function AutoLock() {
     try {
       await updateAutoLock(value);
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       setError("Could not save. Try again.");
     } finally {
       setSaving(false);

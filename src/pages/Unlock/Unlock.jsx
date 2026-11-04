@@ -6,6 +6,7 @@ import { useAuth } from "../../auth/authContext";
 import { InvalidPinError } from "../../crypto/vault";
 import { getThrottleState, recordFailure } from "../../auth/throttle";
 import { PIN_LENGTH } from "../../constants/app";
+import { logger } from "../../lib/logger";
 
 function formatCountdown(seconds) {
   const m = Math.floor(seconds / 60);
@@ -67,7 +68,7 @@ export default function Unlock() {
         setThrottle(t);
         setError(t.isLocked ? "" : "Incorrect PIN");
       } else {
-        console.error("Unlock failed:", err);
+        logger.error("Unlock failed:", err);
         setError("Unlock failed");
       }
       setDigits("");

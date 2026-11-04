@@ -11,6 +11,7 @@ import { BootScreen } from "../../auth/RouteGuards";
 import { useTransaction, useLookup } from "../../hooks/useTransactions";
 import { deleteTransaction } from "../../services/transactions";
 import { formatBDT } from "../../lib/money";
+import { logger } from "../../lib/logger";
 
 const HERO_META = {
   transfer: {
@@ -147,7 +148,7 @@ export default function TransactionDetail() {
       await deleteTransaction(id);
       navigate("/transactions", { replace: true });
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       setDeleteError("Could not delete. Try again.");
       setDeleting(false);
     }

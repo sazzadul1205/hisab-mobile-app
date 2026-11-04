@@ -9,6 +9,7 @@ import { Button } from "../../components/Button";
 import { useAccount } from "../../hooks/useAccounts";
 import { saveReconciliation } from "../../services/reconciliations";
 import { formatBDT, parseMoney } from "../../lib/money";
+import { logger } from "../../lib/logger";
 
 const TYPE_COLOR = {
   cash: "#0E7C5A",
@@ -112,7 +113,7 @@ export default function Reconcile() {
       });
       navigate(`/accounts/${id}`, { replace: true });
     } catch (err) {
-      console.error("Reconcile failed:", err);
+      logger.error("Reconcile failed:", err);
       setError("Could not save. Try again.");
       setSaving(false);
     }

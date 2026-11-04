@@ -8,6 +8,7 @@ import { Note } from "../../components/Note";
 import { useAccount } from "../../hooks/useAccounts";
 import { setArchived } from "../../services/accounts";
 import { formatBDT } from "../../lib/money";
+import { logger } from "../../lib/logger";
 
 function InfoRow({ label, value, last = false }) {
   return (
@@ -58,7 +59,7 @@ export default function ArchiveAccount() {
       await setArchived(id, !isAlreadyArchived);
       navigate(`/accounts/${id}`, { replace: true });
     } catch (err) {
-      console.error("Archive failed:", err);
+      logger.error("Archive failed:", err);
       setError("Could not update. Try again.");
       setSaving(false);
     }

@@ -15,6 +15,7 @@ import { useAccounts } from "../../hooks/useAccounts";
 import { useCategories, useTransaction } from "../../hooks/useTransactions";
 import { createIncome, updateTransaction } from "../../services/transactions";
 import { parseMoney, fromMinor } from "../../lib/money";
+import { logger } from "../../lib/logger";
 
 /* ================================================================
    Inner form — receives fully-loaded data, so all useState
@@ -77,7 +78,7 @@ function IncomeForm({ id, isEdit, initial, accounts, categories }) {
         navigate(`/transactions/${tx.id}`, { replace: true });
       }
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       setError("Could not save. Try again.");
       setSaving(false);
     }

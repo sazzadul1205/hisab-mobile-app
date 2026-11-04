@@ -6,8 +6,10 @@ import { Alert } from "../../components/Alert";
 import { Button, ButtonRow } from "../../components/Button";
 import { useAuth } from "../../auth/authContext";
 import { InvalidPinError } from "../../crypto/vault";
+import { recordFailure } from "../../auth/throttle";
 import { wipeAllData } from "../../services/deleteAll";
 import { PIN_LENGTH } from "../../constants/app";
+import { logger } from "../../lib/logger";
 
 export default function DeleteAll() {
   const { verifyPin, lock } = useAuth();
@@ -38,9 +40,10 @@ export default function DeleteAll() {
       await verifyPin(pin);
     } catch (err) {
       if (err instanceof InvalidPinError) {
+        recordFailure();
         setError("Incorrect PIN.");
       } else {
-        console.error(err);
+        logger.error(err);
         setError("Could not verify PIN. Try again.");
       }
       setBusy(false);
@@ -58,7 +61,7 @@ export default function DeleteAll() {
       await wipeAllData();
       window.location.replace("/");
     } catch (err) {
-      console.error("Wipe failed:", err);
+      logger.error("Wipe failed:", err);
       setError("Could not delete data. Try again.");
       setBusy(false);
     }
