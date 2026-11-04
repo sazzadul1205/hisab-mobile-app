@@ -424,6 +424,14 @@ function OnboardingEmpty({ onAdd }) {
           >
             + Add account
           </button>
+          <div className="text-center mt-3">
+            <Link
+              to="/settings/manual"
+              className="text-[12px] font-semibold text-(--brand) no-underline"
+            >
+              Read the user manual first →
+            </Link>
+          </div>
         </div>
       </ScrollArea>
       <BottomNav active="home" />

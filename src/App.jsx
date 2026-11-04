@@ -37,6 +37,8 @@ import DeleteAll from "./pages/DeleteAll/DeleteAll";
 import Export from "./pages/Export/Export";
 import Storage from "./pages/Storage/Storage";
 import ThemeSettings from "./pages/ThemeSettings/ThemeSettings";
+import UserManual from "./pages/UserManual/UserManual";
+import Changelog from "./pages/Changelog/Changelog";
 
 export default function App() {
   return (
@@ -100,9 +102,9 @@ export default function App() {
               <Route path="/settings" element={<Settings />} />
               <Route path="/settings/export" element={<Export />} />
               <Route path="/settings/storage" element={<Storage />} />
-
-              {/* Add the new theme route */}
               <Route path="/settings/theme" element={<ThemeSettings />} />
+              <Route path="/settings/manual" element={<UserManual />} />
+              <Route path="/settings/changelog" element={<Changelog />} />
 
               <Route path="/delete-all" element={<DeleteAll />} />
             </Route>

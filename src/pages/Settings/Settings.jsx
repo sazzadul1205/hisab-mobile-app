@@ -97,6 +97,32 @@ export default function Settings() {
               trailing={<Chevron />}
             />
           </div>
+          <div onClick={() => navigate("/settings/manual")}>
+            <ListItem
+              icon={
+                <>
+                  <path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4z" />
+                  <path d="M8 9h8M8 13h5M8 17h8" />
+                </>
+              }
+              title="User Manual"
+              subtitle="How to use Hisab"
+              trailing={<Chevron />}
+            />
+          </div>
+          <div onClick={() => navigate("/settings/changelog")}>
+            <ListItem
+              icon={
+                <>
+                  <path d="M12 3v12M8 8l4-4 4 4" />
+                  <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+                </>
+              }
+              title="Changelog"
+              subtitle="Version history and updates"
+              trailing={<Chevron />}
+            />
+          </div>
         </div>
 
         <SectionLabel>Data</SectionLabel>
