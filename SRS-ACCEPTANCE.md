@@ -39,18 +39,18 @@ All items from the SRS are implemented and verified.
 
 ## Test Inventory
 
-| Test file | Coverage |
-|---|---|
-| `src/services/transactions.test.js` | createIncome, createExpense, createTransfer, update, delete, balance checks |
-| `src/services/storage.test.js` | Storage estimate, table counts, byte formatting |
-| `src/services/settings.test.js` | Auto-lock get/set, last import account |
-| `src/services/importParser.test.js` | CSV parsing, format detection, duplicate detection, fee rows |
-| `src/services/export.test.js` | CSV export build |
-| `src/services/encryption.test.js` | encrypt/decrypt round-trip, migration |
-| `src/services/categories.test.js` | list, get, create, update, duplicate detection |
-| `src/services/calc.test.js` | accountBalance, computeBalances, combinedBalance, netCashFlow, expensesByCategory, dailyFlow |
-| `src/services/backup.test.js` | createBackupFile, validateEnvelope, readBackupFile, restoreBackup (replace/merge), backup log |
-| `src/services/accounts.test.js` | list, get, create, update, setArchived |
-| `src/crypto/vault.test.js` | setupVault, unlockVault (valid/invalid PIN), changePin, rewrapDEK, encryptForStorage, decryptFromStorage |
-| `src/auth/throttle.test.js` | recordFailure, recordSuccess, getThrottleState, tier escalation |
-| `src/lib/money.test.js` | toMinor, fromMinor, parseMoney, formatBDT, formatBDTShort, isMinor |
+| Test file                           | Coverage                                                                                                 |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `src/services/transactions.test.js` | createIncome, createExpense, createTransfer, update, delete, balance checks                              |
+| `src/services/storage.test.js`      | Storage estimate, table counts, byte formatting                                                          |
+| `src/services/settings.test.js`     | Auto-lock get/set, last import account                                                                   |
+| `src/services/importParser.test.js` | CSV parsing, format detection, duplicate detection, fee rows                                             |
+| `src/services/export.test.js`       | CSV export build                                                                                         |
+| `src/services/encryption.test.js`   | encrypt/decrypt round-trip, migration                                                                    |
+| `src/services/categories.test.js`   | list, get, create, update, duplicate detection                                                           |
+| `src/services/calc.test.js`         | accountBalance, computeBalances, combinedBalance, netCashFlow, expensesByCategory, dailyFlow             |
+| `src/services/backup.test.js`       | createBackupFile, validateEnvelope, readBackupFile, restoreBackup (replace/merge), backup log            |
+| `src/services/accounts.test.js`     | list, get, create, update, setArchived                                                                   |
+| `src/crypto/vault.test.js`          | setupVault, unlockVault (valid/invalid PIN), changePin, rewrapDEK, encryptForStorage, decryptFromStorage |
+| `src/auth/throttle.test.js`         | recordFailure, recordSuccess, getThrottleState, tier escalation                                          |
+| `src/lib/money.test.js`             | toMinor, fromMinor, parseMoney, formatBDT, formatBDTShort, isMinor                                       |

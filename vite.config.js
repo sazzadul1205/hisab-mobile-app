@@ -1,9 +1,27 @@
+/* eslint-disable no-undef */
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
 
+// Resolve env vars at build time. The service worker reads these
+// placeholders; Vite replaces them during build so the built sw.js
+// never contains a literal "" for a missing key.
+function env(key) {
+    return JSON.stringify(process.env[key] ?? "");
+}
+
 export default defineConfig({
+  define: {
+    // Public sw.js placeholders — replaced by esbuild at build time.
+    "__VITE_FIREBASE_API_KEY__": env("VITE_FIREBASE_API_KEY"),
+    "__VITE_FIREBASE_APP_ID__": env("VITE_FIREBASE_APP_ID"),
+    "__VITE_FIREBASE_PROJECT_ID__": env("VITE_FIREBASE_PROJECT_ID"),
+    "__VITE_FIREBASE_STORAGE_BUCKET__": env("VITE_FIREBASE_STORAGE_BUCKET"),
+    "__VITE_FIREBASE_MESSAGING_SENDER_ID__": env("VITE_FIREBASE_MESSAGING_SENDER_ID"),
+    "__VITE_FIREBASE_MEASUREMENT_ID__": env("VITE_FIREBASE_MEASUREMENT_ID"),
+    "__VITE_FIREBASE_AUTH_DOMAIN__": env("VITE_FIREBASE_AUTH_DOMAIN"),
+  },
   plugins: [
     react(),
     tailwindcss(),

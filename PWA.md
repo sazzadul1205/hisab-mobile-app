@@ -27,24 +27,24 @@ Hisab is a Progressive Web App (PWA) that can be installed on iOS, Android, and 
 
 The PWA manifest is defined in `vite.config.js` under `VitePWA({ manifest: { ... } })`:
 
-| Field | Value | Purpose |
-|---|---|---|
-| `name` | "Hisab — Personal Finance" | Full app name |
-| `short_name` | "Hisab" | Home screen label |
-| `display` | `standalone` | Hides browser chrome |
-| `orientation` | `portrait` | Phone-first layout |
-| `theme_color` | `#0E7C5A` | Brand green |
-| `background_color` | `#EEF2F0` | Splash screen background |
-| `categories` | `["finance", "productivity"]` | App store categorization |
-| `scope` | `/` | Full-site scope |
+| Field              | Value                         | Purpose                  |
+| ------------------ | ----------------------------- | ------------------------ |
+| `name`             | "Hisab — Personal Finance"    | Full app name            |
+| `short_name`       | "Hisab"                       | Home screen label        |
+| `display`          | `standalone`                  | Hides browser chrome     |
+| `orientation`      | `portrait`                    | Phone-first layout       |
+| `theme_color`      | `#0E7C5A`                     | Brand green              |
+| `background_color` | `#EEF2F0`                     | Splash screen background |
+| `categories`       | `["finance", "productivity"]` | App store categorization |
+| `scope`            | `/`                           | Full-site scope          |
 
 ### Icon Sizes
 
-| Size | Purpose |
-|---|---|
-| 64x64 | Favicon |
-| 192x192 | Android home screen |
-| 512x512 | iOS home screen |
+| Size               | Purpose                 |
+| ------------------ | ----------------------- |
+| 64x64              | Favicon                 |
+| 192x192            | Android home screen     |
+| 512x512            | iOS home screen         |
 | 512x512 (maskable) | Adaptive icon (Android) |
 
 ## Service Worker
@@ -62,7 +62,10 @@ The `index.html` includes Apple-specific meta tags:
 
 ```html
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta
+  name="apple-mobile-web-app-status-bar-style"
+  content="black-translucent"
+/>
 <meta name="apple-mobile-web-app-title" content="Hisab" />
 <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
 ```
@@ -76,7 +79,10 @@ The `vercel.json` file configures Vercel deployment:
 ```json
 {
   "rewrites": [
-    { "source": "/.well-known/assetlinks.json", "destination": "/assetlinks.json" },
+    {
+      "source": "/.well-known/assetlinks.json",
+      "destination": "/assetlinks.json"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

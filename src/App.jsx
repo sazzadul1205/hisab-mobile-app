@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./auth/ThemeProvider";
 import { AuthProvider } from "./auth/AuthProvider";
-import { ReminderScheduler } from "./components/ReminderScheduler";
 import {
   RequireAuth,
   RequireNoVault,
@@ -47,7 +46,6 @@ export default function App() {
     <ThemeProvider>
       <BrowserRouter>
         <AuthProvider>
-            <ReminderScheduler />
             <Routes>
             <Route path="/" element={<RootRedirect />} />
 
