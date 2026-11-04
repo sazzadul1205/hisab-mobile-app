@@ -1,16 +1,29 @@
-# React + Vite
+# Hisab — Personal Finance & Bookkeeping PWA
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A private, local-first, mobile-friendly app for recording daily income and expenses across multiple accounts (cash, bKash, bank), tracking balances, and understanding spending through charts.
 
-Currently, two official plugins are available:
+**No accounts. No cloud. No tracking.** Your data stays on your device, encrypted by your PIN.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- **Security:** 6-digit PIN, PBKDF2 + AES-GCM encryption at rest, auto-lock, encrypted backups.
+- **Accounts:** Track balances across Cash, bKash, Nagad, and Bank accounts.
+- **Transactions:** Income, Expenses, and Transfers (with fee handling).
+- **Insights:** Real-time dashboard, spending breakdowns, and period reports.
+- **Import:** Local CSV parsing for bKash and bank statements.
+- **Export:** Spreadsheet-friendly CSV export.
+- **PWA:** Installable on iOS/Android, works fully offline.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- **Frontend:** React 18, Vite, Tailwind CSS v4
+- **State/Routing:** React Router, Dexie (IndexedDB), `useLiveQuery`
+- **Crypto:** Web Crypto API (PBKDF2-SHA256, AES-GCM)
+- **Testing:** Vitest + fake-indexeddb (162 passing tests)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Local Development
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
