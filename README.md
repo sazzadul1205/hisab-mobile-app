@@ -16,7 +16,7 @@ A private, local-first, mobile-friendly app for recording daily income and expen
 
 ## Tech Stack
 
-- **Frontend:** React 18, Vite, Tailwind CSS v4
+- **Frontend:** React 19, Vite, Tailwind CSS v4
 - **State/Routing:** React Router, Dexie (IndexedDB), `useLiveQuery`
 - **Crypto:** Web Crypto API (PBKDF2-SHA256, AES-GCM)
 - **Testing:** Vitest + fake-indexeddb (162 passing tests)
@@ -27,3 +27,54 @@ A private, local-first, mobile-friendly app for recording daily income and expen
    ```bash
    npm install
    ```
+2. Run the dev server:
+   ```bash
+   npm run dev
+   ```
+3. Run tests:
+   ```bash
+   npm run test:run
+   ```
+4. Lint:
+   ```bash
+   npm run lint
+   ```
+5. Build for production:
+   ```bash
+   npm run build
+   ```
+
+## Project Structure
+
+```text
+src/
+├── App.jsx              # Route definitions + guards
+├── main.jsx             # Entry point
+├── auth/                # Auth provider, route guards, session, throttle, theme
+├── components/          # Reusable UI primitives (PhoneFrame, Button, etc.)
+├── constants/           # App constants, categories, icons
+├── crypto/              # vault.js, kdf.js, aes.js
+├── db/                  # Dexie schema + seed
+├── hooks/               # useAccounts, useTransactions, useLookup
+├── lib/                 # money.js, webcrypto.js, base64.js
+├── pages/               # All route-level pages
+├── services/            # Domain services (transactions, backup, etc.)
+└── test/                # Test setup + helpers
+```
+
+## Security Model
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the full two-layer key system design.
+
+## Documentation
+
+- [Architecture & Security Design](ARCHITECTURE.md)
+- [PWA Guide](PWA.md)
+- [SRS Acceptance Criteria](SRS-ACCEPTANCE.md)
+- [UI Design Reference](Design.html)
+- [Agent Guidelines](AGENTS.md)
+- [Contributing](CONTRIBUTING.md)
+
+## License
+
+Proprietary — for internal use only.

@@ -1,0 +1,43 @@
+{
+  "name": "hisab-mobile-app",
+  "version": "0.0.0",
+  "description": "Local-first, PIN-encrypted personal finance PWA for Bangladesh (BDT only)",
+  "type": "module",
+  "scripts": {
+    "dev": "npx vite --host",
+    "build": "vite build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "generate:icons": "pwa-assets-generator"
+  },
+  "permissions": {
+    "bash": {
+      "allow": [
+        "npm install",
+        "npm run dev",
+        "npm run build",
+        "npm run lint",
+        "npm run lint:fix",
+        "npm run test",
+        "npm run test:run",
+        "npm run preview"
+      ]
+    }
+  },
+  "agents": {
+    "review": ".kilo/agent/review.md",
+    "test-agent": ".kilo/agent/test-agent.md",
+    "security": ".kilo/agent/security.md",
+    "architect": ".kilo/agent/architect.md"
+  },
+  "commands": {
+    "dev": ".kilo/command/dev.md",
+    "test": ".kilo/command/test.md",
+    "build": ".kilo/command/build.md",
+    "lint": ".kilo/command/lint.md",
+    "lint:fix": ".kilo/command/lint-fix.md"
+  }
+}
