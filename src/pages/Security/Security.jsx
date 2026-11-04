@@ -5,8 +5,18 @@ import { Chevron } from "../../components/Chevron";
 import { Toggle } from "../../components/Toggle";
 import { Alert } from "../../components/Alert";
 import { SectionLabel } from "../../components/SectionLabel";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../auth/authContext";
 
 export default function Security() {
+  const navigate = useNavigate();
+  const { lock } = useAuth();
+
+  const handleLockNow = () => {
+    lock();
+    navigate("/unlock", { replace: true });
+  };
+
   return (
     <PhoneFrame>
       <StatusBar />
@@ -52,16 +62,18 @@ export default function Security() {
 
         <SectionLabel>Actions</SectionLabel>
         <div className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-4">
-          <ListItem
-            icon={
-              <>
-                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                <path d="M10 17l5-5-5-5M15 12H3" />
-              </>
-            }
-            title="Lock now"
-            trailing={<Chevron />}
-          />
+          <div onClick={handleLockNow}>
+            <ListItem
+              icon={
+                <>
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                  <path d="M10 17l5-5-5-5M15 12H3" />
+                </>
+              }
+              title="Lock now"
+              trailing={<Chevron />}
+            />
+          </div>
           <ListItem
             icon={<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z" />}
             title="Key management info"

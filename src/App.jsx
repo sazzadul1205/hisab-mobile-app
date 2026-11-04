@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import WelcomePin from "./pages/WelcomePin/WelcomePin";
 import Unlock from "./pages/Unlock/Unlock";
 import Security from "./pages/Security/Security";
@@ -22,41 +22,68 @@ import DeleteAll from "./pages/DeleteAll/DeleteAll";
 import ArchiveAccount from "./pages/ArchiveAccount/ArchiveAccount";
 import EditTransaction from "./pages/EditTransaction/EditTransaction";
 import AddCategory from "./pages/AddCategory/AddCategory";
+import { AuthProvider } from "./auth/AuthProvider";
+import {
+  RequireAuth,
+  RequireNoVault,
+  RequireVaultLocked,
+  RootRedirect,
+} from "./auth/RouteGuards";
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/welcome" replace />} />
-        <Route path="/welcome" element={<WelcomePin />} />
-        <Route path="/unlock" element={<Unlock />} />
-        <Route path="/security" element={<Security />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/accounts" element={<Accounts />} />
-        <Route path="/accounts/new" element={<AddAccount />} />
-        <Route path="/accounts/:id" element={<AccountDetail />} />
-        <Route path="/accounts/:id/edit" element={<AddAccount mode="edit" />} />
-        <Route path="/accounts/:id/reconcile" element={<Reconcile />} />
-        <Route path="/accounts/:id/archive" element={<ArchiveAccount />} />
-        <Route path="/transactions" element={<Transactions />} />
-        <Route path="/transactions/:id" element={<TransactionDetail />} />
-        <Route path="/transactions/:id/edit" element={<EditTransaction />} />
-        <Route path="/income/new" element={<AddIncome />} />
-        <Route path="/expense/new" element={<AddExpense />} />
-        <Route path="/transfer/new" element={<AddTransfer />} />
-        <Route path="/categories" element={<Categories />} />
-        <Route path="/categories/new" element={<AddCategory />} />
-        <Route
-          path="/categories/:id/edit"
-          element={<AddCategory mode="edit" />}
-        />
-        <Route path="/reports" element={<Reports />} />
-        <Route path="/import" element={<ImportStatement />} />
-        <Route path="/import/review" element={<ReviewImport />} />
-        <Route path="/backup" element={<Backup />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/delete-all" element={<DeleteAll />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<RootRedirect />} />
+
+          {/* Guest-only: reachable only when NO vault exists */}
+          <Route element={<RequireNoVault />}>
+            <Route path="/welcome" element={<WelcomePin />} />
+          </Route>
+
+          {/* Guest-only: reachable only when a vault exists AND locked */}
+          <Route element={<RequireVaultLocked />}>
+            <Route path="/unlock" element={<Unlock />} />
+          </Route>
+
+          {/* Everything else requires an unlocked session */}
+          <Route element={<RequireAuth />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/accounts" element={<Accounts />} />
+            <Route path="/accounts/new" element={<AddAccount />} />
+            <Route path="/accounts/:id" element={<AccountDetail />} />
+            <Route
+              path="/accounts/:id/edit"
+              element={<AddAccount mode="edit" />}
+            />
+            <Route path="/accounts/:id/reconcile" element={<Reconcile />} />
+            <Route path="/accounts/:id/archive" element={<ArchiveAccount />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/transactions/:id" element={<TransactionDetail />} />
+            <Route
+              path="/transactions/:id/edit"
+              element={<EditTransaction />}
+            />
+            <Route path="/income/new" element={<AddIncome />} />
+            <Route path="/expense/new" element={<AddExpense />} />
+            <Route path="/transfer/new" element={<AddTransfer />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/categories/new" element={<AddCategory />} />
+            <Route
+              path="/categories/:id/edit"
+              element={<AddCategory mode="edit" />}
+            />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/import" element={<ImportStatement />} />
+            <Route path="/import/review" element={<ReviewImport />} />
+            <Route path="/backup" element={<Backup />} />
+            <Route path="/security" element={<Security />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/delete-all" element={<DeleteAll />} />
+          </Route>
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
