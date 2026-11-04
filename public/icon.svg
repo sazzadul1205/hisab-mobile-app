@@ -1,26 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#118A64" />
-      <stop offset="100%" stop-color="#0A5A41" />
-    </linearGradient>
-  </defs>
-
-  <!-- Full-bleed background. The OS or generator adds the rounding. -->
-  <rect width="512" height="512" fill="url(#bg)" />
-
-  <!-- Stylized ৳ (taka sign), drawn with paths — no font dependency. -->
-  <g fill="#FFFFFF">
-    <!-- Vertical stem -->
-    <rect x="216" y="140" width="32" height="232" rx="16" />
-    <!-- Top loop -->
-    <path
-      d="M 216 180 C 216 140, 296 140, 296 180 C 296 220, 216 220, 216 220"
-      stroke="#FFFFFF"
-      stroke-width="32"
-      stroke-linecap="round"
-    />
-    <!-- Crossbar -->
-    <rect x="176" y="220" width="160" height="32" rx="16" />
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="112" fill="#0F766E"/>
+  <circle cx="256" cy="240" r="150" fill="#FFFFFF"/>
+  <rect x="186" y="252" width="36" height="60" rx="8" fill="#0F766E"/>
+  <rect x="238" y="212" width="36" height="100" rx="8" fill="#0F766E"/>
+  <rect x="290" y="172" width="36" height="140" rx="8" fill="#0F766E"/>
+  <circle cx="388" cy="388" r="64" fill="#F59E0B" stroke="#0F766E" stroke-width="14"/>
+  <path d="M372 384v-12a16 16 0 0 1 32 0v12" fill="none" stroke="#0F172A" stroke-width="9" stroke-linecap="round"/>
+  <rect x="362" y="384" width="52" height="38" rx="8" fill="#0F172A"/>
+  <circle cx="388" cy="400" r="6" fill="#F59E0B"/>
 </svg>
