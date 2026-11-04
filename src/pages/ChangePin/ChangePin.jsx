@@ -136,6 +136,7 @@ export default function ChangePin() {
       <ScrollArea>
         <AppBar title="Change PIN" />
 
+        <div className="stagger">
         <div className="text-center pt-8 pb-6">
           <div className="w-16 h-16 rounded-[22px] mx-auto mb-4.5 grid place-items-center bg-(--brand-soft) text-(--brand-dk)">
             <svg
@@ -202,6 +203,7 @@ export default function ChangePin() {
             {step === "verify" ? "Cancel" : "Back"}
           </button>
         </div>
+      </div>
       </ScrollArea>
     </PhoneFrame>
   );

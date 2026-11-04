@@ -4,6 +4,24 @@ All notable changes to Hisab are documented here.
 
 ---
 
+## [1.0.1] — 2026-11-04
+
+### Changed
+- Added a shared animation system in `src/index.css` (6 keyframes + a `.stagger`
+  cascade utility, gated by `prefers-reduced-motion`).
+- Buttons now scale down on press (`active:scale-[0.96]`) for tactile feedback.
+- Wrapped content blocks in 21 page components with the stagger animation so
+  lists, cards, and sections cascade in on mount instead of appearing all at once.
+- Fixed a pre-existing duplicate `ScrollArea` import in `UserManual.jsx` that
+  broke production builds.
+- Removed an unused `TYPE_COLOR` constant from the in-app Changelog page.
+
+### Security
+- Added `dev-dist` to the ESLint ignore list so generated PWA service-worker
+  files no longer fail `npm run lint`.
+
+---
+
 ## [1.0.0] — 2026-11-04
 
 ### Added

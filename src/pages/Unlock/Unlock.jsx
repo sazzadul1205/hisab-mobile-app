@@ -83,6 +83,8 @@ export default function Unlock() {
       <StatusBar />
       <ScrollArea>
         {/* Hero */}
+        <div className="stagger">
+        {/* Hero */}
         <div className="text-center pt-11 pb-5.5">
           <div className="w-16 h-16 rounded-[22px] mx-auto mb-4.5 grid place-items-center bg-(--brand-soft) text-(--brand-dk)">
             <svg
@@ -151,6 +153,7 @@ export default function Unlock() {
             Forgot PIN?
           </span>
         </div>
+      </div>
       </ScrollArea>
     </PhoneFrame>
   );

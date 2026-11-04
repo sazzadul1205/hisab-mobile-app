@@ -142,6 +142,7 @@ function TransferForm({ id, isEdit, initial, accounts, transactions }) {
           }
         />
 
+        <div className="stagger">
         {!isEdit && <TransactionTypeSegments active="transfer" />}
 
         <AmountInput value={amount} onChange={setAmount} hint={hint} />
@@ -198,6 +199,7 @@ function TransferForm({ id, isEdit, initial, accounts, transactions }) {
             {error}
           </div>
         )}
+      </div>
       </ScrollArea>
 
       <div

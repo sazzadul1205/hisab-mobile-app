@@ -192,6 +192,7 @@ export default function WelcomePin() {
     <PhoneFrame>
       <StatusBar />
       <ScrollArea>
+        <div className="stagger">
         <div className="text-center pt-6.5 pb-5.5">
           <div className="w-16 h-16 rounded-[22px] mx-auto mb-4.5 grid place-items-center bg-(--brand-soft) text-(--brand-dk)">
             <svg
@@ -283,6 +284,7 @@ export default function WelcomePin() {
             />
           </div>
         )}
+      </div>
       </ScrollArea>
 
       {step === "confirm" && (

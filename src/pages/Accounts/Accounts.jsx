@@ -163,6 +163,7 @@ export default function Accounts() {
           />
         </div>
 
+        <div className="stagger">
         <div
           className="rounded-[18px] p-5 text-white"
           style={{ background: "linear-gradient(150deg, #118A64, #0A5A41)" }}
@@ -239,6 +240,7 @@ export default function Accounts() {
           Balances are always recalculated from the opening balance and saved
           transactions — never stored as a fixed number.
         </Note>
+      </div>
       </ScrollArea>
       <BottomNav active="accounts" />
     </PhoneFrame>

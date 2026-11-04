@@ -135,6 +135,7 @@ export default function Categories() {
           }
         />
 
+        <div className="stagger">
         <SegmentedControl value={tab} options={TABS} onChange={setTab} />
 
         {isManage ? (
@@ -178,6 +179,7 @@ export default function Categories() {
             </Note>
           </>
         )}
+      </div>
       </ScrollArea>
     </PhoneFrame>
   );

@@ -131,6 +131,7 @@ function ExpenseForm({
           }
         />
 
+        <div className="stagger">
         {!isEdit && <TransactionTypeSegments active="expense" />}
 
         <AmountInput
@@ -186,6 +187,7 @@ function ExpenseForm({
           Amount must be positive and must not exceed the source account
           balance. Overdrafts are blocked.
         </div>
+      </div>
       </ScrollArea>
 
       <div

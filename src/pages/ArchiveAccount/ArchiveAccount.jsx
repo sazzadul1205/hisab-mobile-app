@@ -71,6 +71,7 @@ export default function ArchiveAccount() {
       <ScrollArea>
         <AppBar title={`${action} account`} />
 
+        <div className="stagger">
         <div
           className={`w-16 h-16 rounded-[22px] mx-auto mt-3 mb-4.5 grid place-items-center ${
             isAlreadyArchived
@@ -137,6 +138,7 @@ export default function ArchiveAccount() {
           Archived accounts are excluded from the combined balance and from new
           transactions, but historical reports and records remain intact.
         </Note>
+      </div>
       </ScrollArea>
 
       <div

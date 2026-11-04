@@ -4,6 +4,26 @@ import { BottomNav } from "../../components/BottomNav";
 
 const RELEASES = [
   {
+    version: "1.0.1",
+    date: "2026-11-04",
+    changes: [
+      { type: "Changed", items: [
+        "Added a shared animation system in src/index.css (6 keyframes plus a "
+        + ".stagger cascade utility, gated by prefers-reduced-motion)",
+        "Buttons now scale down on press (active:scale-[0.96]) for tactile feedback",
+        "Wrapped content blocks in 21 page components with the stagger animation "
+        + "so lists, cards, and sections cascade in on mount instead of appearing all at once",
+        "Fixed a pre-existing duplicate ScrollArea import in UserManual.jsx that "
+        + "broke production builds",
+        "Removed an unused TYPE_COLOR constant from this page",
+      ]},
+      { type: "Security", items: [
+        "Added dev-dist to the ESLint ignore list so generated PWA "
+        + "service-worker files no longer fail npm run lint",
+      ]},
+    ],
+  },
+  {
     version: "1.0.0",
     date: "2026-11-04",
     changes: [
@@ -58,14 +78,6 @@ const RELEASES = [
     ],
   },
 ];
-
-const TYPE_COLOR = {
-  Added: "text-(--in)",
-  Changed: "text-(--brand)",
-  Fixed: "text-(--out)",
-  Security: "text-(--warn)",
-  Removed: "text-(--muted)",
-};
 
 function Release({ version, date, changes }) {
   return (
@@ -132,7 +144,7 @@ export default function Changelog() {
           </div>
         </div>
 
-        <div className="pb-4">
+        <div className="pb-4 stagger">
           {RELEASES.map((r) => (
             <Release key={r.version} {...r} />
           ))}
@@ -140,7 +152,7 @@ export default function Changelog() {
 
         <div className="text-center mt-3 mb-2">
           <span className="text-[11px] text-(--muted)">
-            Format: Keep a Changelog · Hisab v1.0
+            Format: Keep a Changelog · Hisab v1.0.1
           </span>
         </div>
       </ScrollArea>

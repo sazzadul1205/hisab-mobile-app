@@ -53,6 +53,7 @@ export default function Export() {
       <ScrollArea>
         <AppBar title="Export data" />
 
+        <div className="stagger">
         <Alert
           tone="info"
           className="mb-3.5"
@@ -97,6 +98,7 @@ export default function Export() {
             {error}
           </div>
         )}
+      </div>
       </ScrollArea>
 
       <div

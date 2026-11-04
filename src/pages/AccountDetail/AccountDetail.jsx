@@ -159,6 +159,7 @@ export default function AccountDetail() {
           }
         />
 
+        <div className="stagger">
         <div
           className="rounded-[18px] p-5 text-white"
           style={{ background: "linear-gradient(150deg, #118A64, #0A5A41)" }}
@@ -249,6 +250,7 @@ export default function AccountDetail() {
             ? "Archived accounts remain viewable for historical reference. Data is never deleted on archive."
             : "Archiving never deletes data. Archived accounts can be restored at any time."}
         </Note>
+      </div>
       </ScrollArea>
     </PhoneFrame>
   );

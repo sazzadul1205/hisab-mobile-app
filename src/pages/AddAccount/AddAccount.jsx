@@ -88,6 +88,7 @@ export default function AddAccount({ mode = "new" }) {
       <ScrollArea>
         <AppBar title={isEdit ? "Edit account" : "New account"} />
 
+        <div className="stagger">
         <Field label="Account name">
           <TextInput
             inputRef={nameRef}
@@ -133,6 +134,7 @@ export default function AddAccount({ mode = "new" }) {
             ? "Only the fields you change will be updated. Transaction history is never rewritten."
             : "Prevent accidental duplicate submissions. Name is required and balance uses an exact money representation."}
         </div>
+      </div>
       </ScrollArea>
 
       <div

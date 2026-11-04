@@ -40,6 +40,7 @@ export default function Settings() {
           </div>
         </div>
 
+        <div className="stagger">
         <SectionLabel className="mt-1">Security</SectionLabel>
         <div className="bg-(--card) border border-(--line) rounded-[18px] overflow-hidden mb-4">
           <div onClick={() => navigate("/security/change-pin")}>
@@ -197,9 +198,10 @@ export default function Settings() {
 
         <div className="text-center mt-4">
           <span className="text-[11px] text-(--muted)">
-            Hisab v1.0 · BDT only · offline-ready
+            Hisab v1.0.1 · BDT only · offline-ready
           </span>
         </div>
+      </div>
       </ScrollArea>
       <BottomNav active="settings" />
     </PhoneFrame>

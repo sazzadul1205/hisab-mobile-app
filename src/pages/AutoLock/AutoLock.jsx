@@ -44,6 +44,7 @@ export default function AutoLock() {
       <ScrollArea>
         <AppBar title="Auto-lock" />
 
+        <div className="stagger">
         <SectionLabel className="mt-1">Lock after</SectionLabel>
 
         <div className="bg-(--card) border border-(--line) rounded-[18px] overflow-hidden mb-3">
@@ -92,6 +93,7 @@ export default function AutoLock() {
           as activity, so the new clock starts from now. While locked, the PIN
           is required to unlock.
         </Note>
+      </div>
       </ScrollArea>
     </PhoneFrame>
   );

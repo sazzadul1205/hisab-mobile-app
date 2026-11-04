@@ -101,6 +101,7 @@ function IncomeForm({ id, isEdit, initial, accounts, categories }) {
           }
         />
 
+        <div className="stagger">
         {!isEdit && <TransactionTypeSegments active="income" />}
 
         <AmountInput value={amount} onChange={setAmount} />
@@ -138,6 +139,7 @@ function IncomeForm({ id, isEdit, initial, accounts, categories }) {
             {error}
           </div>
         )}
+      </div>
       </ScrollArea>
 
       <div

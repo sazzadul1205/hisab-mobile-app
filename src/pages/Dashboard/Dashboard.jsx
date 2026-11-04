@@ -398,7 +398,7 @@ function OnboardingEmpty({ onAdd }) {
         </div>
 
         <div className="text-center py-10 px-4 mt-4">
-          <div className="w-16 h-16 rounded-[22px] mx-auto mb-4 grid place-items-center bg-(--brand-soft) text-(--brand-dk)">
+          <div className="w-16 h-16 rounded-[22px] mx-auto mb-4 grid place-items-center bg-(--brand-soft) text-(--brand-dk) bounce">
             <svg
               viewBox="0 0 24 24"
               className="w-7 h-7 stroke-current fill-none stroke-[1.8] [stroke-linecap:round] [stroke-linejoin:round]"
@@ -529,23 +529,25 @@ export default function Dashboard() {
           />
         </div>
 
-        <BalanceCard total={combined} today={today} activeCount={activeCount} />
-        <QuickActions />
-        <WeeklyChart data={week} />
-        {categories.length > 0 && <CategoryBreakdown categories={categories} />}
-        {recent.length > 0 ? (
-          <RecentActivity
-            items={recent}
-            accountMap={accountMap}
-            categoryMap={categoryMap}
-          />
-        ) : (
-          <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mt-3 text-center">
-            <small className="text-[12px] text-(--muted)">
-              No transactions yet. Tap Income or Expense to record your first.
-            </small>
-          </div>
-        )}
+        <div className="stagger">
+          <BalanceCard total={combined} today={today} activeCount={activeCount} />
+          <QuickActions />
+          <WeeklyChart data={week} />
+          {categories.length > 0 && <CategoryBreakdown categories={categories} />}
+          {recent.length > 0 ? (
+            <RecentActivity
+              items={recent}
+              accountMap={accountMap}
+              categoryMap={categoryMap}
+            />
+          ) : (
+            <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mt-3 text-center">
+              <small className="text-[12px] text-(--muted)">
+                No transactions yet. Tap Income or Expense to record your first.
+              </small>
+            </div>
+          )}
+        </div>
       </ScrollArea>
       <BottomNav active="home" />
     </PhoneFrame>

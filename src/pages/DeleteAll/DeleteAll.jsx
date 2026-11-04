@@ -75,6 +75,7 @@ export default function DeleteAll() {
       <ScrollArea>
         <AppBar title="Delete all data" />
 
+        <div className="stagger">
         <div
           className="w-16 h-16 rounded-[22px] mx-auto mt-3 mb-4.5
                      grid place-items-center bg-(--danger-soft) text-(--danger)"
@@ -154,6 +155,7 @@ export default function DeleteAll() {
             {error}
           </div>
         )}
+      </div>
       </ScrollArea>
 
       <div

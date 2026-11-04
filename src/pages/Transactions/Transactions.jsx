@@ -158,35 +158,37 @@ export default function Transactions() {
             </small>
           </div>
         ) : (
-          groups.map((g, gi) => (
-            <div key={g.day} className={gi === 0 ? "mt-3" : "mt-1"}>
-              <SectionLabel>{g.label}</SectionLabel>
-              <div className="bg-(--card) border border-(--line) rounded-[18px] py-1 px-3.5">
-                {g.rows.map((tx, ri) => {
-                  const fromName = accountMap.get(tx.accountId)?.name ?? "—";
-                  const toName =
-                    accountMap.get(tx.destinationAccountId)?.name ?? "—";
-                  const catName = categoryMap.get(tx.categoryId)?.name;
-                  const meta =
-                    tx.type === "transfer"
-                      ? `${fromName} → ${toName}`
-                      : `${fromName}${catName ? ` · ${catName}` : ""}`;
-                  return (
-                    <TransactionRow
-                      key={tx.id}
-                      tone={TYPE_TONE[tx.type]}
-                      icon={TYPE_ICON[tx.type]}
-                      title={tx.note || catName || tx.type}
-                      meta={meta}
-                      amount={formatAmount(tx)}
-                      last={ri === g.rows.length - 1}
-                      onClick={() => navigate(`/transactions/${tx.id}`)}
-                    />
-                  );
-                })}
+          <div className="stagger">
+            {groups.map((g, gi) => (
+              <div key={g.day} className={gi === 0 ? "mt-3" : "mt-1"}>
+                <SectionLabel>{g.label}</SectionLabel>
+                <div className="bg-(--card) border border-(--line) rounded-[18px] py-1 px-3.5">
+                  {g.rows.map((tx, ri) => {
+                    const fromName = accountMap.get(tx.accountId)?.name ?? "—";
+                    const toName =
+                      accountMap.get(tx.destinationAccountId)?.name ?? "—";
+                    const catName = categoryMap.get(tx.categoryId)?.name;
+                    const meta =
+                      tx.type === "transfer"
+                        ? `${fromName} → ${toName}`
+                        : `${fromName}${catName ? ` · ${catName}` : ""}`;
+                    return (
+                      <TransactionRow
+                        key={tx.id}
+                        tone={TYPE_TONE[tx.type]}
+                        icon={TYPE_ICON[tx.type]}
+                        title={tx.note || catName || tx.type}
+                        meta={meta}
+                        amount={formatAmount(tx)}
+                        last={ri === g.rows.length - 1}
+                        onClick={() => navigate(`/transactions/${tx.id}`)}
+                      />
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </ScrollArea>
       <BottomNav active="activity" />

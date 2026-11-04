@@ -174,6 +174,7 @@ export default function TransactionDetail() {
           }
         />
 
+        <div className="stagger">
         <div className="bg-(--card) border border-(--line) rounded-[18px] shadow-[0_1px_2px_rgba(14,26,22,0.06)] text-center p-5.5 px-4">
           <div
             className={`w-13 h-13 rounded-2xl mx-auto mb-3 grid place-items-center ${meta.bg} ${meta.fg}`}
@@ -275,6 +276,7 @@ export default function TransactionDetail() {
           restore both source and destination accounts to their pre-transfer
           state.
         </Note>
+      </div>
       </ScrollArea>
 
       {confirmDelete && (

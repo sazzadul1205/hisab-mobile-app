@@ -61,6 +61,7 @@ function CategoryForm({ isEdit, id, initial, initialType, fromTab }) {
       <ScrollArea>
         <AppBar title={isEdit ? "Edit category" : "New category"} />
 
+        <div className="stagger">
         <Field label="Category name">
           <TextInput
             placeholder="e.g. Groceries"
@@ -117,6 +118,7 @@ function CategoryForm({ isEdit, id, initial, initialType, fromTab }) {
             ? "Renaming is safe. Existing transactions keep their category link."
             : "New categories appear immediately in the transaction forms."}
         </Note>
+      </div>
       </ScrollArea>
 
       <div

@@ -127,6 +127,7 @@ export default function Reconcile() {
       <ScrollArea>
         <AppBar title="Reconcile" />
 
+        <div className="stagger">
         <Field label="Account">
           <AccountSelect
             initial={initials(account.name)}
@@ -174,6 +175,7 @@ export default function Reconcile() {
           No transaction is added or edited. Difference is stored for later
           reference only.
         </Alert>
+      </div>
       </ScrollArea>
 
       <div

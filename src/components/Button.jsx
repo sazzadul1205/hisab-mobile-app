@@ -7,7 +7,9 @@ export function Button({
 }) {
   const base =
     "flex items-center justify-center gap-2 w-full font-bold " +
-    "tracking-[-0.1px] border-0 cursor-pointer font-[inherit]";
+    "tracking-[-0.1px] border-0 cursor-pointer font-[inherit] " +
+    "transition-[transform,box-shadow] duration-150 ease-out " +
+    "active:scale-[0.96]";
 
   const sizes = {
     md: "p-[15px] text-[14.5px] rounded-[14px]",

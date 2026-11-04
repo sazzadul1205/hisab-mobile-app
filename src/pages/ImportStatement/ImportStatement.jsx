@@ -185,6 +185,7 @@ function ImportForm({ accounts, defaultAccountId }) {
       <ScrollArea>
         <AppBar title="Import statement" />
 
+        <div className="stagger">
         {!file ? (
           <EmptyState />
         ) : (
@@ -251,6 +252,7 @@ function ImportForm({ accounts, defaultAccountId }) {
           row before anything is saved. The destination account is remembered
           for next time.
         </Note>
+      </div>
       </ScrollArea>
 
       <div

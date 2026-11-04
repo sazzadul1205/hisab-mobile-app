@@ -317,7 +317,7 @@ export default function ReviewImport() {
           </Chip>
         </ChipStrip>
 
-        <div className="bg-(--card) border border-(--line) rounded-[18px] py-1 px-3.5 mt-3">
+        <div className="bg-(--card) border border-(--line) rounded-[18px] py-1 px-3.5 mt-3 stagger">
           {filteredRows.length === 0 && (
             <div className="text-center py-6 text-[12px] text-(--muted)">
               No rows match this filter.

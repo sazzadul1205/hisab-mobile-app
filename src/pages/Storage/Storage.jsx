@@ -54,6 +54,7 @@ export default function Storage() {
       <ScrollArea>
         <AppBar title="Storage" />
 
+        <div className="stagger">
         <div
           className="rounded-[18px] p-5 text-white mb-3"
           style={{ background: "linear-gradient(150deg, #118A64, #0A5A41)" }}
@@ -94,6 +95,7 @@ export default function Storage() {
             backup in Backup &amp; restore.
           </Note>
         )}
+      </div>
       </ScrollArea>
     </PhoneFrame>
   );

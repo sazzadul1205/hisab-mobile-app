@@ -65,27 +65,28 @@ export default function KeyInfo() {
           </div>
         </div>
 
-        <SectionLabel>How it works</SectionLabel>
-        <div className="bg-(--card) border border-(--line) rounded-[18px] px-4 py-1 mb-3">
-          <Step
-            number="1"
-            title="PIN derives a master key"
-            body="Your PIN goes through PBKDF2-SHA256 with 600,000 iterations and a random salt. The result is a 32-byte master key."
-          />
-          <Step
-            number="2"
-            title="Master key unlocks the DEK"
-            body="A second, random 32-byte key — the DEK (Data Encryption Key) — is stored encrypted with the master key. Only your PIN can unwrap it."
-          />
-          <Step
-            number="3"
-            title="The DEK encrypts every record"
-            body="All account names, transaction amounts, notes, categories, and balances are encrypted with the DEK using AES-GCM before being stored."
-          />
-        </div>
+        <div className="stagger">
+          <SectionLabel>How it works</SectionLabel>
+          <div className="bg-(--card) border border-(--line) rounded-[18px] px-4 py-1 mb-3">
+            <Step
+              number="1"
+              title="PIN derives a master key"
+              body="Your PIN goes through PBKDF2-SHA256 with 600,000 iterations and a random salt. The result is a 32-byte master key."
+            />
+            <Step
+              number="2"
+              title="Master key unlocks the DEK"
+              body="A second, random 32-byte key — the DEK (Data Encryption Key) — is stored encrypted with the master key. Only your PIN can unwrap it."
+            />
+            <Step
+              number="3"
+              title="The DEK encrypts every record"
+              body="All account names, transaction amounts, notes, categories, and balances are encrypted with the DEK using AES-GCM before being stored."
+            />
+          </div>
 
-        <SectionLabel>What is encrypted vs. visible</SectionLabel>
-        <div className="bg-(--card) border border-(--line) rounded-[18px] px-4 py-1 mb-3">
+          <SectionLabel>What is encrypted vs. visible</SectionLabel>
+          <div className="bg-(--card) border border-(--line) rounded-[18px] px-4 py-1 mb-3">
           <DataRow
             label="Account names, opening balances"
             value="Encrypted"
@@ -216,6 +217,7 @@ export default function KeyInfo() {
           encrypted backup, your data is unrecoverable. This is deliberate — a
           recovery mechanism would mean the encryption could be bypassed.
         </Alert>
+        </div>
 
         <div className="text-center mt-4 mb-2">
           <span className="text-[11px] text-(--muted)">

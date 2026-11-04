@@ -24,6 +24,7 @@ export default function Security() {
       <ScrollArea>
         <AppBar title="Security" />
 
+        <div className="stagger">
         <SectionLabel className="mt-0">Access protection</SectionLabel>
         <div className="bg-(--card) border border-(--line) rounded-[18px] overflow-hidden mb-4">
           <div onClick={() => navigate("/security/change-pin")}>
@@ -102,6 +103,7 @@ export default function Security() {
           Changing a PIN must preserve access to encrypted records. Recovery
           does not silently bypass encryption.
         </Alert>
+      </div>
       </ScrollArea>
     </PhoneFrame>
   );

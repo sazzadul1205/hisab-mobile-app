@@ -414,12 +414,14 @@ export default function Reports() {
           />
         </div>
 
+        <div className="stagger">
         <SegmentedControl value={tab} options={TABS} onChange={setTab} />
 
         <NetCashFlowCard flow={flow} />
         <SpendingTrendCard trend={trend} label={period.trendLabel} />
         {categories.length > 0 && <ByCategoryCard categories={categories} />}
         <AccountBalancesCard accounts={accounts} balances={balances} />
+      </div>
       </ScrollArea>
       <BottomNav active="reports" />
     </PhoneFrame>

@@ -140,86 +140,88 @@ function BackupTab({ onCreated }) {
 
   return (
     <>
-      <Alert
-        tone="info"
-        icon={
-          <>
-            <circle cx="12" cy="12" r="9" />
-            <path d="M12 8v4M12 16h.01" />
-          </>
-        }
-        title="What gets backed up"
-        className="mb-3.5"
-      >
-        Accounts, transactions, categories, and reconciliation records.
-        Encrypted with the password you choose below — the PIN is not involved.
-      </Alert>
-
-      <Field label="Backup password" hint="min 8 characters">
-        <TextInput
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Choose a strong password"
-        />
-      </Field>
-
-      <Field label="Confirm password">
-        <TextInput
-          type="password"
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          placeholder="Repeat the password"
-        />
-      </Field>
-
-      {error && (
-        <div className="text-[12px] font-semibold text-(--out) mb-3 text-center">
-          {error}
-        </div>
-      )}
-
-      {success && (
+      <div className="stagger">
         <Alert
-          tone="ok"
-          className="mb-3"
+          tone="info"
           icon={
             <>
               <circle cx="12" cy="12" r="9" />
-              <path d="M9 12l2 2 4-4" />
+              <path d="M12 8v4M12 16h.01" />
             </>
           }
-          title="Backup created"
+          title="What gets backed up"
+          className="mb-3.5"
         >
-          <span className="block">
-            {success.filename} · {formatBytes(success.size)} · {success.total}{" "}
-            records
-          </span>
-          <span className="block mt-1">
-            Check your downloads — the file should be there.
-          </span>
+          Accounts, transactions, categories, and reconciliation records.
+          Encrypted with the password you choose below — the PIN is not involved.
         </Alert>
-      )}
 
-      <Button onClick={handleCreate} disabled={busy}>
-        {busy ? "Encrypting…" : "Create encrypted backup"}
-      </Button>
+        <Field label="Backup password" hint="min 8 characters">
+          <TextInput
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Choose a strong password"
+          />
+        </Field>
 
-      <Alert
-        tone="warn"
-        className="mt-4"
-        icon={
-          <>
-            <path d="M12 9v4" />
-            <circle cx="12" cy="17" r=".6" fill="currentColor" />
-            <path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
-          </>
-        }
-        title="Lost password = unrecoverable"
-      >
-        Keep this password somewhere safe. It cannot be reset. The PIN does not
-        unlock the backup file.
-      </Alert>
+        <Field label="Confirm password">
+          <TextInput
+            type="password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            placeholder="Repeat the password"
+          />
+        </Field>
+
+        {error && (
+          <div className="text-[12px] font-semibold text-(--out) mb-3 text-center">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <Alert
+            tone="ok"
+            className="mb-3"
+            icon={
+              <>
+                <circle cx="12" cy="12" r="9" />
+                <path d="M9 12l2 2 4-4" />
+              </>
+            }
+            title="Backup created"
+          >
+            <span className="block">
+              {success.filename} · {formatBytes(success.size)} · {success.total}{" "}
+              records
+            </span>
+            <span className="block mt-1">
+              Check your downloads — the file should be there.
+            </span>
+          </Alert>
+        )}
+
+        <Button onClick={handleCreate} disabled={busy}>
+          {busy ? "Encrypting…" : "Create encrypted backup"}
+        </Button>
+
+        <Alert
+          tone="warn"
+          className="mt-4"
+          icon={
+            <>
+              <path d="M12 9v4" />
+              <circle cx="12" cy="17" r=".6" fill="currentColor" />
+              <path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+            </>
+          }
+          title="Lost password = unrecoverable"
+        >
+          Keep this password somewhere safe. It cannot be reset. The PIN does not
+          unlock the backup file.
+        </Alert>
+      </div>
     </>
   );
 }
@@ -307,7 +309,7 @@ function RestoreTab({ onRestored }) {
   return (
     <>
       {stage === "idle" && (
-        <>
+        <div className="stagger">
           <SectionLabel className="mt-0">Restore from file</SectionLabel>
 
           <div className="bg-(--card) border border-(--line) rounded-[18px] overflow-hidden mb-3">
@@ -372,132 +374,134 @@ function RestoreTab({ onRestored }) {
             There is no recovery. If the password is lost, the backup file is
             unrecoverable.
           </Alert>
-        </>
+        </div>
       )}
 
-      {stage === "preview" && decrypted && (
-        <>
-          <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mb-3">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">
-                Backup contents
-              </h3>
-              <StatusPill tone="ok">Valid</StatusPill>
+{stage === "preview" && decrypted && (
+          <div className="stagger">
+            <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mb-3">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">
+                  Backup contents
+                </h3>
+                <StatusPill tone="ok">Valid</StatusPill>
+              </div>
+              <PreviewRow
+                label="Created"
+                value={format(
+                  new Date(decrypted.createdAt),
+                  "d MMM yyyy · h:mm a",
+                )}
+              />
+              <PreviewRow
+                label="Accounts"
+                value={String(decrypted.counts.accounts)}
+              />
+              <PreviewRow
+                label="Transactions"
+                value={String(decrypted.counts.transactions)}
+              />
+              <PreviewRow
+                label="Categories"
+                value={String(decrypted.counts.categories)}
+              />
+              <PreviewRow
+                label="Reconciliations"
+                value={String(decrypted.counts.reconciliationRecords)}
+              />
+              <PreviewRow
+                label="Imports"
+                value={String(decrypted.counts.importRecords)}
+                last
+              />
             </div>
-            <PreviewRow
-              label="Created"
-              value={format(
-                new Date(decrypted.createdAt),
-                "d MMM yyyy · h:mm a",
-              )}
-            />
-            <PreviewRow
-              label="Accounts"
-              value={String(decrypted.counts.accounts)}
-            />
-            <PreviewRow
-              label="Transactions"
-              value={String(decrypted.counts.transactions)}
-            />
-            <PreviewRow
-              label="Categories"
-              value={String(decrypted.counts.categories)}
-            />
-            <PreviewRow
-              label="Reconciliations"
-              value={String(decrypted.counts.reconciliationRecords)}
-            />
-            <PreviewRow
-              label="Imports"
-              value={String(decrypted.counts.importRecords)}
-              last
-            />
-          </div>
 
-          {result && (
-            <Alert
-              tone="ok"
-              className="mb-3"
-              icon={
-                <>
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="M9 12l2 2 4-4" />
-                </>
-              }
-              title="Restore complete"
-            >
-              <span className="block">
-                {result.added} records added
-                {result.skipped > 0 ? `, ${result.skipped} skipped` : ""}.
-              </span>
-              <span className="block mt-1">
-                Existing vault and PIN are unchanged.
-              </span>
-            </Alert>
-          )}
-
-          {error && (
-            <div className="text-[12px] font-semibold text-(--out) mb-3 text-center">
-              {error}
-            </div>
-          )}
-
-          {!result && (
-            <>
+            {result && (
               <Alert
-                tone="warn"
+                tone="ok"
                 className="mb-3"
                 icon={
                   <>
-                    <path d="M12 9v4" />
-                    <circle cx="12" cy="17" r=".6" fill="currentColor" />
-                    <path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M9 12l2 2 4-4" />
                   </>
                 }
-                title="Never silently overwrites"
+                title="Restore complete"
               >
-                Choose how to apply this backup. Existing records with the same
-                ID are the only possible conflicts.
+                <span className="block">
+                  {result.mode === "replace"
+                    ? "All existing data was replaced."
+                    : `${result.added} records added`}
+                  {result.skipped > 0 ? `, ${result.skipped} skipped` : ""}.
+                </span>
+                <span className="block mt-1">
+                  Existing vault and PIN are unchanged.
+                </span>
               </Alert>
+            )}
 
-              <div className="flex flex-col gap-2.5">
-                <Button
-                  variant="secondary"
-                  onClick={() => handleRestore("merge")}
-                  disabled={stage === "restoring"}
-                >
-                  Merge (skip existing)
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => handleRestore("replace")}
-                  disabled={stage === "restoring"}
-                >
-                  {stage === "restoring"
-                    ? "Restoring…"
-                    : "Replace all (delete existing)"}
-                </Button>
-                <button
-                  type="button"
-                  onClick={reset}
-                  disabled={stage === "restoring"}
-                  className="text-[12px] font-semibold text-(--muted) mt-1
-                             bg-transparent border-0 cursor-pointer font-[inherit]
-                             disabled:opacity-40"
-                >
-                  Cancel
-                </button>
+            {error && (
+              <div className="text-[12px] font-semibold text-(--out) mb-3 text-center">
+                {error}
               </div>
-            </>
-          )}
+            )}
 
-          {result && (
-            <Button variant="secondary" onClick={reset}>
-              Done
-            </Button>
-          )}
-        </>
-      )}
+            {!result && (
+              <>
+                <Alert
+                  tone="warn"
+                  className="mb-3"
+                  icon={
+                    <>
+                      <path d="M12 9v4" />
+                      <circle cx="12" cy="17" r=".6" fill="currentColor" />
+                      <path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+                    </>
+                  }
+                  title="Never silently overwrites"
+                >
+                  Choose how to apply this backup. Existing records with the same
+                  ID are the only possible conflicts.
+                </Alert>
+
+                <div className="flex flex-col gap-2.5">
+                  <Button
+                    variant="secondary"
+                    onClick={() => handleRestore("merge")}
+                    disabled={stage === "restoring"}
+                  >
+                    Merge (skip existing)
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleRestore("replace")}
+                    disabled={stage === "restoring"}
+                  >
+                    {stage === "restoring"
+                      ? "Restoring…"
+                      : "Replace all (delete existing)"}
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={reset}
+                    disabled={stage === "restoring"}
+                    className="text-[12px] font-semibold text-(--muted) mt-1
+                               bg-transparent border-0 cursor-pointer font-[inherit]
+                               disabled:opacity-40"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            )}
+
+            {result && (
+              <Button variant="secondary" onClick={reset}>
+                Done
+              </Button>
+            )}
+          </div>
+        )}
     </>
   );
 }
@@ -575,7 +579,7 @@ function HistoryTab({ log }) {
   return (
     <>
       <SectionLabel className="mt-0">Recent backups</SectionLabel>
-      <div className="bg-(--card) border border-(--line) rounded-[18px] px-3.5 py-1.5">
+      <div className="bg-(--card) border border-(--line) rounded-[18px] px-3.5 py-1.5 stagger">
         {log.map((entry, i) => (
           <div
             key={entry.id}
@@ -617,9 +621,11 @@ export default function Backup() {
 
         <SegmentedControl value={tab} options={TABS} onChange={setTab} />
 
-        {tab === "backup" && <BackupTab onCreated={handleCreated} />}
-        {tab === "restore" && <RestoreTab onRestored={handleRestored} />}
-        {tab === "history" && <HistoryTab log={log} />}
+        <div className="stagger">
+          {tab === "backup" && <BackupTab onCreated={handleCreated} />}
+          {tab === "restore" && <RestoreTab onRestored={handleRestored} />}
+          {tab === "history" && <HistoryTab log={log} />}
+        </div>
       </ScrollArea>
     </PhoneFrame>
   );
