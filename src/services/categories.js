@@ -1,31 +1,31 @@
 import { db } from "../db/db";
+import { encryptRecord, decryptRecord } from "./encryption";
+
+const TABLE = "categories";
 
 export async function listCategories(type) {
-    if (type === "income" || type === "expense") {
-        return db.categories.where("type").equals(type).toArray();
-    }
-    return db.categories.toArray();
+    const query =
+        type === "income" || type === "expense"
+            ? db.categories.where("type").equals(type)
+            : db.categories.toArray();
+    const rows = await (Array.isArray(query) ? query : query.toArray());
+    return Promise.all(rows.map((r) => decryptRecord(TABLE, r)));
 }
 
 export async function getCategory(id) {
     if (!id) return null;
-    return (await db.categories.get(id)) ?? null;
+    const row = await db.categories.get(id);
+    if (!row) return null;
+    return decryptRecord(TABLE, row);
 }
 
 export async function createCategory({ name, type }) {
     const trimmed = (name ?? "").trim();
     if (!trimmed) throw new Error("NAME_REQUIRED");
-    if (type !== "income" && type !== "expense") {
-        throw new Error("TYPE_INVALID");
-    }
+    if (type !== "income" && type !== "expense") throw new Error("TYPE_INVALID");
 
-    // Prevent duplicate names within the same type
-    const existing = await db.categories.where("type").equals(type).toArray();
-    if (
-        existing.some(
-            (c) => c.name.toLowerCase() === trimmed.toLowerCase(),
-        )
-    ) {
+    const sameType = await listCategories(type);
+    if (sameType.some((c) => c.name.toLowerCase() === trimmed.toLowerCase())) {
         throw new Error("DUPLICATE_NAME");
     }
 
@@ -36,7 +36,7 @@ export async function createCategory({ name, type }) {
         isDefault: false,
         createdAt: new Date().toISOString(),
     };
-    await db.categories.add(category);
+    await db.categories.add(await encryptRecord(TABLE, category));
     return category;
 }
 
@@ -44,22 +44,19 @@ export async function updateCategory(id, { name }) {
     const trimmed = (name ?? "").trim();
     if (!trimmed) throw new Error("NAME_REQUIRED");
 
-    const existing = await db.categories.get(id);
-    if (!existing) throw new Error("NOT_FOUND");
+    const row = await db.categories.get(id);
+    if (!row) throw new Error("NOT_FOUND");
+    const existing = await decryptRecord(TABLE, row);
 
-    const sameType = await db.categories
-        .where("type")
-        .equals(existing.type)
-        .toArray();
+    const sameType = await listCategories(existing.type);
     if (
         sameType.some(
-            (c) =>
-                c.id !== id &&
-                c.name.toLowerCase() === trimmed.toLowerCase(),
+            (c) => c.id !== id && c.name.toLowerCase() === trimmed.toLowerCase(),
         )
     ) {
         throw new Error("DUPLICATE_NAME");
     }
 
-    await db.categories.update(id, { name: trimmed });
+    const merged = { ...existing, name: trimmed };
+    await db.categories.put(await encryptRecord(TABLE, merged));
 }

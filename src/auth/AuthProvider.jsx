@@ -11,6 +11,7 @@ import {
 } from "./session";
 import { recordSuccess } from "./throttle";
 import { AuthContext } from "./authContext";
+import { ensureEncryptedAtRest } from "../services/encryption";
 
 const VAULT_SETTINGS_KEY = "vault";
 const AUTO_LOCK_TICK_MS = 10_000;
@@ -73,14 +74,27 @@ export function AuthProvider({ children }) {
     return () => clearInterval(id);
   }, [status]);
 
-  const setupVaultAndUnlock = useCallback(async (pin) => {
-    const { dekBytes, metadata } = await setupVault(pin);
-    await seedDefaultCategories();
-    await db.appSettings.put({ key: VAULT_SETTINGS_KEY, value: metadata });
-    setActiveKey(dekBytes);
-    setVaultMeta(metadata);
-    setStatus("unlocked");
+  // Run migration if needed — non-blocking, safe to fire-and-forget.
+  // Failures log but never block the app: decryption handles both
+  // pre-migration (plaintext) and post-migration (encrypted) rows.
+  const kickMigration = useCallback(() => {
+    ensureEncryptedAtRest().catch((err) =>
+      console.error("Encryption migration failed:", err),
+    );
   }, []);
+
+  const setupVaultAndUnlock = useCallback(
+    async (pin) => {
+      const { dekBytes, metadata } = await setupVault(pin);
+      await seedDefaultCategories();
+      await db.appSettings.put({ key: VAULT_SETTINGS_KEY, value: metadata });
+      setActiveKey(dekBytes);
+      setVaultMeta(metadata);
+      setStatus("unlocked");
+      kickMigration();
+    },
+    [kickMigration],
+  );
 
   const unlockWithPin = useCallback(
     async (pin) => {
@@ -89,13 +103,12 @@ export function AuthProvider({ children }) {
       setActiveKey(dekBytes);
       recordSuccess();
       setStatus("unlocked");
+      kickMigration();
       return dekBytes;
     },
-    [vaultMeta],
+    [vaultMeta, kickMigration],
   );
 
-  /* Verify a PIN without mutating session — used by the Change PIN
-     flow's "current PIN" step. Throws InvalidPinError on wrong PIN. */
   const verifyPin = useCallback(
     async (pin) => {
       if (!vaultMeta) throw new Error("No vault");
@@ -104,9 +117,6 @@ export function AuthProvider({ children }) {
     [vaultMeta],
   );
 
-  /* Rewrap the currently-active DEK with a new PIN, persist the new
-     vault metadata, and update state. Does not touch records — the
-     DEK itself is unchanged. Requires an unlocked session. */
   const applyNewPin = useCallback(
     async (newPin) => {
       if (!vaultMeta) throw new Error("No vault");

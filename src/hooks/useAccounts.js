@@ -6,10 +6,30 @@ import {
     combinedBalance,
     accountBalance,
 } from "../services/calc";
+import { decryptRecord, EncryptionNotReadyError } from "../services/encryption";
+
+/* Try to decrypt; return undefined if the vault is momentarily
+   locked, so pages show a skeleton instead of throwing. Any other
+   error propagates (corrupted data should surface, not hide). */
+async function safeDecryptAll(tableName, rows) {
+    try {
+        return await Promise.all(rows.map((r) => decryptRecord(tableName, r)));
+    } catch (err) {
+        if (err instanceof EncryptionNotReadyError) return undefined;
+        throw err;
+    }
+}
 
 export function useAccounts() {
-    const accounts = useLiveQuery(() => db.accounts.toArray(), []);
-    const transactions = useLiveQuery(() => db.transactions.toArray(), []);
+    const accounts = useLiveQuery(async () => {
+        const rows = await db.accounts.toArray();
+        return safeDecryptAll("accounts", rows);
+    }, []);
+
+    const transactions = useLiveQuery(async () => {
+        const rows = await db.transactions.toArray();
+        return safeDecryptAll("transactions", rows);
+    }, []);
 
     const balances = useMemo(() => {
         if (!accounts || !transactions) return new Map();
@@ -31,20 +51,36 @@ export function useAccounts() {
 }
 
 export function useAccount(id) {
-    const account = useLiveQuery(
-        () => (id ? db.accounts.get(id) : null),
-        [id],
-    );
+    const account = useLiveQuery(async () => {
+        if (!id) return null;
+        const row = await db.accounts.get(id);
+        if (!row) return null;
+        try {
+            return await decryptRecord("accounts", row);
+        } catch (err) {
+            if (err instanceof EncryptionNotReadyError) return undefined;
+            throw err;
+        }
+    }, [id]);
 
     const transactions = useLiveQuery(async () => {
         if (!id) return [];
-        const [asSource, asDest] = await Promise.all([
+        const [srcRows, dstRows] = await Promise.all([
             db.transactions.where("accountId").equals(id).toArray(),
             db.transactions.where("destinationAccountId").equals(id).toArray(),
         ]);
         const map = new Map();
-        for (const tx of [...asSource, ...asDest]) map.set(tx.id, tx);
-        return [...map.values()].sort((a, b) => b.date.localeCompare(a.date));
+        for (const r of [...srcRows, ...dstRows]) map.set(r.id, r);
+        const rows = [...map.values()];
+        try {
+            const decrypted = await Promise.all(
+                rows.map((r) => decryptRecord("transactions", r)),
+            );
+            return decrypted.sort((a, b) => b.date.localeCompare(a.date));
+        } catch (err) {
+            if (err instanceof EncryptionNotReadyError) return undefined;
+            throw err;
+        }
     }, [id]);
 
     const balance = useMemo(() => {

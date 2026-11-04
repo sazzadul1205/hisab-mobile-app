@@ -1,17 +1,25 @@
 import { db } from "../db/db";
 import { accountBalance } from "./calc";
+import { encryptRecord, decryptRecord } from "./encryption";
+
+const TABLE = "transactions";
 
 async function ensureSufficientBalance(accountId, totalDebit, excludeTxId) {
-    const account = await db.accounts.get(accountId);
-    if (!account) throw new Error("ACCOUNT_NOT_FOUND");
+    const accountRow = await db.accounts.get(accountId);
+    if (!accountRow) throw new Error("ACCOUNT_NOT_FOUND");
+    const account = await decryptRecord("accounts", accountRow);
 
-    let txs = await db.transactions.where("accountId").equals(accountId).toArray();
-    const incoming = await db.transactions
-        .where("destinationAccountId")
-        .equals(accountId)
-        .toArray();
-    txs = [...txs, ...incoming];
-    if (excludeTxId) txs = txs.filter((t) => t.id !== excludeTxId);
+    const [srcRows, dstRows] = await Promise.all([
+        db.transactions.where("accountId").equals(accountId).toArray(),
+        db.transactions.where("destinationAccountId").equals(accountId).toArray(),
+    ]);
+    const allRows = [...srcRows, ...dstRows];
+    const decrypted = await Promise.all(
+        allRows.map((r) => decryptRecord(TABLE, r)),
+    );
+    const txs = excludeTxId
+        ? decrypted.filter((t) => t.id !== excludeTxId)
+        : decrypted;
 
     const balance = accountBalance(account, txs);
     if (totalDebit > balance) throw new Error("INSUFFICIENT_BALANCE");
@@ -19,9 +27,7 @@ async function ensureSufficientBalance(accountId, totalDebit, excludeTxId) {
 }
 
 export async function createIncome({ amount, accountId, categoryId, date, note }) {
-    if (!Number.isInteger(amount) || amount <= 0) {
-        throw new Error("AMOUNT_INVALID");
-    }
+    if (!Number.isInteger(amount) || amount <= 0) throw new Error("AMOUNT_INVALID");
     if (!accountId) throw new Error("ACCOUNT_REQUIRED");
     if (!categoryId) throw new Error("CATEGORY_REQUIRED");
 
@@ -37,14 +43,12 @@ export async function createIncome({ amount, accountId, categoryId, date, note }
         createdAt: now,
         updatedAt: now,
     };
-    await db.transactions.add(tx);
+    await db.transactions.add(await encryptRecord(TABLE, tx));
     return tx;
 }
 
 export async function createExpense({ amount, accountId, categoryId, date, note }) {
-    if (!Number.isInteger(amount) || amount <= 0) {
-        throw new Error("AMOUNT_INVALID");
-    }
+    if (!Number.isInteger(amount) || amount <= 0) throw new Error("AMOUNT_INVALID");
     if (!accountId) throw new Error("ACCOUNT_REQUIRED");
     if (!categoryId) throw new Error("CATEGORY_REQUIRED");
 
@@ -62,7 +66,7 @@ export async function createExpense({ amount, accountId, categoryId, date, note 
         createdAt: now,
         updatedAt: now,
     };
-    await db.transactions.add(tx);
+    await db.transactions.add(await encryptRecord(TABLE, tx));
     return tx;
 }
 
@@ -74,18 +78,10 @@ export async function createTransfer({
     date,
     note,
 }) {
-    if (!Number.isInteger(amount) || amount <= 0) {
-        throw new Error("AMOUNT_INVALID");
-    }
-    if (!Number.isInteger(fee) || fee < 0) {
-        throw new Error("FEE_INVALID");
-    }
-    if (!accountId || !destinationAccountId) {
-        throw new Error("ACCOUNT_REQUIRED");
-    }
-    if (accountId === destinationAccountId) {
-        throw new Error("SAME_ACCOUNT");
-    }
+    if (!Number.isInteger(amount) || amount <= 0) throw new Error("AMOUNT_INVALID");
+    if (!Number.isInteger(fee) || fee < 0) throw new Error("FEE_INVALID");
+    if (!accountId || !destinationAccountId) throw new Error("ACCOUNT_REQUIRED");
+    if (accountId === destinationAccountId) throw new Error("SAME_ACCOUNT");
 
     await ensureSufficientBalance(accountId, amount + fee);
 
@@ -102,15 +98,15 @@ export async function createTransfer({
         createdAt: now,
         updatedAt: now,
     };
-    await db.transactions.add(tx);
+    await db.transactions.add(await encryptRecord(TABLE, tx));
     return tx;
 }
 
 export async function updateTransaction(id, patch) {
-    const existing = await db.transactions.get(id);
-    if (!existing) throw new Error("NOT_FOUND");
+    const row = await db.transactions.get(id);
+    if (!row) throw new Error("NOT_FOUND");
+    const existing = await decryptRecord(TABLE, row);
 
-    // Re-validate balance on amount changes
     if (existing.type === "expense" && patch.amount != null) {
         await ensureSufficientBalance(
             patch.accountId ?? existing.accountId,
@@ -125,10 +121,12 @@ export async function updateTransaction(id, patch) {
         await ensureSufficientBalance(sourceId, amount + fee, id);
     }
 
-    await db.transactions.update(id, {
+    const merged = {
+        ...existing,
         ...patch,
         updatedAt: new Date().toISOString(),
-    });
+    };
+    await db.transactions.put(await encryptRecord(TABLE, merged));
 }
 
 export async function deleteTransaction(id) {

@@ -1,4 +1,7 @@
 import { db } from "../db/db";
+import { encryptRecord, decryptRecord } from "./encryption";
+
+const TABLE = "reconciliationRecords";
 
 export async function saveReconciliation({
     accountId,
@@ -20,14 +23,15 @@ export async function saveReconciliation({
         difference: actualBalance - recordedBalance,
         note: note.trim(),
     };
-    await db.reconciliationRecords.add(record);
+    await db.reconciliationRecords.add(await encryptRecord(TABLE, record));
     return record;
 }
 
 export async function listReconciliations(accountId) {
-    return db.reconciliationRecords
+    const rows = await db.reconciliationRecords
         .where("accountId")
         .equals(accountId)
         .reverse()
         .sortBy("reconciliationDate");
+    return Promise.all(rows.map((r) => decryptRecord(TABLE, r)));
 }
