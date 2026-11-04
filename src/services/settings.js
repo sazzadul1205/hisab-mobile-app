@@ -60,3 +60,46 @@ export async function setLastImportAccountId(id) {
     if (typeof id !== "string" || !id) throw new Error("INVALID_ACCOUNT_ID");
     await db.appSettings.put({ key: LAST_IMPORT_ACCOUNT_KEY, value: id });
 }
+
+/* ----------------------------------------------------------------
+   Daily reminders — "Good morning" + "Good night" nudges.
+   Stored as a single JSON blob so one read/writes the whole block.
+   All times are 24-hour integers (hour only, 0-23). Minutes are
+   ignored on purpose — the scheduler checks once per minute and
+   fires when the wall clock crosses the configured hour.
+   ---------------------------------------------------------------- */
+export const REMINDER_KEY = "reminders";
+
+export const DEFAULT_REMINDER_SETTINGS = {
+    enabled: false,
+    morning: 8, // 08:00
+    evening: 21, // 21:00
+    morningLabel: "Good morning — did you record today's purchases?",
+    eveningLabel: "Good night — catch up on today before you sleep.",
+};
+
+export async function getReminderSettings() {
+    const row = await db.appSettings.get(REMINDER_KEY);
+    if (!row?.value) return { ...DEFAULT_REMINDER_SETTINGS };
+    return { ...DEFAULT_REMINDER_SETTINGS, ...row.value };
+}
+
+export async function setReminderSettings(patch) {
+    const current = await getReminderSettings();
+    const next = { ...current, ...patch };
+    // Basic validation — bad values would hang the scheduler.
+    if (typeof next.morning !== "number" || next.morning < 0 || next.morning > 23) {
+        throw new Error("INVALID_REMINDER_MORNING");
+    }
+    if (typeof next.evening !== "number" || next.evening < 0 || next.evening > 23) {
+        throw new Error("INVALID_REMINDER_EVENING");
+    }
+    await db.appSettings.put({ key: REMINDER_KEY, value: next });
+    // Let the scheduler and the service worker pick up the change.
+    if (typeof window !== "undefined") {
+        window.dispatchEvent(
+            new CustomEvent("hisab:reminder-settings", { detail: next }),
+        );
+    }
+    return next;
+}

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./auth/ThemeProvider";
 import { AuthProvider } from "./auth/AuthProvider";
+import { ReminderScheduler } from "./components/ReminderScheduler";
 import {
   RequireAuth,
   RequireNoVault,
@@ -39,13 +40,15 @@ import Storage from "./pages/Storage/Storage";
 import ThemeSettings from "./pages/ThemeSettings/ThemeSettings";
 import UserManual from "./pages/UserManual/UserManual";
 import Changelog from "./pages/Changelog/Changelog";
+import Reminders from "./pages/Reminders/Reminders";
 
 export default function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
+            <ReminderScheduler />
+            <Routes>
             <Route path="/" element={<RootRedirect />} />
 
             <Route element={<RequireNoVault />}>
@@ -105,6 +108,7 @@ export default function App() {
               <Route path="/settings/theme" element={<ThemeSettings />} />
               <Route path="/settings/manual" element={<UserManual />} />
               <Route path="/settings/changelog" element={<Changelog />} />
+              <Route path="/settings/reminders" element={<Reminders />} />
 
               <Route path="/delete-all" element={<DeleteAll />} />
             </Route>
