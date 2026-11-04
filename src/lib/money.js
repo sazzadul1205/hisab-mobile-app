@@ -72,3 +72,9 @@ export function formatBDT(minor) {
 export function isMinor(value) {
   return Number.isInteger(value) && Number.isSafeInteger(value);
 }
+
+/** Like formatBDT but drops .00 for whole-BDT amounts. */
+export function formatBDTShort(minor) {
+  const full = formatBDT(minor);
+  return full.endsWith(".00") ? full.slice(0, -3) : full;
+}
