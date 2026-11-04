@@ -42,3 +42,21 @@ export async function setAutoLockMs(ms) {
     }
     await db.appSettings.put({ key: AUTO_LOCK_KEY, value: ms });
 }
+
+/* ----------------------------------------------------------------
+   Last-used import account — persists so the Import form defaults
+   to the same account on the next visit. Without this, users who
+   import into bKash would see it default back to Cash on reload,
+   silently breaking duplicate detection (which is per-account).
+   ---------------------------------------------------------------- */
+export const LAST_IMPORT_ACCOUNT_KEY = "import-account-id";
+
+export async function getLastImportAccountId() {
+    const row = await db.appSettings.get(LAST_IMPORT_ACCOUNT_KEY);
+    return typeof row?.value === "string" ? row.value : null;
+}
+
+export async function setLastImportAccountId(id) {
+    if (typeof id !== "string" || !id) throw new Error("INVALID_ACCOUNT_ID");
+    await db.appSettings.put({ key: LAST_IMPORT_ACCOUNT_KEY, value: id });
+}

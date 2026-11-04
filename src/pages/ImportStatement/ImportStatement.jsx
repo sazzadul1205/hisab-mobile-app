@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { AppBar } from "../../components/AppBar";
 import { Button, ButtonRow } from "../../components/Button";
@@ -9,7 +10,12 @@ import { Alert } from "../../components/Alert";
 import { Note } from "../../components/Note";
 import { BootScreen } from "../../auth/RouteGuards";
 import { useAccounts } from "../../hooks/useAccounts";
+import { db } from "../../db/db";
 import { parseStatement, looksLikeCsv } from "../../services/importParser";
+import {
+  LAST_IMPORT_ACCOUNT_KEY,
+  setLastImportAccountId,
+} from "../../services/settings";
 
 /* ================================================================
    Sub-views
@@ -99,13 +105,18 @@ function FileChosenState({ fileName, parsed, onClear }) {
 }
 
 /* ================================================================
-   Inner form — mounts only with fully-loaded accounts
+   Inner form — mounts once accounts + saved account are ready
    ================================================================ */
-function ImportForm({ accounts }) {
+function ImportForm({ accounts, defaultAccountId }) {
   const navigate = useNavigate();
   const fileRef = useRef(null);
 
-  const [accountId, setAccountId] = useState(() => accounts[0]?.id ?? "");
+  const [accountId, setAccountId] = useState(() => {
+    if (defaultAccountId && accounts.some((a) => a.id === defaultAccountId)) {
+      return defaultAccountId;
+    }
+    return accounts[0]?.id ?? "";
+  });
   const [file, setFile] = useState(null);
   const [parsed, setParsed] = useState(null);
   const [parsing, setParsing] = useState(false);
@@ -120,9 +131,14 @@ function ImportForm({ accounts }) {
 
   const handleAccountChange = (newId) => {
     setAccountId(newId);
-    // Duplicate detection was computed against the previous account.
-    // If the user changes account after parsing, force them to re-parse.
+    // Duplicate detection is per-account — switching accounts
+    // invalidates the current parse. Force a re-parse.
     if (parsed) resetParse();
+    // Persist so next import defaults here (the bug that made
+    // duplicate detection look broken on second import).
+    setLastImportAccountId(newId).catch((err) =>
+      console.warn("Could not persist import account:", err),
+    );
   };
 
   const handleChoose = async (e) => {
@@ -160,9 +176,7 @@ function ImportForm({ accounts }) {
 
   const handleContinue = () => {
     if (!parsed) return;
-    navigate("/import/review", {
-      state: { ...parsed, accountId },
-    });
+    navigate("/import/review", { state: parsed });
   };
 
   return (
@@ -234,7 +248,8 @@ function ImportForm({ accounts }) {
 
         <Note>
           Balances do not change during parsing. You will review every parsed
-          row before anything is saved.
+          row before anything is saved. The destination account is remembered
+          for next time.
         </Note>
       </ScrollArea>
 
@@ -263,13 +278,19 @@ function ImportForm({ accounts }) {
 }
 
 /* ================================================================
-   Outer — handles loading + empty-accounts guard
+   Outer — loading + empty-accounts guard + saved-account read
    ================================================================ */
 export default function ImportStatement() {
   const navigate = useNavigate();
-  const { accounts, loading } = useAccounts();
+  const { accounts, loading: accLoading } = useAccounts();
 
-  if (loading) return <BootScreen />;
+  // undefined = still loading, null = no saved value, string = saved id
+  const lastAccountId = useLiveQuery(async () => {
+    const row = await db.appSettings.get(LAST_IMPORT_ACCOUNT_KEY);
+    return row?.value ?? null;
+  }, []);
+
+  if (accLoading || lastAccountId === undefined) return <BootScreen />;
 
   const activeAccounts = accounts.filter((a) => !a.isArchived);
 
@@ -295,5 +316,7 @@ export default function ImportStatement() {
     );
   }
 
-  return <ImportForm accounts={activeAccounts} />;
+  return (
+    <ImportForm accounts={activeAccounts} defaultAccountId={lastAccountId} />
+  );
 }

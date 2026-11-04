@@ -398,7 +398,9 @@ export async function parseStatement({ file, accountId }) {
 
         // If bKash provided a service charge, add it as a separate
         // "Transfer fees" expense — honest accounting, one row per
-        // real ledger entry.
+        // real ledger entry. This row must also be checked against
+        // existing transactions; otherwise re-imports silently add
+        // duplicate fee entries.
         if (base.fee > 0) {
             const feeRow = {
                 date: base.date,
@@ -408,10 +410,16 @@ export async function parseStatement({ file, accountId }) {
                 fee: 0,
             };
             const feeSig = signature(feeRow);
+            const feeExistingCount = existingSigs.get(feeSig) ?? 0;
+            const feeSeenInFile = rows.filter(
+                (r) => r.status !== "invalid" && r._sig === feeSig,
+            ).length;
+            const feeIsDuplicate = feeExistingCount > 0 || feeSeenInFile > 0;
+
             rows.push({
                 id: nextId(),
-                status: "ok",
-                included: true,
+                status: feeIsDuplicate ? "duplicate" : "ok",
+                included: !feeIsDuplicate,
                 error: null,
                 raw: rawRow,
                 description: feeRow.description,
