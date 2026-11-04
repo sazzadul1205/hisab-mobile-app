@@ -5,6 +5,7 @@ import { PinKeypad } from "../../components/PinKeypad";
 import { Button } from "../../components/Button";
 import { useAuth } from "../../auth/authContext";
 import { PIN_LENGTH } from "../../constants/app";
+import { isSecureContext, InsecureContextError } from "../../lib/webcrypto";
 
 function Bullet({ icon, title, subtitle }) {
   return (
@@ -27,15 +28,88 @@ function Bullet({ icon, title, subtitle }) {
   );
 }
 
+/* ================================================================
+   Shown when the browser context can't do crypto.
+   ================================================================ */
+function SecureContextRequired() {
+  return (
+    <PhoneFrame>
+      <StatusBar />
+      <ScrollArea>
+        <div className="text-center pt-14 px-6">
+          <div className="w-16 h-16 rounded-[22px] mx-auto mb-5 grid place-items-center bg-(--warn-soft) text-(--warn)">
+            <svg
+              viewBox="0 0 24 24"
+              className="w-7 h-7 stroke-current fill-none stroke-[1.8] [stroke-linecap:round] [stroke-linejoin:round]"
+            >
+              <path d="M12 9v4" />
+              <circle cx="12" cy="17" r=".6" fill="currentColor" />
+              <path d="M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+            </svg>
+          </div>
+          <h2 className="m-0 mb-3 text-[20px] font-bold tracking-[-0.4px]">
+            Secure connection required
+          </h2>
+          <p className="m-0 text-[13px] leading-[1.6] text-(--muted) mb-5">
+            Hisab encrypts your data with the Web Crypto API. Browsers only
+            allow this on <b className="text-(--ink-2)">HTTPS</b> or{" "}
+            <b className="text-(--ink-2)">localhost</b>.
+          </p>
+        </div>
+
+        <div className="bg-(--app) border border-dashed border-(--line) rounded-[14px] p-4 text-[12px] leading-[1.65] text-(--muted) mb-3">
+          <b className="block text-(--ink-2) font-semibold mb-1.5">
+            Testing on a phone?
+          </b>
+          Open the app over HTTPS. Two options:
+          <ul className="mt-1.5 ml-4 list-disc space-y-1">
+            <li>
+              <code className="bg-(--line-2) px-1 rounded">
+                npx ngrok http 5173
+              </code>{" "}
+              then open the https URL
+            </li>
+            <li>
+              <code className="bg-(--line-2) px-1 rounded">
+                npx cloudflared tunnel --url http://localhost:5173
+              </code>
+            </li>
+          </ul>
+        </div>
+
+        <div className="bg-(--app) border border-dashed border-(--line) rounded-[14px] p-4 text-[12px] leading-[1.65] text-(--muted)">
+          <b className="block text-(--ink-2) font-semibold mb-1.5">
+            On this machine?
+          </b>
+          Open{" "}
+          <code className="bg-(--line-2) px-1 rounded">
+            http://localhost:5173
+          </code>{" "}
+          (not the LAN IP). Both <code>localhost</code> and{" "}
+          <code>127.0.0.1</code> count as secure.
+        </div>
+      </ScrollArea>
+    </PhoneFrame>
+  );
+}
+
+/* ================================================================
+   Setup flow
+   ================================================================ */
 export default function WelcomePin() {
   const navigate = useNavigate();
   const { setupVaultAndUnlock } = useAuth();
 
-  const [step, setStep] = useState("enter"); // 'enter' | 'confirm'
+  const [step, setStep] = useState("enter");
   const [digits, setDigits] = useState("");
   const [firstPin, setFirstPin] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Guard before rendering anything that might trigger crypto
+  if (!isSecureContext()) {
+    return <SecureContextRequired />;
+  }
 
   const handleDigit = async (d) => {
     if (loading || digits.length >= PIN_LENGTH) return;
@@ -81,7 +155,13 @@ export default function WelcomePin() {
       navigate("/dashboard", { replace: true });
     } catch (err) {
       console.error("Vault setup failed:", err);
-      setError("Setup failed. Try again.");
+      if (err instanceof InsecureContextError) {
+        setError(
+          "Browser won't allow encryption here. Use HTTPS or localhost.",
+        );
+      } else {
+        setError(err?.message ?? "Setup failed. Try again.");
+      }
       setDigits("");
       setFirstPin("");
       setStep("enter");
@@ -100,7 +180,6 @@ export default function WelcomePin() {
     <PhoneFrame>
       <StatusBar />
       <ScrollArea>
-        {/* Hero */}
         <div className="text-center pt-6.5 pb-5.5">
           <div className="w-16 h-16 rounded-[22px] mx-auto mb-4.5 grid place-items-center bg-(--brand-soft) text-(--brand-dk)">
             <svg
@@ -121,7 +200,6 @@ export default function WelcomePin() {
           </p>
         </div>
 
-        {/* Dots */}
         <div className="flex gap-3.75 justify-center mt-6.5">
           {Array.from({ length: PIN_LENGTH }).map((_, i) => (
             <i
@@ -154,7 +232,6 @@ export default function WelcomePin() {
           </div>
         )}
 
-        {/* Keypad */}
         <div className="mt-8">
           <PinKeypad
             onDigit={handleDigit}
@@ -164,7 +241,6 @@ export default function WelcomePin() {
           />
         </div>
 
-        {/* Bullets — only step 1 */}
         {step === "enter" && (
           <div className="flex flex-col gap-3 mt-6 mb-1.5">
             <Bullet
@@ -197,7 +273,6 @@ export default function WelcomePin() {
         )}
       </ScrollArea>
 
-      {/* Start over — only step 2 */}
       {step === "confirm" && (
         <div
           className="flex-none px-4.5 pt-3 pb-[calc(20px+env(safe-area-inset-bottom))] md:pb-5"

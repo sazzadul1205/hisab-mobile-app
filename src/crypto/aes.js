@@ -1,11 +1,7 @@
-/* ----------------------------------------------------------------
-   AES-GCM primitives on top of Web Crypto.
-
-   Always uses a 96-bit IV (the GCM default and strongest choice).
-   Key must be 16, 24, or 32 bytes.
-   ---------------------------------------------------------------- */
+import { requireCrypto } from "../lib/webcrypto";
 
 export async function encryptBytes(bytes, rawKey, iv) {
+    const crypto = requireCrypto();
     const key = await crypto.subtle.importKey(
         "raw",
         rawKey,
@@ -18,6 +14,7 @@ export async function encryptBytes(bytes, rawKey, iv) {
 }
 
 export async function decryptBytes(ciphertext, rawKey, iv) {
+    const crypto = requireCrypto();
     const key = await crypto.subtle.importKey(
         "raw",
         rawKey,
@@ -25,7 +22,6 @@ export async function decryptBytes(ciphertext, rawKey, iv) {
         false,
         ["decrypt"],
     );
-    // Throws on tag mismatch (wrong key or tampered ciphertext)
     const buf = await crypto.subtle.decrypt(
         { name: "AES-GCM", iv },
         key,
@@ -35,5 +31,6 @@ export async function decryptBytes(ciphertext, rawKey, iv) {
 }
 
 export function randomBytes(n) {
+    const crypto = requireCrypto();
     return crypto.getRandomValues(new Uint8Array(n));
 }

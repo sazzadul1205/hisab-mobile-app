@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
-import AddIncome from "./AddIncome";
-import AddExpense from "./AddExpense";
-import AddTransfer from "./AddTransfer";
+import AddIncome from "../AddIncome/AddIncome";
+import AddExpense from "../AddExpense/AddExpense";
+import AddTransfer from "../AddTransfer/AddTransfer";
 import { useTransaction } from "../../hooks/useTransactions";
 import { BootScreen } from "../../auth/RouteGuards";
 
