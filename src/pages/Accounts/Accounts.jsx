@@ -93,8 +93,8 @@ export default function Accounts() {
         <StatusBar />
         <ScrollArea>
           <div className="p-4">
-            <div className="h-8 bg-(--line-2) rounded w-32 mb-2 animate-pulse" />
-            <div className="h-4 bg-(--line-2) rounded w-40 mb-6 animate-pulse" />
+            <div className="skeleton-box h-8 w-32 rounded mb-2" />
+            <div className="skeleton-box h-4 w-40 rounded mb-6" />
             <div className="h-24 bg-(--line-2) rounded-[18px] mb-4 animate-pulse" />
             <div className="h-16 bg-(--line-2) rounded-[18px] mb-2.5 animate-pulse" />
             <div className="h-16 bg-(--line-2) rounded-[18px] animate-pulse" />

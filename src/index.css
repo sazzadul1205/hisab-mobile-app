@@ -1,5 +1,49 @@
 @import "tailwindcss";
 
+/* 1. Stop the blue highlight and text selection globally */
+* {
+  -webkit-touch-callout: none; /* Disables the iOS long-press menu */
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Stops the grey flash when tapping buttons on Android */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 2. Allow text selection ONLY inside inputs (so they can edit amounts/notes/PIN) */
+input,
+textarea {
+  -webkit-touch-callout: default;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Modern Skeleton Shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-box {
+  background: linear-gradient(
+    90deg,
+    var(--line-2) 25%,
+    var(--line) 50%,
+    var(--line-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
 /* Default Theme (Light Green / Slate) */
 :root {
   --bg: #eef2f0;

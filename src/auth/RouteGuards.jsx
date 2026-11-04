@@ -3,13 +3,28 @@ import { useAuth } from "./authContext";
 
 export function BootScreen() {
   return (
-    <div className="min-h-dvh bg-(--bg) flex items-center justify-center">
+    <div className="min-h-dvh bg-(--bg) flex flex-col items-center justify-center">
+      {/* Pulsing Brand Icon */}
       <div
-        className="w-10 h-10 rounded-full border-[3px] border-(--line)
-                   border-t-(--brand) animate-spin"
-        role="status"
-        aria-label="Loading"
-      />
+        className="w-20 h-20 rounded-3xl grid place-items-center bg-(--brand) text-white shadow-xl mb-6"
+        style={{ animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite" }}
+      >
+        <svg viewBox="0 0 24 24" className="w-10 h-10 fill-current">
+          {/* The taka symbol path */}
+          <path
+            d="M7 4v16M12 8h4a3 3 0 0 1 0 6h-4"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            fill="none"
+          />
+        </svg>
+      </div>
+
+      {/* Loading text */}
+      <div className="text-[13px] font-semibold tracking-widest text-(--muted) uppercase animate-pulse">
+        Securing Data
+      </div>
     </div>
   );
 }

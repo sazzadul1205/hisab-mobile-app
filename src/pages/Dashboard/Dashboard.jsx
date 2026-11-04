@@ -437,19 +437,28 @@ function DashboardSkeleton() {
       <StatusBar />
       <ScrollArea>
         <div className="p-4">
-          <div className="h-3 bg-(--line-2) rounded w-32 mb-2 animate-pulse" />
-          <div className="h-7 bg-(--line-2) rounded w-48 mb-6 animate-pulse" />
-          <div className="h-40 bg-(--line-2) rounded-3xl mb-3 animate-pulse" />
-          <div className="grid grid-cols-4 gap-2 mb-3">
+          {/* Header */}
+          <div className="skeleton-box h-3 w-32 rounded mb-2" />
+          <div className="skeleton-box h-7 w-48 rounded mb-6" />
+
+          {/* Balance Card */}
+          <div className="skeleton-box h-44 rounded-3xl mb-3" />
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-4 gap-2 mb-4">
             {[0, 1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="h-20 bg-(--line-2) rounded-[14px] animate-pulse"
-              />
+              <div key={i} className="skeleton-box h-20 rounded-[14px]" />
             ))}
           </div>
-          <div className="h-40 bg-(--line-2) rounded-[18px] mb-3 animate-pulse" />
-          <div className="h-32 bg-(--line-2) rounded-[18px] animate-pulse" />
+
+          {/* Chart Card */}
+          <div className="skeleton-box h-48 rounded-[18px] mb-3" />
+
+          {/* Category Card */}
+          <div className="skeleton-box h-40 rounded-[18px] mb-3" />
+
+          {/* Recent Card */}
+          <div className="skeleton-box h-36 rounded-[18px]" />
         </div>
       </ScrollArea>
       <BottomNav active="home" />
