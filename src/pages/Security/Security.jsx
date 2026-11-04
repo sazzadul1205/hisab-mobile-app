@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { AppBar } from "../../components/AppBar";
 import { ListItem } from "../../components/ListItem";
@@ -5,12 +6,12 @@ import { Chevron } from "../../components/Chevron";
 import { Toggle } from "../../components/Toggle";
 import { Alert } from "../../components/Alert";
 import { SectionLabel } from "../../components/SectionLabel";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/authContext";
+import { formatAutoLock } from "../../services/settings";
 
 export default function Security() {
   const navigate = useNavigate();
-  const { lock } = useAuth();
+  const { autoLockMs, lock } = useAuth();
 
   const handleLockNow = () => {
     lock();
@@ -37,17 +38,19 @@ export default function Security() {
               trailing={<Chevron />}
             />
           </div>
-          <ListItem
-            icon={
-              <>
-                <circle cx="12" cy="12" r="8" />
-                <path d="M12 8v4l3 2" />
-              </>
-            }
-            title="Auto-lock"
-            subtitle="After 2 minutes"
-            trailing={<Chevron />}
-          />
+          <div onClick={() => navigate("/security/auto-lock")}>
+            <ListItem
+              icon={
+                <>
+                  <circle cx="12" cy="12" r="8" />
+                  <path d="M12 8v4l3 2" />
+                </>
+              }
+              title="Auto-lock"
+              subtitle={`After ${formatAutoLock(autoLockMs).toLowerCase()}`}
+              trailing={<Chevron />}
+            />
+          </div>
           <ListItem
             icon={
               <>

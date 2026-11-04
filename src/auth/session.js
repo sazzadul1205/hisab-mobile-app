@@ -41,6 +41,9 @@ export function shouldAutoLock() {
 
 export function setAutoLockDuration(ms) {
     autoLockMs = ms;
+    // Changing the interval counts as activity. Otherwise picking
+    // "5 minutes" while 4:30 idle would immediately trip the lock.
+    lastActivityAt = Date.now();
 }
 
 export function getAutoLockDuration() {

@@ -8,10 +8,16 @@ import {
   touch,
   lock as sessionLock,
   shouldAutoLock,
+  setAutoLockDuration,
 } from "./session";
 import { recordSuccess } from "./throttle";
 import { AuthContext } from "./authContext";
 import { ensureEncryptedAtRest } from "../services/encryption";
+import {
+  DEFAULT_AUTO_LOCK_MS,
+  getAutoLockMs,
+  setAutoLockMs,
+} from "../services/settings";
 
 const VAULT_SETTINGS_KEY = "vault";
 const AUTO_LOCK_TICK_MS = 10_000;
@@ -20,15 +26,24 @@ const ACTIVITY_THROTTLE_MS = 1_000;
 export function AuthProvider({ children }) {
   const [status, setStatus] = useState("booting");
   const [vaultMeta, setVaultMeta] = useState(null);
+  const [autoLockMs, setAutoLockMsState] = useState(DEFAULT_AUTO_LOCK_MS);
   const lastActivityAt = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const row = await db.appSettings.get(VAULT_SETTINGS_KEY);
+        const [vaultRow, autoLockValue] = await Promise.all([
+          db.appSettings.get(VAULT_SETTINGS_KEY),
+          getAutoLockMs(),
+        ]);
         if (cancelled) return;
-        const meta = row?.value;
+
+        // Apply auto-lock setting first — it's independent of vault state
+        setAutoLockDuration(autoLockValue);
+        setAutoLockMsState(autoLockValue);
+
+        const meta = vaultRow?.value;
         if (!meta || !meta.wrappedDEK) {
           setStatus("no-vault");
           return;
@@ -74,9 +89,6 @@ export function AuthProvider({ children }) {
     return () => clearInterval(id);
   }, [status]);
 
-  // Run migration if needed — non-blocking, safe to fire-and-forget.
-  // Failures log but never block the app: decryption handles both
-  // pre-migration (plaintext) and post-migration (encrypted) rows.
   const kickMigration = useCallback(() => {
     ensureEncryptedAtRest().catch((err) =>
       console.error("Encryption migration failed:", err),
@@ -132,6 +144,12 @@ export function AuthProvider({ children }) {
     [vaultMeta],
   );
 
+  const updateAutoLock = useCallback(async (ms) => {
+    await setAutoLockMs(ms);
+    setAutoLockDuration(ms);
+    setAutoLockMsState(ms);
+  }, []);
+
   const lock = useCallback(() => {
     sessionLock();
     setStatus("locked");
@@ -147,6 +165,8 @@ export function AuthProvider({ children }) {
         verifyPin,
         applyNewPin,
         lock,
+        autoLockMs,
+        updateAutoLock,
       }}
     >
       {children}

@@ -5,15 +5,17 @@ import { SectionLabel } from "../../components/SectionLabel";
 import { ListItem } from "../../components/ListItem";
 import { Chevron } from "../../components/Chevron";
 import { Note } from "../../components/Note";
+import { useAuth } from "../../auth/authContext";
+import { formatAutoLock } from "../../services/settings";
 
 export default function Settings() {
   const navigate = useNavigate();
+  const { autoLockMs } = useAuth();
 
   return (
     <PhoneFrame>
       <StatusBar />
       <ScrollArea>
-        {/* Header — title + subtitle, no back (tab page) */}
         <div className="py-1.5 pb-3.5">
           <h2 className="m-0 text-[23px] font-bold tracking-[-0.5px] leading-tight">
             Settings
@@ -24,10 +26,7 @@ export default function Settings() {
         </div>
 
         <SectionLabel className="mt-1">Security</SectionLabel>
-        <div
-          className="bg-white border border-(--line) rounded-[18px]
-                        overflow-hidden mb-4"
-        >
+        <div className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-4">
           <div onClick={() => navigate("/security/change-pin")}>
             <ListItem
               icon={
@@ -40,7 +39,7 @@ export default function Settings() {
               trailing={<Chevron />}
             />
           </div>
-          <div onClick={() => navigate("/security")}>
+          <div onClick={() => navigate("/security/auto-lock")}>
             <ListItem
               icon={
                 <>
@@ -49,32 +48,31 @@ export default function Settings() {
                 </>
               }
               title="Auto-lock"
-              subtitle="After 2 minutes"
+              subtitle={`After ${formatAutoLock(autoLockMs).toLowerCase()}`}
               trailing={<Chevron />}
             />
           </div>
-          <ListItem
-            icon={
-              <>
-                <path d="M4 12h16" />
-                <circle cx="12" cy="12" r="9" />
-              </>
-            }
-            title="Lock now"
-            trailing={<Chevron />}
-          />
+          <div onClick={() => navigate("/security")}>
+            <ListItem
+              icon={
+                <>
+                  <path d="M4 12h16" />
+                  <circle cx="12" cy="12" r="9" />
+                </>
+              }
+              title="Security"
+              subtitle="Biometric, lock now"
+              trailing={<Chevron />}
+            />
+          </div>
         </div>
 
         <SectionLabel>Data</SectionLabel>
-        <div
-          className="bg-white border border-(--line) rounded-[18px]
-                        overflow-hidden mb-4"
-        >
+        <div className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-4">
           <div onClick={() => navigate("/categories")}>
             <ListItem
               icon={<path d="M4 5h7l2 2h7v12H4z" />}
               title="Categories"
-              subtitle="8 income · 12 expense"
               trailing={<Chevron />}
             />
           </div>
@@ -109,24 +107,19 @@ export default function Settings() {
               </>
             }
             title="Storage"
-            subtitle="1.4 MB used"
+            subtitle="Used on this device"
             trailing={<Chevron />}
           />
         </div>
 
         <SectionLabel>Danger zone</SectionLabel>
         <div
-          className="bg-white border border-(--line) rounded-[18px]
-             overflow-hidden mb-4"
+          className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-4"
           onClick={() => navigate("/delete-all")}
         >
           <ListItem
             danger
-            icon={
-              <>
-                <path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13" />
-              </>
-            }
+            icon={<path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13" />}
             title="Delete all app data"
             trailing={<Chevron />}
           />

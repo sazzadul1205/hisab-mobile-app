@@ -30,6 +30,7 @@ import {
   RootRedirect,
 } from "./auth/RouteGuards";
 import ChangePin from "./pages/ChangePin/ChangePin";
+import AutoLock from "./pages/AutoLock/AutoLock";
 
 export default function App() {
   return (
@@ -38,17 +39,14 @@ export default function App() {
         <Routes>
           <Route path="/" element={<RootRedirect />} />
 
-          {/* Guest-only: reachable only when NO vault exists */}
           <Route element={<RequireNoVault />}>
             <Route path="/welcome" element={<WelcomePin />} />
           </Route>
 
-          {/* Guest-only: reachable only when a vault exists AND locked */}
           <Route element={<RequireVaultLocked />}>
             <Route path="/unlock" element={<Unlock />} />
           </Route>
 
-          {/* Everything else requires an unlocked session */}
           <Route element={<RequireAuth />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/accounts" element={<Accounts />} />
@@ -81,6 +79,7 @@ export default function App() {
             <Route path="/backup" element={<Backup />} />
             <Route path="/security" element={<Security />} />
             <Route path="/security/change-pin" element={<ChangePin />} />
+            <Route path="/security/auto-lock" element={<AutoLock />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/delete-all" element={<DeleteAll />} />
           </Route>

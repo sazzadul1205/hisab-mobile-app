@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#118A64" />
+      <stop offset="100%" stop-color="#0A5A41" />
+    </linearGradient>
+  </defs>
+
+  <!-- Full-bleed background. The OS or generator adds the rounding. -->
+  <rect width="512" height="512" fill="url(#bg)" />
+
+  <!-- Stylized ৳ (taka sign), drawn with paths — no font dependency. -->
+  <g fill="#FFFFFF">
+    <!-- Vertical stem -->
+    <rect x="216" y="140" width="32" height="232" rx="16" />
+    <!-- Top loop -->
+    <path
+      d="M 216 180 C 216 140, 296 140, 296 180 C 296 220, 216 220, 216 220"
+      stroke="#FFFFFF"
+      stroke-width="32"
+      stroke-linecap="round"
+    />
+    <!-- Crossbar -->
+    <rect x="176" y="220" width="160" height="32" rx="16" />
+  </g>
+</svg>

@@ -9,21 +9,38 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "icons/*.png"],
+      includeAssets: ["favicon.ico", "apple-touch-icon-180x180.png"],
       manifest: {
-        name: "Personal Finance & Bookkeeping",
-        short_name: "Finance",
-        description: "Local-first personal finance & bookkeeping (BDT)",
-        theme_color: "#0f172a",
-        background_color: "#0f172a",
+        name: "Hisab — Personal Finance",
+        short_name: "Hisab",
+        description:
+          "Local-first personal finance & bookkeeping for Bangladesh. BDT only.",
+        theme_color: "#0E7C5A",
+        background_color: "#EEF2F0",
         display: "standalone",
         orientation: "portrait",
         start_url: "/",
+        scope: "/",
+        lang: "en",
+        categories: ["finance", "productivity"],
         icons: [
-          { src: "icons/icon-192.png", sizes: "192x192", type: "image/png" },
-          { src: "icons/icon-512.png", sizes: "512x512", type: "image/png" },
           {
-            src: "icons/icon-512-maskable.png",
+            src: "pwa-64x64.png",
+            sizes: "64x64",
+            type: "image/png",
+          },
+          {
+            src: "pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+          {
+            src: "maskable-icon-512x512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable",
