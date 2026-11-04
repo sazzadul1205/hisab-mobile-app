@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { AppBar } from "../../components/AppBar";
 import { SegmentedControl } from "../../components/SegmentedControl";
@@ -7,29 +7,52 @@ import { Field, TextInput } from "../../components/FormField";
 import { Alert } from "../../components/Alert";
 import { Note } from "../../components/Note";
 import { Button, ButtonRow } from "../../components/Button";
-
-// Demo category — replaced by a store lookup when the DB wires in
-const DEMO_CATEGORY = {
-  name: "Groceries",
-  type: "expense",
-};
+import { BootScreen } from "../../auth/RouteGuards";
+import { useCategories } from "../../hooks/useTransactions";
+import { createCategory, updateCategory } from "../../services/categories";
 
 const TYPE_LABEL = { expense: "Expense", income: "Income" };
 
-export default function AddCategory({ mode = "new" }) {
+/* ================================================================
+   Inner form
+   ================================================================ */
+function CategoryForm({ isEdit, id, initial, initialType, fromTab }) {
   const navigate = useNavigate();
-  const [params] = useSearchParams();
-  const isEdit = mode === "edit";
 
-  const initialType = isEdit
-    ? DEMO_CATEGORY.type
-    : params.get("type") === "income"
-      ? "income"
-      : "expense";
-
+  const [name, setName] = useState(initial?.name ?? "");
   const [type, setType] = useState(initialType);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  const close = () => navigate("/categories");
+  const backTab = fromTab ?? (isEdit ? initial?.type : type) ?? "expense";
+  const close = () => navigate(`/categories?tab=${backTab}`, { replace: true });
+
+  const handleSave = async () => {
+    setError("");
+    const trimmed = name.trim();
+    if (!trimmed) {
+      setError("Category name is required.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      if (isEdit) {
+        await updateCategory(id, { name: trimmed });
+      } else {
+        await createCategory({ name: trimmed, type });
+      }
+      close();
+    } catch (err) {
+      if (err.message === "DUPLICATE_NAME") {
+        setError(`A ${type} category named "${trimmed}" already exists.`);
+      } else {
+        console.error(err);
+        setError("Could not save. Try again.");
+      }
+      setSaving(false);
+    }
+  };
 
   return (
     <PhoneFrame>
@@ -40,20 +63,15 @@ export default function AddCategory({ mode = "new" }) {
         <Field label="Category name">
           <TextInput
             placeholder="e.g. Groceries"
-            defaultValue={isEdit ? DEMO_CATEGORY.name : undefined}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
         </Field>
 
         {isEdit ? (
           <Field label="Type">
-            <div
-              className="flex items-center justify-between bg-white border
-                         border-(--line) rounded-[14px] px-3.5 py-3.25
-                         text-[14px] text-(--ink)"
-            >
-              <span className="font-semibold">
-                {TYPE_LABEL[DEMO_CATEGORY.type]}
-              </span>
+            <div className="flex items-center justify-between bg-white border border-(--line) rounded-[14px] px-3.5 py-3.25 text-[14px] text-(--ink)">
+              <span className="font-semibold">{TYPE_LABEL[initial?.type]}</span>
               <span className="text-[10.5px] font-bold tracking-wider uppercase text-(--muted)">
                 Locked
               </span>
@@ -70,6 +88,12 @@ export default function AddCategory({ mode = "new" }) {
               onChange={setType}
             />
           </Field>
+        )}
+
+        {error && (
+          <div className="text-[12px] font-semibold text-(--out) mb-3 text-center">
+            {error}
+          </div>
         )}
 
         <Alert
@@ -90,7 +114,7 @@ export default function AddCategory({ mode = "new" }) {
         <Note>
           {isEdit
             ? "Renaming is safe. Existing transactions keep their category link."
-            : "Default categories are seeded with the app. New categories you add here can be renamed or deleted."}
+            : "New categories appear immediately in the transaction forms."}
         </Note>
       </ScrollArea>
 
@@ -106,12 +130,71 @@ export default function AddCategory({ mode = "new" }) {
             variant="secondary"
             className="flex-[0_0_34%]"
             onClick={close}
+            disabled={saving}
           >
             Cancel
           </Button>
-          <Button>{isEdit ? "Save changes" : "Save category"}</Button>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? "Saving…" : isEdit ? "Save changes" : "Save category"}
+          </Button>
         </ButtonRow>
       </div>
     </PhoneFrame>
+  );
+}
+
+/* ================================================================
+   Outer
+   ================================================================ */
+export default function AddCategory({ mode = "new" }) {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [params] = useSearchParams();
+  const isEdit = mode === "edit";
+
+  const { categories, loading } = useCategories();
+
+  if (loading) return <BootScreen />;
+
+  const initial = isEdit ? (categories.find((c) => c.id === id) ?? null) : null;
+  const fromTab = params.get("from") ?? null;
+
+  if (isEdit && !initial) {
+    return (
+      <PhoneFrame>
+        <StatusBar />
+        <ScrollArea>
+          <AppBar title="Category" />
+          <div className="text-center py-10 px-4">
+            <b className="block text-[13.5px] font-semibold mb-2">
+              Category not found
+            </b>
+            <small className="block text-[12px] text-(--muted) mb-4">
+              It may have been removed.
+            </small>
+            <Button onClick={() => navigate("/categories")}>
+              Back to categories
+            </Button>
+          </div>
+        </ScrollArea>
+      </PhoneFrame>
+    );
+  }
+
+  const initialType = isEdit
+    ? initial.type
+    : params.get("type") === "income"
+      ? "income"
+      : "expense";
+
+  return (
+    <CategoryForm
+      key={isEdit ? id : "new"}
+      isEdit={isEdit}
+      id={id}
+      initial={initial}
+      initialType={initialType}
+      fromTab={fromTab}
+    />
   );
 }

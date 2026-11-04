@@ -165,3 +165,33 @@ export async function decryptFromStorage({ iv, ct }, dekBytes) {
     const plaintext = await decryptBytes(ct, dekBytes, iv);
     return JSON.parse(new TextDecoder().decode(plaintext));
 }
+
+/* ----------------------------------------------------------------
+   Rewrap — used by the Change PIN flow after the user has been
+   verified. Skips re-derivation of the old master key (caller
+   already verified), so the whole change costs one PBKDF2 derive.
+   ---------------------------------------------------------------- */
+export async function rewrapDEK(dekBytes, newPin, metadata) {
+    if (!newPin || typeof newPin !== "string") {
+        throw new Error("NEW_PIN_REQUIRED");
+    }
+    if (!dekBytes || dekBytes.length !== DEK_BYTES) {
+        throw new Error("INVALID_DEK");
+    }
+
+    const newSalt = randomBytes(SALT_BYTES);
+    const newMasterKey = await deriveMasterKey(
+        newPin,
+        newSalt,
+        metadata.iterations,
+    );
+    const newIv = randomBytes(IV_BYTES);
+    const newWrappedDEK = await encryptBytes(dekBytes, newMasterKey, newIv);
+
+    return {
+        ...metadata,
+        salt: newSalt,
+        iv: newIv,
+        wrappedDEK: newWrappedDEK,
+    };
+}

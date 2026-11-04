@@ -29,6 +29,7 @@ import {
   RequireVaultLocked,
   RootRedirect,
 } from "./auth/RouteGuards";
+import ChangePin from "./pages/ChangePin/ChangePin";
 
 export default function App() {
   return (
@@ -79,6 +80,7 @@ export default function App() {
             <Route path="/import/review" element={<ReviewImport />} />
             <Route path="/backup" element={<Backup />} />
             <Route path="/security" element={<Security />} />
+            <Route path="/security/change-pin" element={<ChangePin />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/delete-all" element={<DeleteAll />} />
           </Route>

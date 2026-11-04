@@ -3,6 +3,7 @@ import {
     setupVault,
     unlockVault,
     changePin,
+    rewrapDEK,
     encryptForStorage,
     decryptFromStorage,
     InvalidPinError,
@@ -180,5 +181,46 @@ describe("encryptForStorage / decryptFromStorage", () => {
         // Ciphertext was never re-encrypted — same DEK, same plaintext
         const decoded = await decryptFromStorage({ iv, ct }, result.dekBytes);
         expect(decoded).toEqual({ amount: 500 });
+    });
+});
+
+/* ============================================================
+   rewrapDEK
+   ============================================================ */
+describe("rewrapDEK", () => {
+    it("produces metadata that unlocks with the new PIN and the same DEK", async () => {
+        const { dekBytes, metadata } = await setupVault(PIN, FAST);
+        const newMeta = await rewrapDEK(dekBytes, "5678", metadata);
+
+        // Old PIN no longer works
+        await expect(unlockVault(PIN, newMeta)).rejects.toBeInstanceOf(
+            InvalidPinError,
+        );
+
+        // New PIN works and yields the same DEK
+        const unlocked = await unlockVault("5678", newMeta);
+        expect(hex(unlocked)).toBe(hex(dekBytes));
+    });
+
+    it("regenerates salt and IV", async () => {
+        const { dekBytes, metadata } = await setupVault(PIN, FAST);
+        const newMeta = await rewrapDEK(dekBytes, "5678", metadata);
+
+        expect(hex(newMeta.salt)).not.toBe(hex(metadata.salt));
+        expect(hex(newMeta.iv)).not.toBe(hex(metadata.iv));
+    });
+
+    it("rejects empty new PIN", async () => {
+        const { dekBytes, metadata } = await setupVault(PIN, FAST);
+        await expect(rewrapDEK(dekBytes, "", metadata)).rejects.toThrow(
+            "NEW_PIN_REQUIRED",
+        );
+    });
+
+    it("rejects a non-32-byte DEK", async () => {
+        const { metadata } = await setupVault(PIN, FAST);
+        await expect(rewrapDEK(new Uint8Array(16), "5678", metadata)).rejects.toThrow(
+            "INVALID_DEK",
+        );
     });
 });

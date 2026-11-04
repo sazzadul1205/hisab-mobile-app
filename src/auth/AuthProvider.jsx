@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { db, seedDefaultCategories } from "../db/db";
-import { setupVault, unlockVault } from "../crypto/vault";
+import { setupVault, unlockVault, rewrapDEK } from "../crypto/vault";
 import {
   setActiveKey,
+  getActiveKey,
   isUnlocked as sessionIsUnlocked,
   touch,
   lock as sessionLock,
@@ -16,7 +17,6 @@ const AUTO_LOCK_TICK_MS = 10_000;
 const ACTIVITY_THROTTLE_MS = 1_000;
 
 export function AuthProvider({ children }) {
-  // status: 'booting' | 'no-vault' | 'locked' | 'unlocked'
   const [status, setStatus] = useState("booting");
   const [vaultMeta, setVaultMeta] = useState(null);
   const lastActivityAt = useRef(0);
@@ -94,6 +94,34 @@ export function AuthProvider({ children }) {
     [vaultMeta],
   );
 
+  /* Verify a PIN without mutating session — used by the Change PIN
+     flow's "current PIN" step. Throws InvalidPinError on wrong PIN. */
+  const verifyPin = useCallback(
+    async (pin) => {
+      if (!vaultMeta) throw new Error("No vault");
+      await unlockVault(pin, vaultMeta);
+    },
+    [vaultMeta],
+  );
+
+  /* Rewrap the currently-active DEK with a new PIN, persist the new
+     vault metadata, and update state. Does not touch records — the
+     DEK itself is unchanged. Requires an unlocked session. */
+  const applyNewPin = useCallback(
+    async (newPin) => {
+      if (!vaultMeta) throw new Error("No vault");
+      const dek = getActiveKey();
+      if (!dek) throw new Error("Not unlocked");
+      const newMetadata = await rewrapDEK(dek, newPin, vaultMeta);
+      await db.appSettings.put({
+        key: VAULT_SETTINGS_KEY,
+        value: newMetadata,
+      });
+      setVaultMeta(newMetadata);
+    },
+    [vaultMeta],
+  );
+
   const lock = useCallback(() => {
     sessionLock();
     setStatus("locked");
@@ -106,6 +134,8 @@ export function AuthProvider({ children }) {
         vaultMeta,
         setupVaultAndUnlock,
         unlockWithPin,
+        verifyPin,
+        applyNewPin,
         lock,
       }}
     >

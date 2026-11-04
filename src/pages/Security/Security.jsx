@@ -25,16 +25,18 @@ export default function Security() {
 
         <SectionLabel className="mt-0">Access protection</SectionLabel>
         <div className="bg-white border border-(--line) rounded-[18px] overflow-hidden mb-4">
-          <ListItem
-            icon={
-              <>
-                <rect x="4" y="10.5" width="16" height="10.5" rx="3" />
-                <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
-              </>
-            }
-            title="Change PIN"
-            trailing={<Chevron />}
-          />
+          <div onClick={() => navigate("/security/change-pin")}>
+            <ListItem
+              icon={
+                <>
+                  <rect x="4" y="10.5" width="16" height="10.5" rx="3" />
+                  <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+                </>
+              }
+              title="Change PIN"
+              trailing={<Chevron />}
+            />
+          </div>
           <ListItem
             icon={
               <>

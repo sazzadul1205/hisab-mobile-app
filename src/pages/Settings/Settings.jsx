@@ -28,7 +28,7 @@ export default function Settings() {
           className="bg-white border border-(--line) rounded-[18px]
                         overflow-hidden mb-4"
         >
-          <div onClick={() => navigate("/security")}>
+          <div onClick={() => navigate("/security/change-pin")}>
             <ListItem
               icon={
                 <>

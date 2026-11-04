@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useMemo } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { AppBar } from "../../components/AppBar";
 import { IconButton } from "../../components/IconButton";
@@ -10,98 +10,9 @@ import { StatusPill } from "../../components/StatusPill";
 import { Alert } from "../../components/Alert";
 import { Note } from "../../components/Note";
 import { Button } from "../../components/Button";
-
-const EXPENSE_CATEGORIES = [
-  {
-    id: "groceries",
-    label: "Groceries",
-    isDefault: true,
-    icon: (
-      <>
-        <path d="M6 7h12l-1 13H7z" />
-        <path d="M9 7V5a3 3 0 0 1 6 0v2" />
-      </>
-    ),
-  },
-  {
-    id: "bills",
-    label: "Bills",
-    icon: (
-      <>
-        <path d="M4 6h16v12H4z" />
-        <path d="M4 11h16" />
-      </>
-    ),
-  },
-  {
-    id: "transport",
-    label: "Transport",
-    icon: (
-      <>
-        <circle cx="12" cy="12" r="8" />
-        <path d="M12 8v4l3 2" />
-      </>
-    ),
-  },
-  {
-    id: "rent",
-    label: "Rent",
-    icon: (
-      <>
-        <path d="M4 20V9l8-5 8 5v11" />
-        <path d="M9 20v-6h6v6" />
-      </>
-    ),
-  },
-  {
-    id: "food",
-    label: "Food & dining",
-    icon: <path d="M12 4v16M8 8h6a3 3 0 0 1 0 6H8" />,
-  },
-  {
-    id: "health",
-    label: "Health",
-    icon: (
-      <>
-        <path d="M4 5h16v14H4z" />
-        <path d="M8 9h8M8 13h5" />
-      </>
-    ),
-  },
-];
-
-const INCOME_CATEGORIES = [
-  {
-    id: "salary",
-    label: "Salary",
-    isDefault: true,
-    icon: <path d="M12 4v16M8 8h6a3 3 0 0 1 0 6H8" />,
-  },
-  {
-    id: "freelance",
-    label: "Freelance",
-    icon: <path d="M13 3 5 14h6l-1 7 8-11h-6z" />,
-  },
-  {
-    id: "business",
-    label: "Business",
-    icon: (
-      <>
-        <path d="M4 5h16v14H4z" />
-        <path d="M8 9h8M8 13h5" />
-      </>
-    ),
-  },
-  {
-    id: "gift",
-    label: "Gift",
-    icon: (
-      <path d="M12 3l2.5 5.5L20 9.5l-4 4 1 6-5-2.8L7 19.5l1-6-4-4 5.5-1z" />
-    ),
-  },
-  { id: "side", label: "Side income", icon: <path d="M4 12h16M12 4v16" /> },
-  { id: "other", label: "Other", icon: <path d="M4 12h16M12 4v16" /> },
-];
+import { BootScreen } from "../../auth/RouteGuards";
+import { useCategories } from "../../hooks/useTransactions";
+import { getCategoryIcon } from "../../constants/categoryIcons";
 
 const TABS = [
   { value: "expense", label: "Expense" },
@@ -115,8 +26,8 @@ function CategoryList({ categories, onSelect }) {
       {categories.map((c) => (
         <ListItem
           key={c.id}
-          icon={c.icon}
-          title={c.label}
+          icon={getCategoryIcon(c.id)}
+          title={c.name}
           badge={
             c.isDefault ? <StatusPill tone="neutral">Default</StatusPill> : null
           }
@@ -128,7 +39,7 @@ function CategoryList({ categories, onSelect }) {
   );
 }
 
-function ManageEmpty() {
+function ManageInfo() {
   return (
     <div className="text-center py-10 px-4">
       <div className="w-13 h-13 rounded-2xl mx-auto mb-3 grid place-items-center bg-(--app) border border-dashed border-(--line) text-(--muted)">
@@ -139,10 +50,33 @@ function ManageEmpty() {
           <path d="M4 7h16M4 12h16M4 17h16" />
         </svg>
       </div>
-      <b className="block text-[13.5px] font-semibold mb-1.25">Bulk manage</b>
+      <b className="block text-[13.5px] font-semibold mb-1.25">
+        No bulk operations in v1
+      </b>
       <small className="block text-[12px] text-(--muted) leading-[1.55] max-w-[34ch] mx-auto">
-        Reorder categories, merge duplicates, and archive unused ones. Available
-        when the data layer is connected.
+        Reorder, merge, and archive are planned for a future release. Use the
+        Expense and Income tabs to add or rename categories.
+      </small>
+    </div>
+  );
+}
+
+function EmptyState({ type }) {
+  return (
+    <div className="text-center py-10 px-4">
+      <div className="w-13 h-13 rounded-2xl mx-auto mb-3 grid place-items-center bg-(--app) border border-dashed border-(--line) text-(--muted)">
+        <svg
+          viewBox="0 0 24 24"
+          className="w-5.5 h-5.5 stroke-current fill-none stroke-[1.8] [stroke-linecap:round] [stroke-linejoin:round]"
+        >
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </div>
+      <b className="block text-[13.5px] font-semibold mb-1.25">
+        No {type} categories
+      </b>
+      <small className="block text-[12px] text-(--muted) leading-[1.55]">
+        Add one to use it when recording transactions.
       </small>
     </div>
   );
@@ -150,9 +84,38 @@ function ManageEmpty() {
 
 export default function Categories() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState("expense");
+  const [params, setParams] = useSearchParams();
+
+  const rawTab = params.get("tab");
+  const tab = rawTab === "income" || rawTab === "manage" ? rawTab : "expense";
+
+  const setTab = (v) => setParams({ tab: v }, { replace: true });
+
+  const { categories, loading } = useCategories();
+
+  const counts = useMemo(() => {
+    let income = 0;
+    let expense = 0;
+    for (const c of categories) {
+      if (c.type === "income") income++;
+      else if (c.type === "expense") expense++;
+    }
+    return { income, expense };
+  }, [categories]);
+
+  const visible = useMemo(() => {
+    if (tab === "manage") return [];
+    return categories
+      .filter((c) => c.type === tab)
+      .sort((a, b) => {
+        if (a.isDefault !== b.isDefault) return a.isDefault ? -1 : 1;
+        return a.name.localeCompare(b.name);
+      });
+  }, [categories, tab]);
+
+  if (loading) return <BootScreen />;
+
   const isManage = tab === "manage";
-  const categories = tab === "expense" ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
 
   return (
     <PhoneFrame>
@@ -160,7 +123,7 @@ export default function Categories() {
       <ScrollArea>
         <AppBar
           title="Categories"
-          subtitle="8 income · 12 expense"
+          subtitle={`${counts.income} income · ${counts.expense} expense`}
           right={
             !isManage ? (
               <IconButton
@@ -175,12 +138,14 @@ export default function Categories() {
         <SegmentedControl value={tab} options={TABS} onChange={setTab} />
 
         {isManage ? (
-          <ManageEmpty />
+          <ManageInfo />
+        ) : visible.length === 0 ? (
+          <EmptyState type={tab} />
         ) : (
           <>
             <CategoryList
-              categories={categories}
-              onSelect={(id) => navigate(`/categories/${id}/edit`)}
+              categories={visible}
+              onSelect={(id) => navigate(`/categories/${id}/edit?from=${tab}`)}
             />
 
             <Button
@@ -203,13 +168,13 @@ export default function Categories() {
               }
               title="Deletion behavior"
             >
-              Removing a category used by saved transactions is not finalized.
-              Existing references will not silently break.
+              Deleting a category used by saved transactions is not supported in
+              v1. Existing references will not silently break.
             </Alert>
 
             <Note>
-              Category type must be income or expense. Default categories cannot
-              be deleted, only renamed.
+              Category type is fixed after creation. Default categories can be
+              renamed but not deleted.
             </Note>
           </>
         )}
