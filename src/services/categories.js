@@ -4,11 +4,10 @@ import { encryptRecord, decryptRecord } from "./encryption";
 const TABLE = "categories";
 
 export async function listCategories(type) {
-    const query =
+    const rows =
         type === "income" || type === "expense"
-            ? db.categories.where("type").equals(type)
-            : db.categories.toArray();
-    const rows = await (Array.isArray(query) ? query : query.toArray());
+            ? await db.categories.where("type").equals(type).toArray()
+            : await db.categories.toArray();
     return Promise.all(rows.map((r) => decryptRecord(TABLE, r)));
 }
 

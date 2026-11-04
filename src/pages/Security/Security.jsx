@@ -79,11 +79,13 @@ export default function Security() {
               trailing={<Chevron />}
             />
           </div>
-          <ListItem
-            icon={<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z" />}
-            title="Key management info"
-            trailing={<Chevron />}
-          />
+          <div onClick={() => navigate("/security/key-info")}>
+            <ListItem
+              icon={<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z" />}
+              title="Key management info"
+              trailing={<Chevron />}
+            />
+          </div>
         </div>
 
         <Alert

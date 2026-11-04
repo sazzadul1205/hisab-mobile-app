@@ -33,6 +33,7 @@ import ChangePin from "./pages/ChangePin/ChangePin";
 import AutoLock from "./pages/AutoLock/AutoLock";
 import Export from "./pages/Export/Export";
 import Storage from "./pages/Storage/Storage";
+import KeyInfo from "./pages/KeyInfo/KeyInfo";
 
 export default function App() {
   return (
@@ -82,6 +83,7 @@ export default function App() {
             <Route path="/security" element={<Security />} />
             <Route path="/security/change-pin" element={<ChangePin />} />
             <Route path="/security/auto-lock" element={<AutoLock />} />
+            <Route path="/security/key-info" element={<KeyInfo />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/settings/export" element={<Export />} />
             <Route path="/settings/storage" element={<Storage />} />

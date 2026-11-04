@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
@@ -8,6 +9,7 @@ import { Button } from "../../components/Button";
 import { Note } from "../../components/Note";
 import { BootScreen } from "../../auth/RouteGuards";
 import { useTransaction, useLookup } from "../../hooks/useTransactions";
+import { deleteTransaction } from "../../services/transactions";
 import { formatBDT } from "../../lib/money";
 
 const HERO_META = {
@@ -56,11 +58,57 @@ function DetailField({ label, value, valueClass = "" }) {
   );
 }
 
+function DeleteModal({ onCancel, onConfirm, busy, error }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-94.5 bg-white rounded-[20px] p-5 shadow-2xl">
+        <div className="w-12 h-12 rounded-[14px] mx-auto mb-4 grid place-items-center bg-(--danger-soft) text-(--danger)">
+          <svg
+            viewBox="0 0 24 24"
+            className="w-6 h-6 stroke-current fill-none stroke-[1.8] [stroke-linecap:round] [stroke-linejoin:round]"
+          >
+            <path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13" />
+          </svg>
+        </div>
+        <h3 className="m-0 mb-2 text-center text-[17px] font-bold tracking-[-0.3px]">
+          Delete this transaction?
+        </h3>
+        <p className="m-0 mb-4 text-center text-[12.5px] text-(--muted) leading-[1.55]">
+          This will remove the transaction and update all affected account
+          balances.
+        </p>
+        {error && (
+          <div className="text-[12px] font-semibold text-(--out) mb-3 text-center">
+            {error}
+          </div>
+        )}
+        <div className="flex gap-2.5">
+          <Button
+            variant="secondary"
+            className="flex-[0_0_40%]"
+            onClick={onCancel}
+            disabled={busy}
+          >
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={onConfirm} disabled={busy}>
+            {busy ? "Deleting…" : "Delete"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function TransactionDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { transaction, loading } = useTransaction(id);
   const { accountMap, categoryMap, loading: lookupLoading } = useLookup();
+
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   if (loading || lookupLoading) return <BootScreen />;
 
@@ -91,6 +139,19 @@ export default function TransactionDetail() {
     accountMap.get(transaction.destinationAccountId)?.name ?? "—";
   const categoryName = categoryMap.get(transaction.categoryId)?.name ?? "—";
   const totalDebit = transaction.amount + (transaction.fee ?? 0);
+
+  const handleDelete = async () => {
+    setDeleteError("");
+    setDeleting(true);
+    try {
+      await deleteTransaction(id);
+      navigate("/transactions", { replace: true });
+    } catch (err) {
+      console.error(err);
+      setDeleteError("Could not delete. Try again.");
+      setDeleting(false);
+    }
+  };
 
   return (
     <PhoneFrame>
@@ -198,8 +259,10 @@ export default function TransactionDetail() {
           </Button>
           <Button
             variant="secondary"
+            className="text-(--danger)"
             onClick={() => {
-              // Delete flow wires next step — for now inert
+              setDeleteError("");
+              setConfirmDelete(true);
             }}
           >
             Delete
@@ -207,10 +270,23 @@ export default function TransactionDetail() {
         </div>
 
         <Note>
-          Deleting a transaction updates every affected balance. Transfers show
-          both source and destination accounts, plus any fee.
+          Deleting a transaction updates every affected balance. Transfers
+          restore both source and destination accounts to their pre-transfer
+          state.
         </Note>
       </ScrollArea>
+
+      {confirmDelete && (
+        <DeleteModal
+          busy={deleting}
+          error={deleteError}
+          onCancel={() => {
+            if (deleting) return;
+            setConfirmDelete(false);
+          }}
+          onConfirm={handleDelete}
+        />
+      )}
     </PhoneFrame>
   );
 }

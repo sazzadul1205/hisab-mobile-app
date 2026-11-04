@@ -3,6 +3,7 @@ import { resetTestState } from "../test/helpers";
 import { createAccount } from "./accounts";
 import { createIncome, createExpense, createTransfer } from "./transactions";
 import { buildCsvExport } from "./export";
+import { createCategory } from "./categories";
 
 beforeEach(resetTestState);
 
@@ -22,17 +23,23 @@ describe("buildCsvExport", () => {
             type: "cash",
             openingBalance: 500000,
         });
+        const salaryCat = await createCategory({ name: "Salary", type: "income" });
+        const groceriesCat = await createCategory({
+            name: "Groceries",
+            type: "expense",
+        });
+
         await createIncome({
             amount: 100000,
             accountId: acc.id,
-            categoryId: "inc-salary",
+            categoryId: salaryCat.id,
             date: "2026-11-04T10:00:00.000Z",
             note: "Monthly",
         });
         await createExpense({
             amount: 25000,
             accountId: acc.id,
-            categoryId: "exp-groceries",
+            categoryId: groceriesCat.id,
             date: "2026-11-04T11:00:00.000Z",
             note: "Milk",
         });
@@ -46,6 +53,7 @@ describe("buildCsvExport", () => {
         expect(csv).toContain("Groceries");
         expect(csv).toContain("Monthly");
     });
+
 
     it("includes destination account and fee for transfers", async () => {
         const a = await createAccount({

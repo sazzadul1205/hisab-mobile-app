@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { db, seedDefaultCategories } from "../db/db";
 import { setupVault, unlockVault, rewrapDEK } from "../crypto/vault";
 import {
@@ -20,15 +20,14 @@ import {
 } from "../services/settings";
 
 const VAULT_SETTINGS_KEY = "vault";
-const AUTO_LOCK_TICK_MS = 10_000;
 const ACTIVITY_THROTTLE_MS = 1_000;
 
 export function AuthProvider({ children }) {
   const [status, setStatus] = useState("booting");
   const [vaultMeta, setVaultMeta] = useState(null);
   const [autoLockMs, setAutoLockMsState] = useState(DEFAULT_AUTO_LOCK_MS);
-  const lastActivityAt = useRef(0);
 
+  /* ---------- Boot: load vault metadata + auto-lock setting ---------- */
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -39,7 +38,6 @@ export function AuthProvider({ children }) {
         ]);
         if (cancelled) return;
 
-        // Apply auto-lock setting first — it's independent of vault state
         setAutoLockDuration(autoLockValue);
         setAutoLockMsState(autoLockValue);
 
@@ -60,41 +58,66 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
+  /* ----------------------------------------------------------------
+     Auto-lock: one setTimeout, re-armed on every activity.
+     Fires exactly at autoLockMs (not "autoLockMs + up to 10s").
+     visibilitychange is a safety net for background-throttled timers.
+     ---------------------------------------------------------------- */
   useEffect(() => {
     if (status !== "unlocked") return;
-    const handler = () => {
-      const now = Date.now();
-      if (now - lastActivityAt.current > ACTIVITY_THROTTLE_MS) {
-        lastActivityAt.current = now;
-        touch();
-      }
+    if (autoLockMs <= 0) return; // "never" — not offered in v1
+
+    let timeoutId = null;
+
+    const armTimer = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        sessionLock();
+        setStatus("locked");
+      }, autoLockMs);
     };
+
+    armTimer();
+
+    let lastLocalActivity = 0;
+    const onActivity = () => {
+      const now = Date.now();
+      if (now - lastLocalActivity < ACTIVITY_THROTTLE_MS) return;
+      lastLocalActivity = now;
+      touch();
+      armTimer();
+    };
+
     const events = ["mousemove", "keydown", "touchstart", "click", "scroll"];
     for (const e of events) {
-      window.addEventListener(e, handler, { passive: true });
+      window.addEventListener(e, onActivity, { passive: true });
     }
-    return () => {
-      for (const e of events) window.removeEventListener(e, handler);
-    };
-  }, [status]);
 
-  useEffect(() => {
-    if (status !== "unlocked") return;
-    const id = setInterval(() => {
-      if (shouldAutoLock()) {
+    // Safety net: if the tab was background-throttled, we might have
+    // missed our timer. On return to foreground, recheck.
+    const onVisibility = () => {
+      if (document.visibilityState === "visible" && shouldAutoLock()) {
         sessionLock();
         setStatus("locked");
       }
-    }, AUTO_LOCK_TICK_MS);
-    return () => clearInterval(id);
-  }, [status]);
+    };
+    document.addEventListener("visibilitychange", onVisibility);
 
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      for (const e of events) window.removeEventListener(e, onActivity);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [status, autoLockMs]);
+
+  /* ---------- Migration kickoff (unchanged) ---------- */
   const kickMigration = useCallback(() => {
     ensureEncryptedAtRest().catch((err) =>
       console.error("Encryption migration failed:", err),
     );
   }, []);
 
+  /* ---------- Vault lifecycle (unchanged) ---------- */
   const setupVaultAndUnlock = useCallback(
     async (pin) => {
       const { dekBytes, metadata } = await setupVault(pin);

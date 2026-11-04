@@ -5,7 +5,7 @@ import { PinKeypad } from "../../components/PinKeypad";
 import { Button } from "../../components/Button";
 import { useAuth } from "../../auth/authContext";
 import { PIN_LENGTH } from "../../constants/app";
-import { isSecureContext, InsecureContextError } from "../../lib/webcrypto";
+import { hasWebCrypto, InsecureContextError } from "../../lib/webcrypto";
 
 function Bullet({ icon, title, subtitle }) {
   return (
@@ -107,7 +107,7 @@ export default function WelcomePin() {
   const [loading, setLoading] = useState(false);
 
   // Guard before rendering anything that might trigger crypto
-  if (!isSecureContext()) {
+  if (!hasWebCrypto()) {
     return <SecureContextRequired />;
   }
 

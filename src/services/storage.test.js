@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { resetTestState } from "../test/helpers";
 import { createAccount } from "./accounts";
 import { createIncome } from "./transactions";
@@ -46,14 +46,12 @@ describe("getStorageEstimate", () => {
     });
 
     it("returns unsupported when navigator.storage is missing", async () => {
-        const original = globalThis.navigator;
-
-        globalThis.navigator = {};
+        vi.stubGlobal("navigator", {});
         try {
             const est = await getStorageEstimate();
             expect(est.supported).toBe(false);
         } finally {
-            globalThis.navigator = original;
+            vi.unstubAllGlobals();
         }
     });
 });

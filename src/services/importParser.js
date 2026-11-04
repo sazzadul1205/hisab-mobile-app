@@ -176,8 +176,12 @@ const FORMATS = [
             const amountStr = col(row, headers, /amount/i);
             const typeStr = col(row, headers, /(type|transaction\s*type)/i) ?? "";
             const feeStr = col(row, headers, /(service\s*charge|fee)/i);
+            // Prefer a real note ("Reference", "Description") over the counterparty
+            // identifier ("To/From") — the latter is typically a phone/account number,
+            // not something a user wants to see as their transaction description.
             const descStr =
-                col(row, headers, /(reference|to\/from|description|to\s*\/\s*from|details)/i) ??
+                col(row, headers, /(reference|description|details|narration|memo)/i) ??
+                col(row, headers, /(to\/from|to\s*\/\s*from)/i) ??
                 "";
 
             const date = parseAnyDate(dateStr);
@@ -368,10 +372,13 @@ export async function parseStatement({ file, accountId }) {
         const isDuplicate = existingCount > 0 || seenInFile > 0;
 
         const category = suggestCategory(base.direction, base.description);
-        const status = !category
-            ? "needs-category"
-            : isDuplicate
-                ? "duplicate"
+        // Duplicate first: a row already in the ledger shouldn't ask for a
+        // category. If the user unchecks the duplicate exclusion, ReviewImport
+        // upgrades the status back to needs-category when the category is set.
+        const status = isDuplicate
+            ? "duplicate"
+            : !category
+                ? "needs-category"
                 : "ok";
 
         rows.push({
