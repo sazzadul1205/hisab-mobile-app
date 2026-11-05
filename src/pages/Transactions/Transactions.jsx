@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
+import { PhoneFrame, StatusBar } from "../../components/PhoneFrame";
+import { PullToRefresh } from "../../components/PullToRefresh";
 import { IconButton } from "../../components/IconButton";
 import { BottomNav } from "../../components/BottomNav";
 import { SectionLabel } from "../../components/SectionLabel";
@@ -103,7 +104,13 @@ export default function Transactions() {
   return (
     <PhoneFrame>
       <StatusBar />
-      <ScrollArea>
+      <PullToRefresh
+        onRefresh={async () => {
+          // Dexie useLiveQuery re-runs automatically on DB changes.
+          // This delay gives the user visual feedback of a refresh.
+          await new Promise((res) => setTimeout(res, 800));
+        }}
+      >
         <div className="flex items-center justify-between gap-3 py-1.5 pb-3.5">
           <div>
             <h2 className="m-0 text-[23px] font-bold tracking-[-0.5px] leading-tight">
@@ -190,7 +197,7 @@ export default function Transactions() {
             ))}
           </div>
         )}
-      </ScrollArea>
+      </PullToRefresh>
       <BottomNav active="activity" />
     </PhoneFrame>
   );

@@ -38,11 +38,11 @@ export function StatusBar() {
   );
 }
 
-export function ScrollArea({ children }) {
+export function ScrollArea({ children, overscroll = "contain" }) {
   return (
     <div
-      className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-4.5 pb-5
-                 scrollbar-none [&::-webkit-scrollbar]:hidden"
+      className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-4.5 pb-5
+                 overscroll-y-${overscroll} scrollbar-none [&::-webkit-scrollbar]:hidden`}
     >
       {children}
     </div>

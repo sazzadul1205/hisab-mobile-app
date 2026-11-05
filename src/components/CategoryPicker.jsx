@@ -1,3 +1,5 @@
+import { getCategoryIcon } from "../constants/categoryIcons";
+
 export function CategoryPicker({ categories, selected }) {
   return (
     <div className="grid grid-cols-4 gap-2">
@@ -35,7 +37,7 @@ export function CategoryPicker({ categories, selected }) {
                 className="w-3.75 h-3.75 stroke-current fill-none stroke-[1.9]
                            [stroke-linecap:round] [stroke-linejoin:round]"
               >
-                {c.icon}
+                {getCategoryIcon(c.id)}
               </svg>
             </span>
             {c.label}

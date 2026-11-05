@@ -3,7 +3,7 @@ export function AccountSelect({ initial, color, name }) {
     <button
       type="button"
       className="w-full flex items-center justify-between bg-(--card)
-                 border border-(--line)ded-[14px]
+                 border border-(--line) rounded-[14px]
                  px-3.5 py-3.25 text-[14px] text-(--ink)
                  cursor-pointer font-[inherit] text-left"
     >
