@@ -31,13 +31,25 @@
     "review": ".kilo/agent/review.md",
     "test-agent": ".kilo/agent/test-agent.md",
     "security": ".kilo/agent/security.md",
-    "architect": ".kilo/agent/architect.md"
+    "architect": ".kilo/agent/architect.md",
+    "scaffold": ".kilo/agent/scaffold.md",
+    "money-auditor": ".kilo/agent/money-auditor.md",
+    "encrypt-auditor": ".kilo/agent/encrypt-auditor.md",
+    "pwa-agent": ".kilo/agent/pwa-agent.md"
   },
   "commands": {
     "dev": ".kilo/command/dev.md",
     "test": ".kilo/command/test.md",
     "build": ".kilo/command/build.md",
     "lint": ".kilo/command/lint.md",
-    "lint:fix": ".kilo/command/lint-fix.md"
+    "lint:fix": ".kilo/command/lint-fix.md",
+    "preview": ".kilo/command/preview.md",
+    "feature": ".kilo/command/feature.md",
+    "component": ".kilo/command/component.md",
+    "page": ".kilo/command/page.md",
+    "service": ".kilo/command/service.md",
+    "hook": ".kilo/command/hook.md",
+    "encrypt-check": ".kilo/command/encrypt-check.md",
+    "money-check": ".kilo/command/money-check.md"
   }
 }

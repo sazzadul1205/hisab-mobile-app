@@ -44,8 +44,18 @@ textarea {
   animation: shimmer 1.5s infinite linear;
 }
 
-/* Default Theme (Light Green / Slate) */
+/* ================================================================
+   THEMES
+   Each theme defines the full variable set:
+   surfaces (bg/app/card), lines, text (ink/ink-2/muted),
+   brand trio, and semantic colors (in/out/tr/warn/danger).
+   `color-scheme` makes native controls, scrollbars and
+   autofill match the palette.
+   ================================================================ */
+
+/* ---------- Default: Hisab Green (Light Green / Slate) ---------- */
 :root {
+  color-scheme: light;
   --bg: #eef2f0;
   --app: #f7f9f8;
   --card: #ffffff;
@@ -69,33 +79,61 @@ textarea {
   --danger-soft: #fdecea;
 }
 
-/* Dark Mode */
-[data-theme="dark"] {
-  --bg: #0f172a;
-  --app: #1e293b;
-  --card: #1e293b;
-  --line: #334155;
-  --line-2: #334155;
-  --ink: #f8fafc;
-  --ink-2: #cbd5e1;
-  --muted: #94a3b8;
-  --brand: #10b981;
-  --brand-dk: #34d399;
-  --brand-soft: rgba(16, 185, 129, 0.15);
-  --in: #34d399;
-  --in-soft: rgba(52, 211, 153, 0.15);
-  --out: #f87171;
-  --out-soft: rgba(248, 113, 113, 0.15);
-  --tr: #60a5fa;
-  --tr-soft: rgba(96, 165, 250, 0.15);
-  --warn: #fbbf24;
-  --warn-soft: rgba(251, 191, 36, 0.15);
-  --danger: #f87171;
-  --danger-soft: rgba(248, 113, 113, 0.15);
+/* ---------- Irish Forest (Deep Green / Emerald) ---------- */
+[data-theme="irish"] {
+  color-scheme: light;
+  --bg: #f0fdf4;
+  --app: #f8fafc;
+  --card: #ffffff;
+  --line: #dcfce7;
+  --line-2: #f0fdf4;
+  --ink: #14532d;
+  --ink-2: #166534;
+  --muted: #4ade80;
+  --brand: #15803d;
+  --brand-dk: #14532d;
+  --brand-soft: #dcfce7;
+  --in: #10b981;
+  --in-soft: #d1fae5;
+  --out: #9f1239;
+  --out-soft: #ffe4e6;
+  --tr: #0f766e;
+  --tr-soft: #ccfbf1;
+  --warn: #b45309;
+  --warn-soft: #fef3c7;
+  --danger: #be123c;
+  --danger-soft: #ffe4e6;
 }
 
-/* Ocean (Blue Theme) */
+/* ---------- Teal ---------- */
+[data-theme="teal"] {
+  color-scheme: light;
+  --bg: #f0fdfa;
+  --app: #f7fefe;
+  --card: #ffffff;
+  --line: #ccfbf1;
+  --line-2: #e6fbf7;
+  --ink: #0b2e2b;
+  --ink-2: #1f4f4a;
+  --muted: #6b918d;
+  --brand: #0f766e;
+  --brand-dk: #115e59;
+  --brand-soft: #ccfbf1;
+  --in: #0d9488;
+  --in-soft: #d5f5f0;
+  --out: #be123c;
+  --out-soft: #ffe4e6;
+  --tr: #4338ca;
+  --tr-soft: #e0e7ff;
+  --warn: #b45309;
+  --warn-soft: #fef3c7;
+  --danger: #be123c;
+  --danger-soft: #ffe4e6;
+}
+
+/* ---------- Ocean Blue ---------- */
 [data-theme="ocean"] {
+  color-scheme: light;
   --bg: #eff6ff;
   --app: #f8fafc;
   --card: #ffffff;
@@ -119,30 +157,321 @@ textarea {
   --danger-soft: #ffe4e6;
 }
 
-/* Irish (Deep Green / Emerald Theme) */
-[data-theme="irish"] {
-  --bg: #f0fdf4;
+/* ---------- Nord (Cool Slate Blue) ---------- */
+[data-theme="nord"] {
+  color-scheme: light;
+  --bg: #eceff4;
+  --app: #f4f6f9;
+  --card: #ffffff;
+  --line: #dde3ea;
+  --line-2: #e9edf2;
+  --ink: #2e3440;
+  --ink-2: #4c566a;
+  --muted: #7b8698;
+  --brand: #5e81ac;
+  --brand-dk: #4c6f96;
+  --brand-soft: #e3ebf4;
+  --in: #3f8f7a;
+  --in-soft: #e2f2ee;
+  --out: #bf616a;
+  --out-soft: #fbe9eb;
+  --tr: #7c6bb0;
+  --tr-soft: #ece8f7;
+  --warn: #a6793a;
+  --warn-soft: #fdf3e0;
+  --danger: #bf616a;
+  --danger-soft: #fbe9eb;
+}
+
+/* ---------- Slate (Neutral Grey) ---------- */
+[data-theme="slate"] {
+  color-scheme: light;
+  --bg: #f1f5f9;
   --app: #f8fafc;
   --card: #ffffff;
-  --line: #dcfce7;
-  --line-2: #f0fdf4;
-  --ink: #14532d;
-  --ink-2: #166534;
-  --muted: #4ade80;
-  --brand: #15803d;
-  --brand-dk: #14532d;
-  --brand-soft: #dcfce7;
-  --in: #10b981;
-  --in-soft: #d1fae5;
-  --out: #9f1239;
-  --out-soft: #ffe4e6;
-  --tr: #0f766e;
-  --tr-soft: #ccfbf1;
+  --line: #e2e8f0;
+  --line-2: #eef2f6;
+  --ink: #0f172a;
+  --ink-2: #334155;
+  --muted: #64748b;
+  --brand: #475569;
+  --brand-dk: #334155;
+  --brand-soft: #e2e8f0;
+  --in: #0f766e;
+  --in-soft: #ccfbf1;
+  --out: #b91c1c;
+  --out-soft: #fee2e2;
+  --tr: #4338ca;
+  --tr-soft: #e0e7ff;
+  --warn: #b45309;
+  --warn-soft: #fef3c7;
+  --danger: #b91c1c;
+  --danger-soft: #fee2e2;
+}
+
+/* ---------- Lavender ---------- */
+[data-theme="lavender"] {
+  color-scheme: light;
+  --bg: #f5f3ff;
+  --app: #faf9ff;
+  --card: #ffffff;
+  --line: #e9e4ff;
+  --line-2: #f2efff;
+  --ink: #1e1b3a;
+  --ink-2: #4c4472;
+  --muted: #8b83ad;
+  --brand: #7c5cfc;
+  --brand-dk: #6242e8;
+  --brand-soft: #ede8ff;
+  --in: #0e9f6e;
+  --in-soft: #e3f9f0;
+  --out: #e02424;
+  --out-soft: #fde8e8;
+  --tr: #2563eb;
+  --tr-soft: #e5edff;
+  --warn: #b45309;
+  --warn-soft: #fef3c7;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+}
+
+/* ---------- Rose ---------- */
+[data-theme="rose"] {
+  color-scheme: light;
+  --bg: #fff1f3;
+  --app: #fff7f8;
+  --card: #ffffff;
+  --line: #fde0e5;
+  --line-2: #fdeef1;
+  --ink: #3f0d18;
+  --ink-2: #7a2b3c;
+  --muted: #a86b78;
+  --brand: #be123c;
+  --brand-dk: #9f1239;
+  --brand-soft: #ffe4e6;
+  --in: #0f766e;
+  --in-soft: #ccfbf1;
+  --out: #c2410c;
+  --out-soft: #ffedd5;
+  --tr: #7c3aed;
+  --tr-soft: #ede9fe;
   --warn: #b45309;
   --warn-soft: #fef3c7;
   --danger: #be123c;
   --danger-soft: #ffe4e6;
 }
+
+/* ---------- Cherry ---------- */
+[data-theme="cherry"] {
+  color-scheme: light;
+  --bg: #fff1f5;
+  --app: #fff8fa;
+  --card: #ffffff;
+  --line: #fbdce7;
+  --line-2: #fdedf2;
+  --ink: #3d0719;
+  --ink-2: #7a2342;
+  --muted: #a86a80;
+  --brand: #c2185b;
+  --brand-dk: #9d1249;
+  --brand-soft: #fce4ec;
+  --in: #0f766e;
+  --in-soft: #ccfbf1;
+  --out: #c2410c;
+  --out-soft: #ffedd5;
+  --tr: #6d28d9;
+  --tr-soft: #ede9fe;
+  --warn: #b45309;
+  --warn-soft: #fef3c7;
+  --danger: #c2185b;
+  --danger-soft: #fce4ec;
+}
+
+/* ---------- Sunset ---------- */
+[data-theme="sunset"] {
+  color-scheme: light;
+  --bg: #fff7ed;
+  --app: #fffbf5;
+  --card: #ffffff;
+  --line: #ffe6cc;
+  --line-2: #fff2e0;
+  --ink: #3d1f06;
+  --ink-2: #7c4a1d;
+  --muted: #a8805a;
+  --brand: #d97706;
+  --brand-dk: #b45309;
+  --brand-soft: #ffedd5;
+  --in: #15803d;
+  --in-soft: #dcfce7;
+  --out: #be123c;
+  --out-soft: #ffe4e6;
+  --tr: #7c3aed;
+  --tr-soft: #ede9fe;
+  --warn: #b45309;
+  --warn-soft: #fef3c7;
+  --danger: #be123c;
+  --danger-soft: #ffe4e6;
+}
+
+/* ---------- Amber ---------- */
+[data-theme="amber"] {
+  color-scheme: light;
+  --bg: #fffbeb;
+  --app: #fffdf5;
+  --card: #ffffff;
+  --line: #fdecc8;
+  --line-2: #fef6e0;
+  --ink: #3b2708;
+  --ink-2: #7a5a1f;
+  --muted: #a68a55;
+  --brand: #b45309;
+  --brand-dk: #92400e;
+  --brand-soft: #fef3c7;
+  --in: #15803d;
+  --in-soft: #dcfce7;
+  --out: #b91c1c;
+  --out-soft: #fee2e2;
+  --tr: #1d4ed8;
+  --tr-soft: #dbeafe;
+  --warn: #a16207;
+  --warn-soft: #fef3c7;
+  --danger: #b91c1c;
+  --danger-soft: #fee2e2;
+}
+
+/* ---------- Sepia (Warm Paper) ---------- */
+[data-theme="sepia"] {
+  color-scheme: light;
+  --bg: #f5efe1;
+  --app: #faf5ea;
+  --card: #fffdf7;
+  --line: #e8dfc8;
+  --line-2: #f1ebda;
+  --ink: #3b2f1a;
+  --ink-2: #6b5a3a;
+  --muted: #9c8a68;
+  --brand: #8b6914;
+  --brand-dk: #6b4f0c;
+  --brand-soft: #f3e9cf;
+  --in: #4d7c0f;
+  --in-soft: #edf7d8;
+  --out: #b91c1c;
+  --out-soft: #fbe3e0;
+  --tr: #0e7490;
+  --tr-soft: #dff2f7;
+  --warn: #a16207;
+  --warn-soft: #fdf0c9;
+  --danger: #b91c1c;
+  --danger-soft: #fbe3e0;
+}
+
+/* ---------- Coffee ---------- */
+[data-theme="coffee"] {
+  color-scheme: light;
+  --bg: #f6f1ea;
+  --app: #fbf8f3;
+  --card: #ffffff;
+  --line: #e8dfd3;
+  --line-2: #f2ece4;
+  --ink: #2f2118;
+  --ink-2: #5d4839;
+  --muted: #93806d;
+  --brand: #6f4e37;
+  --brand-dk: #563a28;
+  --brand-soft: #efe3d8;
+  --in: #4d7c0f;
+  --in-soft: #edf7d8;
+  --out: #b91c1c;
+  --out-soft: #fbe3e0;
+  --tr: #1d4ed8;
+  --tr-soft: #e0e9fd;
+  --warn: #a16207;
+  --warn-soft: #fdf0c9;
+  --danger: #b91c1c;
+  --danger-soft: #fbe3e0;
+}
+
+/* ---------- Midnight (Dark) ---------- */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f172a;
+  --app: #1e293b;
+  --card: #1e293b;
+  --line: #334155;
+  --line-2: #334155;
+  --ink: #f8fafc;
+  --ink-2: #cbd5e1;
+  --muted: #94a3b8;
+  --brand: #10b981;
+  --brand-dk: #34d399;
+  --brand-soft: rgba(16, 185, 129, 0.15);
+  --in: #34d399;
+  --in-soft: rgba(52, 211, 153, 0.15);
+  --out: #f87171;
+  --out-soft: rgba(248, 113, 113, 0.15);
+  --tr: #60a5fa;
+  --tr-soft: rgba(96, 165, 250, 0.15);
+  --warn: #fbbf24;
+  --warn-soft: rgba(251, 191, 36, 0.15);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.15);
+}
+
+/* ---------- Midnight Blue (Dark) ---------- */
+[data-theme="midnight-blue"] {
+  color-scheme: dark;
+  --bg: #0b1524;
+  --app: #12233b;
+  --card: #12233b;
+  --line: #24405f;
+  --line-2: #24405f;
+  --ink: #eaf2fb;
+  --ink-2: #b9cbe0;
+  --muted: #8ba3bd;
+  --brand: #4a9eff;
+  --brand-dk: #7cbcff;
+  --brand-soft: rgba(74, 158, 255, 0.15);
+  --in: #34d399;
+  --in-soft: rgba(52, 211, 153, 0.15);
+  --out: #fb7185;
+  --out-soft: rgba(251, 113, 133, 0.15);
+  --tr: #a78bfa;
+  --tr-soft: rgba(167, 139, 250, 0.15);
+  --warn: #fbbf24;
+  --warn-soft: rgba(251, 191, 36, 0.15);
+  --danger: #fb7185;
+  --danger-soft: rgba(251, 113, 133, 0.15);
+}
+
+/* ---------- Plum (Dark Purple) ---------- */
+[data-theme="plum"] {
+  color-scheme: dark;
+  --bg: #140f1c;
+  --app: #1e1528;
+  --card: #1e1528;
+  --line: #34274a;
+  --line-2: #34274a;
+  --ink: #f6f1fb;
+  --ink-2: #cdbde0;
+  --muted: #9b88b3;
+  --brand: #a855f7;
+  --brand-dk: #c084fc;
+  --brand-soft: rgba(168, 85, 247, 0.15);
+  --in: #34d399;
+  --in-soft: rgba(52, 211, 153, 0.15);
+  --out: #fb7185;
+  --out-soft: rgba(251, 113, 133, 0.15);
+  --tr: #60a5fa;
+  --tr-soft: rgba(96, 165, 250, 0.15);
+  --warn: #fbbf24;
+  --warn-soft: rgba(251, 191, 36, 0.15);
+  --danger: #fb7185;
+  --danger-soft: rgba(251, 113, 133, 0.15);
+}
+
+/* ================================================================
+   BASE
+   ================================================================ */
 
 html,
 body,
@@ -193,8 +522,12 @@ body {
 
 /* Fade in — used for page mounts, toast messages */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Slide up — used for sheets, bottom sheets, incoming content */
@@ -235,21 +568,37 @@ body {
 
 /* Pop — used for buttons, toggles, icon buttons on press */
 @keyframes pop {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(0.93); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(0.93);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Pulse — used for the balance card glow, loading indicators */
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.55; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
 }
 
 /* Bounce — used for empty states, success checkmarks */
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-4px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 /* Shimmer — already defined above, kept here for reference */
@@ -259,27 +608,59 @@ body {
    Utility animation classes
    ================================================================ */
 
-.fade-in        { animation: fadeIn 0.25s ease both; }
-.slide-up       { animation: slideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.slide-down     { animation: slideDown 0.22s ease both; }
-.scale-in       { animation: scaleIn 0.2s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.pop            { animation: pop 0.12s ease both; }
-.pulse          { animation: pulse 1.8s ease-in-out infinite; }
-.bounce         { animation: bounce 0.5s ease-in-out infinite; }
+.fade-in {
+  animation: fadeIn 0.25s ease both;
+}
+.slide-up {
+  animation: slideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.slide-down {
+  animation: slideDown 0.22s ease both;
+}
+.scale-in {
+  animation: scaleIn 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.pop {
+  animation: pop 0.12s ease both;
+}
+.pulse {
+  animation: pulse 1.8s ease-in-out infinite;
+}
+.bounce {
+  animation: bounce 0.5s ease-in-out infinite;
+}
 
 /* Staggered list — children cascade in with delay */
 .stagger > * {
   animation: slideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.stagger > *:nth-child(2)  { animation-delay: 0.04s; }
-.stagger > *:nth-child(3)  { animation-delay: 0.08s; }
-.stagger > *:nth-child(4)  { animation-delay: 0.12s; }
-.stagger > *:nth-child(5)  { animation-delay: 0.16s; }
-.stagger > *:nth-child(6)  { animation-delay: 0.20s; }
-.stagger > *:nth-child(7)  { animation-delay: 0.24s; }
-.stagger > *:nth-child(8)  { animation-delay: 0.28s; }
-.stagger > *:nth-child(9)  { animation-delay: 0.32s; }
-.stagger > *:nth-child(10) { animation-delay: 0.36s; }
+.stagger > *:nth-child(2) {
+  animation-delay: 0.04s;
+}
+.stagger > *:nth-child(3) {
+  animation-delay: 0.08s;
+}
+.stagger > *:nth-child(4) {
+  animation-delay: 0.12s;
+}
+.stagger > *:nth-child(5) {
+  animation-delay: 0.16s;
+}
+.stagger > *:nth-child(6) {
+  animation-delay: 0.2s;
+}
+.stagger > *:nth-child(7) {
+  animation-delay: 0.24s;
+}
+.stagger > *:nth-child(8) {
+  animation-delay: 0.28s;
+}
+.stagger > *:nth-child(9) {
+  animation-delay: 0.32s;
+}
+.stagger > *:nth-child(10) {
+  animation-delay: 0.36s;
+}
 
 /* Page transition — fade when navigating between routes */
 .page-enter {
