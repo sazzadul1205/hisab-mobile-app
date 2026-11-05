@@ -30,6 +30,7 @@ import { decryptRecord, encryptRecord } from "./encryption";
 export const BACKUP_FORMAT = "hisab-backup";
 export const BACKUP_VERSION = 1;
 
+const MAX_BACKUP_BYTES = 50 * 1024 * 1024; // 50 MB cap
 const SALT_BYTES = 16;
 const IV_BYTES = 12;
 
@@ -144,6 +145,9 @@ export async function createBackupFile(password, { iterations = DEFAULT_ITERATIO
    a machine code on failure). No crypto here.
    ---------------------------------------------------------------- */
 export function validateEnvelope(raw) {
+    if (typeof raw === "string" && raw.length > MAX_BACKUP_BYTES) {
+        throw new BackupValidationError("FILE_TOO_LARGE");
+    }
     let env;
     try {
         env = typeof raw === "string" ? JSON.parse(raw) : raw;
@@ -162,6 +166,9 @@ export function validateEnvelope(raw) {
     }
     if (!env.kdf || typeof env.kdf.iterations !== "number" || !env.kdf.salt) {
         throw new BackupValidationError("MALFORMED_KDF");
+    }
+    if (env.kdf.iterations < 1000 || env.kdf.iterations > 10000000) {
+        throw new BackupValidationError("INVALID_ITERATIONS");
     }
     if (!env.cipher || !env.cipher.iv) {
         throw new BackupValidationError("MALFORMED_CIPHER");
@@ -208,6 +215,12 @@ export async function readBackupFile(raw, password) {
 
     if (!data || typeof data !== "object" || !Array.isArray(data.accounts)) {
         throw new BackupValidationError("MALFORMED_RECORDS");
+    }
+    const MAX_RECORDS = 100000;
+    for (const key of ["accounts", "transactions", "categories", "reconciliationRecords", "importRecords"]) {
+        if (data[key] != null && (!Array.isArray(data[key]) || data[key].length > MAX_RECORDS)) {
+            throw new BackupValidationError("TOO_MANY_RECORDS");
+        }
     }
 
     return {

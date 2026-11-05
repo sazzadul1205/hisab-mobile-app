@@ -16,9 +16,18 @@ const HEADERS = [
     "Updated At",
 ];
 
+function neutralizeFormula(s) {
+    // Prevent CSV formula injection in spreadsheet apps: prefix any cell
+    // that starts with a dangerous character with a single quote.
+    if (/^[=+\-@\t\r]/.test(s)) {
+        return "'" + s;
+    }
+    return s;
+}
+
 function csvEscape(value) {
-    const s = String(value ?? "");
-    if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+    const s = neutralizeFormula(String(value ?? ""));
+    if (s.includes(",") || s.includes('"') || s.includes("\\n")) {
         return `"${s.replace(/"/g, '""')}"`;
     }
     return s;

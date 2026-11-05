@@ -1,0 +1,19 @@
+# Security Audit — Hisab Mobile App
+Date: 2026-11-05
+
+## Fixes applied
+- vercel.json: added security headers (CSP, HSTS, nosniff, Referrer-Policy, Permissions-Policy, COOP, X-Frame-Options). Assetlinks rewrite retained.
+- src/services/export.js: CSV formula-injection sanitizer (prefix dangerous cells with ').
+- src/services/backup.js: size (50MB) and record count (100k) limits; iterations bounds.
+- .gitignore already covers dev-dist; removed tracked dev-dist/registerSW.js from index.
+
+## Accepted risks / documented
+- PIN is 6-digit numeric (1M combos); throttle memory-only (resets on refresh). Offline brute-force against copied IndexedDB possible. Not changed (data-compat). Documented.
+- IndexedDB plaintext index fields (date, type, accountId, categoryId) metadata leakage by design.
+- firebase dependency has 4 high audit findings requiring --force (breaking). Not applied. Notifications optional; can remove firebase to eliminate.
+- No committed secrets found in .env (keys blank).
+
+## Verification
+- npm run lint: pass
+- npm run test:run: 162 passed
+- npm run build: pass
