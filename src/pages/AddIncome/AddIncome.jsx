@@ -104,7 +104,7 @@ function IncomeForm({ id, isEdit, initial, accounts, categories }) {
         <div className="stagger">
         {!isEdit && <TransactionTypeSegments active="income" />}
 
-        <AmountInput value={amount} onChange={setAmount} />
+        <AmountInput value={amount} onChange={setAmount} autoFocus />
 
         <Field label="Destination account">
           <AccountPicker

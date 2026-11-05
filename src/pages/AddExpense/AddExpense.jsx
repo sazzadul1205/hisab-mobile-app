@@ -137,6 +137,7 @@ function ExpenseForm({
         <AmountInput
           value={amount}
           onChange={setAmount}
+          autoFocus
           hint={
             sourceAccount
               ? `Available in ${sourceAccount.name}: ${formatBDT(availableBalance)}`

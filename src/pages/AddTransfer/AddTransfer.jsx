@@ -145,7 +145,7 @@ function TransferForm({ id, isEdit, initial, accounts, transactions }) {
         <div className="stagger">
         {!isEdit && <TransactionTypeSegments active="transfer" />}
 
-        <AmountInput value={amount} onChange={setAmount} hint={hint} />
+        <AmountInput value={amount} onChange={setAmount} autoFocus hint={hint} />
 
         <Field label="From account">
           <AccountPicker
