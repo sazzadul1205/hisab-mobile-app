@@ -1,130 +1,193 @@
-// PullToRefresh — custom pull-to-refresh wrapper.
-// Listens to touch events on the scroll container, only triggers when
-// scrollTop === 0, and renders a spinner that scales with drag distance.
-// Prevents the native browser bounce/refresh via e.preventDefault() and
-// overscroll-behavior-y: contain on the scroll element.
-
 import { useEffect, useRef, useState } from "react";
 
-const THRESHOLD = 64; // px — distance before "release to refresh" state
-const MAX_PULL = 110; // px — visual cap for the spinner scale
+const THRESHOLD = 64; // px of visual pull needed to trigger
+const MAX_PULL = 120; // visual pull never exceeds this
+const DEAD_ZONE = 8; // finger travel before we take over from native scroll
+const RESISTANCE = 130; // higher = lighter pull
+const MIN_SPIN_MS = 500; // keep the spinner up at least this long
+const EASE = "transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease";
 
-function Spinner({ progress, releasing }) {
-  const scale = Math.min(1, progress / THRESHOLD);
-  const rotation = progress * 3; // spin faster the further you pull
-
-  return (
-    <div
-      className="flex flex-col items-center justify-center gap-2 overflow-hidden transition-[height] duration-150"
-      style={{
-        height: `${progress}px`,
-        opacity: Math.min(1, progress / 24),
-      }}
-    >
-      <div
-        className="w-9 h-9 rounded-full border-2 border-(--line) border-t-(--brand)"
-        style={{
-          transform: `rotate(${rotation}deg) scale(${releasing ? 1 : scale})`,
-          transition: releasing ? "transform 0.15s ease" : "transform 0.05s linear",
-        }}
-      />
-      <span
-        className={`text-[11px] font-semibold ${
-          releasing ? "text-(--brand)" : "text-(--muted)"
-        }`}
-      >
-        {releasing ? "Release to refresh" : "Pull to refresh"}
-      </span>
-    </div>
-  );
-}
+// Rubber band: ~0.9x finger speed at first, flattening toward MAX_PULL
+const dampen = (dy) => MAX_PULL * (1 - Math.exp(-dy / RESISTANCE));
 
 export function PullToRefresh({ onRefresh, children }) {
   const scrollRef = useRef(null);
-  const [pull, setPull] = useState(0);
-  const [refreshing, setRefreshing] = useState(false);
+  const indicatorRef = useRef(null);
+  const ringRef = useRef(null);
+  const refreshingRef = useRef(false);
+  const onRefreshRef = useRef(onRefresh);
 
-  // Track whether we're inside a touch sequence so we can ignore
-  // synthetic events that fire after touchend.
-  const touchStartY = useRef(0);
-  const startedAtTop = useRef(false);
-
-  // Derived state — no effect needed
-  const releasing = !refreshing && pull >= THRESHOLD;
+  // "pull" | "ready" | "refreshing" — only changes at a few moments,
+  // so it's safe to be state. The pull distance itself is NOT state.
+  const [status, setStatus] = useState("pull");
 
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
+    onRefreshRef.current = onRefresh;
+  }, [onRefresh]);
+
+  useEffect(() => {
+    const scroller = scrollRef.current;
+    const indicator = indicatorRef.current;
+    const ring = ringRef.current;
+    if (!scroller || !indicator || !ring) return;
+
+    let startY = 0;
+    let armed = false; // gesture began at scrollTop 0
+    let dragging = false; // we've taken over from native scroll
+    let pull = 0;
+    let dead = false;
+
+    // Direct DOM writes: transform/opacity only, no React render, no layout
+    const apply = (y, animate) => {
+      const transition = animate ? EASE : "none";
+      scroller.style.transition = transition;
+      scroller.style.transform = y ? `translate3d(0, ${y}px, 0)` : ""; // "" at rest so fixed-position children aren't affected
+
+      indicator.style.transition = transition;
+      indicator.style.transform = `translate3d(0, ${y - THRESHOLD}px, 0)`;
+      indicator.style.opacity = refreshingRef.current
+        ? 1
+        : Math.min(1, y / (THRESHOLD * 0.6));
+
+      if (!refreshingRef.current) ring.style.transform = `rotate(${y * 4}deg)`;
+    };
+
+    const startRefresh = () => {
+      refreshingRef.current = true;
+      setStatus("refreshing");
+      apply(THRESHOLD, true); // hold here while loading
+
+      const t0 = performance.now();
+      Promise.resolve()
+        .then(() => onRefreshRef.current?.())
+        .catch(() => {})
+        .then(
+          () =>
+            new Promise((r) =>
+              setTimeout(
+                r,
+                Math.max(0, MIN_SPIN_MS - (performance.now() - t0)),
+              ),
+            ),
+        )
+        .then(() => {
+          if (dead) return;
+          pull = 0;
+          apply(0, true);
+          // let the slide-out finish before resetting state
+          setTimeout(() => {
+            if (dead) return;
+            refreshingRef.current = false;
+            setStatus("pull");
+          }, 300);
+        });
+    };
 
     const onTouchStart = (e) => {
-      // Only one finger
-      if (e.touches.length !== 1) return;
-      touchStartY.current = e.touches[0].clientY;
-      startedAtTop.current = el.scrollTop === 0;
+      if (refreshingRef.current || e.touches.length !== 1) return;
+      startY = e.touches[0].clientY;
+      armed = scroller.scrollTop <= 0;
+      dragging = false;
     };
 
     const onTouchMove = (e) => {
-      if (!startedAtTop.current) return;
-      const y = e.touches[0].clientY;
-      const dy = y - touchStartY.current;
-      if (dy <= 0) {
-        // Scrolling up — reset and let normal scroll happen
-        setPull(0);
+      if (!armed) return;
+      const dy = e.touches[0].clientY - startY;
+
+      if (dy < 0) {
+        // Finger moved up: user is scrolling content, hand over to native scroll
+        if (dragging) {
+          pull = 0;
+          apply(0, false);
+          setStatus("pull");
+        }
+        armed = dragging = false;
         return;
       }
-      // Prevent the native bounce/refresh
-      e.preventDefault();
-      setPull(Math.min(dy, MAX_PULL));
+
+      const d = dy - DEAD_ZONE;
+      if (d <= 0) {
+        if (dragging) {
+          dragging = false;
+          pull = 0;
+          apply(0, false);
+          setStatus("pull");
+        }
+        return;
+      }
+
+      dragging = true;
+      if (e.cancelable) e.preventDefault(); // block native bounce/refresh
+      pull = dampen(d);
+      apply(pull, false);
+      setStatus(pull >= THRESHOLD ? "ready" : "pull"); // no re-render unless it changes
     };
 
     const onTouchEnd = () => {
-      startedAtTop.current = false;
-      const finalPull = pull;
-      setPull(0);
+      const shouldRefresh = dragging && pull >= THRESHOLD;
+      armed = dragging = false;
 
-      if (finalPull >= THRESHOLD) {
-        setRefreshing(true);
-        Promise.resolve(onRefresh())
-          .catch(() => {})
-          .finally(() => {
-            setRefreshing(false);
-          });
+      if (shouldRefresh) {
+        startRefresh();
+      } else {
+        pull = 0;
+        apply(0, true);
+        setStatus("pull");
       }
     };
 
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchmove", onTouchMove, { passive: false });
-    el.addEventListener("touchend", onTouchEnd, { passive: true });
+    scroller.addEventListener("touchstart", onTouchStart, { passive: true });
+    scroller.addEventListener("touchmove", onTouchMove, { passive: false });
+    scroller.addEventListener("touchend", onTouchEnd, { passive: true });
+    scroller.addEventListener("touchcancel", onTouchEnd, { passive: true });
 
     return () => {
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
-      el.removeEventListener("touchend", onTouchEnd);
+      dead = true;
+      scroller.removeEventListener("touchstart", onTouchStart);
+      scroller.removeEventListener("touchmove", onTouchMove);
+      scroller.removeEventListener("touchend", onTouchEnd);
+      scroller.removeEventListener("touchcancel", onTouchEnd);
     };
-  }, [onRefresh, pull]);
+  }, []); // runs once: handlers read refs, not state
+
+  const active = status === "ready" || status === "refreshing";
 
   return (
-    <div
-      ref={scrollRef}
-      className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-4.5 pb-5
-                 overscroll-y-contain scrollbar-none [&::-webkit-scrollbar]:hidden"
-      style={{ touchAction: "pan-y" }}
-    >
+    <div className="relative flex-1 min-h-0 overflow-hidden">
+      {/* Sits behind the scroller; slides in as the scroller is pulled down */}
       <div
-        className="sticky top-0 z-10 bg-(--app)"
-        style={{ marginTop: refreshing ? 0 : `-${pull}px` }}
-      >
-        <div className="pt-1.5">
-          {refreshing || pull > 0 ? (
-            <Spinner progress={pull} releasing={releasing} />
-          ) : null}
-        </div>
-      </div>
-      <div
+        ref={indicatorRef}
+        className="pointer-events-none absolute inset-x-0 top-0 flex flex-col items-center justify-center gap-2"
         style={{
-          transform: refreshing ? "none" : `translateY(${pull}px)`,
-          transition: releasing || refreshing ? "transform 0.25s ease" : "none",
+          height: THRESHOLD,
+          opacity: 0,
+          transform: `translate3d(0, ${-THRESHOLD}px, 0)`,
         }}
+      >
+        <div
+          ref={ringRef}
+          className={`w-9 h-9 rounded-full border-2 border-(--line) border-t-(--brand) ${
+            status === "refreshing" ? "animate-spin" : ""
+          }`}
+        />
+        <span
+          className={`text-[11px] font-semibold ${
+            active ? "text-(--brand)" : "text-(--muted)"
+          }`}
+        >
+          {status === "refreshing"
+            ? "Refreshing…"
+            : status === "ready"
+              ? "Release to refresh"
+              : "Pull to refresh"}
+        </span>
+      </div>
+
+      <div
+        ref={scrollRef}
+        className="relative z-10 h-full overflow-y-auto overflow-x-hidden bg-(--app) px-4.5 pb-5
+                   overscroll-y-contain scrollbar-none [&::-webkit-scrollbar]:hidden"
+        style={{ touchAction: "pan-y" }}
       >
         {children}
       </div>

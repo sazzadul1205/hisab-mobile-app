@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "npx vite --host",
-    "build": "vite build",
+    "build": "npm run generate:icons && vite build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
