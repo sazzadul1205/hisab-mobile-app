@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 export function AmountInput({ value, onChange, hint, autoFocus }) {
   const displayValue = value ?? "";
   const width = Math.max(3, displayValue.length + 1);
@@ -5,7 +7,7 @@ export function AmountInput({ value, onChange, hint, autoFocus }) {
   return (
     <div className="text-center pt-2 pb-5">
       <div className="flex items-center justify-center">
-        <span className="text-[15px] font-bold text-(--muted) mr-1.5" aria-hidden="true">à§³</span>
+        <span className="text-[15px] font-bold text-(--muted) mr-1.5" aria-hidden="true">৳</span>
         <input
           type="text"
           inputMode="decimal"
