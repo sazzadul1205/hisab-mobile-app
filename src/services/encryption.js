@@ -54,7 +54,7 @@ const INDEX_FIELDS = {
     categories: ["id", "type", "isDefault"],
     reconciliationRecords: ["id", "accountId", "reconciliationDate"],
     importRecords: ["id", "accountId", "importDate", "status"],
-    budgets: ["id", "categoryId", "monthKey", "createdAt"],
+    budgets: ["id", "categoryId", "period", "periodKey", "budgetType", "createdAt"],
 };
 
 export function isEncrypted(row) {

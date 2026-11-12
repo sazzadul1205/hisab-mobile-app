@@ -1,19 +1,21 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { resetTestState } from "../test/helpers";
 import {
-  monthKeyFromDate,
-  parseMonthKey,
-  formatMonthKey,
-  previousMonthKey,
-  nextMonthKey,
+  getPeriodKey,
+  parsePeriodKey,
+  formatPeriodKey,
+  getPreviousPeriodKey,
+  getNextPeriodKey,
   createBudget,
   updateBudget,
   deleteBudget,
   getBudget,
-  getBudgetByCategoryMonth,
+  getBudgetByCategoryPeriod,
   listBudgets,
   calculateBudgetActuals,
   calculateBudgetSummary,
+  BUDGET_TYPES,
+  BUDGET_PERIODS,
 } from "../services/budgets";
 import { db } from "../db/db";
 import { DEFAULT_CATEGORIES } from "../constants/categories";
@@ -25,31 +27,43 @@ describe("budgets service", () => {
     await db.categories.bulkAdd(DEFAULT_CATEGORIES);
   });
 
-  describe("monthKey helpers", () => {
-    it("formats month key correctly", () => {
-      const key = monthKeyFromDate(new Date(2026, 10, 15)); // Nov 2026
+  describe("period helpers", () => {
+    it("formats monthly period key correctly", () => {
+      const key = getPeriodKey(new Date(2026, 10, 15), BUDGET_PERIODS.monthly); // Nov 2026
       expect(key).toBe("2026-11");
     });
 
-    it("parses month key", () => {
-      const { year, month } = parseMonthKey("2026-11");
+    it("formats daily period key correctly", () => {
+      const key = getPeriodKey(new Date(2026, 10, 15), BUDGET_PERIODS.daily); // Nov 15, 2026
+      expect(key).toBe("2026-11-15");
+    });
+
+    it("parses monthly period key", () => {
+      const { year, month } = parsePeriodKey("2026-11", BUDGET_PERIODS.monthly);
       expect(year).toBe(2026);
       expect(month).toBe(11);
     });
 
-    it("formats month key for display", () => {
-      const formatted = formatMonthKey("2026-11");
+    it("parses daily period key", () => {
+      const { year, month, day } = parsePeriodKey("2026-11-15", BUDGET_PERIODS.daily);
+      expect(year).toBe(2026);
+      expect(month).toBe(11);
+      expect(day).toBe(15);
+    });
+
+    it("formats monthly period key for display", () => {
+      const formatted = formatPeriodKey("2026-11", BUDGET_PERIODS.monthly);
       expect(formatted).toBe("November 2026");
     });
 
-    it("calculates previous month", () => {
-      expect(previousMonthKey("2026-11")).toBe("2026-10");
-      expect(previousMonthKey("2026-01")).toBe("2025-12");
+    it("calculates previous monthly period", () => {
+      expect(getPreviousPeriodKey("2026-11", BUDGET_PERIODS.monthly)).toBe("2026-10");
+      expect(getPreviousPeriodKey("2026-01", BUDGET_PERIODS.monthly)).toBe("2025-12");
     });
 
-    it("calculates next month", () => {
-      expect(nextMonthKey("2026-11")).toBe("2026-12");
-      expect(nextMonthKey("2026-12")).toBe("2027-01");
+    it("calculates next monthly period", () => {
+      expect(getNextPeriodKey("2026-11", BUDGET_PERIODS.monthly)).toBe("2026-12");
+      expect(getNextPeriodKey("2026-12", BUDGET_PERIODS.monthly)).toBe("2027-01");
     });
   });
 
@@ -57,30 +71,49 @@ describe("budgets service", () => {
     it("creates a budget with valid data", async () => {
       const budget = await createBudget({
         categoryId: "exp-groceries",
-        monthKey: "2026-11",
+        period: BUDGET_PERIODS.monthly,
+        periodKey: "2026-11",
         limitAmount: 500000, // 5000 BDT
+        budgetType: BUDGET_TYPES.recurring,
       });
 
       expect(budget.id).toBeDefined();
       expect(budget.categoryId).toBe("exp-groceries");
-      expect(budget.monthKey).toBe("2026-11");
+      expect(budget.periodKey).toBe("2026-11");
       expect(budget.limitAmount).toBe(500000);
+      expect(budget.budgetType).toBe(BUDGET_TYPES.recurring);
       expect(budget.createdAt).toBeDefined();
       expect(budget.updatedAt).toBeDefined();
     });
 
-    it("rejects duplicate category/month", async () => {
+    it("creates a one-time budget", async () => {
+      const budget = await createBudget({
+        categoryId: "exp-groceries",
+        period: BUDGET_PERIODS.daily,
+        periodKey: "2026-11-15",
+        limitAmount: 500000,
+        budgetType: BUDGET_TYPES.onetime,
+      });
+
+      expect(budget.budgetType).toBe(BUDGET_TYPES.onetime);
+    });
+
+    it("rejects duplicate category/period", async () => {
       await createBudget({
         categoryId: "exp-groceries",
-        monthKey: "2026-11",
+        period: BUDGET_PERIODS.monthly,
+        periodKey: "2026-11",
         limitAmount: 500000,
+        budgetType: BUDGET_TYPES.recurring,
       });
 
       await expect(
         createBudget({
           categoryId: "exp-groceries",
-          monthKey: "2026-11",
+          period: BUDGET_PERIODS.monthly,
+          periodKey: "2026-11",
           limitAmount: 300000,
+          budgetType: BUDGET_TYPES.recurring,
         })
       ).rejects.toThrow("BUDGET_EXISTS");
     });
@@ -89,42 +122,70 @@ describe("budgets service", () => {
       await expect(
         createBudget({
           categoryId: "exp-groceries",
-          monthKey: "2026-11",
+          period: BUDGET_PERIODS.monthly,
+          periodKey: "2026-11",
           limitAmount: 0,
+          budgetType: BUDGET_TYPES.recurring,
         })
       ).rejects.toThrow("LIMIT_INVALID");
 
       await expect(
         createBudget({
           categoryId: "exp-groceries",
-          monthKey: "2026-11",
+          period: BUDGET_PERIODS.monthly,
+          periodKey: "2026-11",
           limitAmount: -100,
+          budgetType: BUDGET_TYPES.recurring,
         })
       ).rejects.toThrow("LIMIT_INVALID");
 
       await expect(
         createBudget({
           categoryId: "exp-groceries",
-          monthKey: "2026-11",
+          period: BUDGET_PERIODS.monthly,
+          periodKey: "2026-11",
           limitAmount: 123.45, // not integer
+          budgetType: BUDGET_TYPES.recurring,
         })
       ).rejects.toThrow("LIMIT_INVALID");
     });
 
-    it("requires categoryId and monthKey", async () => {
+    it("requires categoryId, period, periodKey, and budgetType", async () => {
       await expect(
         createBudget({
-          monthKey: "2026-11",
+          period: BUDGET_PERIODS.monthly,
+          periodKey: "2026-11",
           limitAmount: 500000,
+          budgetType: BUDGET_TYPES.recurring,
         })
       ).rejects.toThrow("CATEGORY_REQUIRED");
 
       await expect(
         createBudget({
           categoryId: "exp-groceries",
+          periodKey: "2026-11",
+          limitAmount: 500000,
+          budgetType: BUDGET_TYPES.recurring,
+        })
+      ).rejects.toThrow("PERIOD_REQUIRED");
+
+      await expect(
+        createBudget({
+          categoryId: "exp-groceries",
+          period: BUDGET_PERIODS.monthly,
+          limitAmount: 500000,
+          budgetType: BUDGET_TYPES.recurring,
+        })
+      ).rejects.toThrow("PERIOD_KEY_REQUIRED");
+
+      await expect(
+        createBudget({
+          categoryId: "exp-groceries",
+          period: BUDGET_PERIODS.monthly,
+          periodKey: "2026-11",
           limitAmount: 500000,
         })
-      ).rejects.toThrow("MONTH_REQUIRED");
+      ).rejects.toThrow("BUDGET_TYPE_REQUIRED");
     });
   });
 
@@ -132,8 +193,10 @@ describe("budgets service", () => {
     it("updates limit amount", async () => {
       const budget = await createBudget({
         categoryId: "exp-groceries",
-        monthKey: "2026-11",
+        period: BUDGET_PERIODS.monthly,
+        periodKey: "2026-11",
         limitAmount: 500000,
+        budgetType: BUDGET_TYPES.recurring,
       });
 
       const updated = await updateBudget(budget.id, { limitAmount: 750000 });
@@ -144,8 +207,10 @@ describe("budgets service", () => {
     it("rejects invalid limit amount", async () => {
       const budget = await createBudget({
         categoryId: "exp-groceries",
-        monthKey: "2026-11",
+        period: BUDGET_PERIODS.monthly,
+        periodKey: "2026-11",
         limitAmount: 500000,
+        budgetType: BUDGET_TYPES.recurring,
       });
 
       await expect(updateBudget(budget.id, { limitAmount: 0 })).rejects.toThrow(
@@ -153,16 +218,20 @@ describe("budgets service", () => {
       );
     });
 
-    it("prevents duplicate category/month on update", async () => {
+    it("prevents duplicate category/period on update", async () => {
       await createBudget({
         categoryId: "exp-groceries",
-        monthKey: "2026-11",
+        period: BUDGET_PERIODS.monthly,
+        periodKey: "2026-11",
         limitAmount: 500000,
+        budgetType: BUDGET_TYPES.recurring,
       });
       const budget2 = await createBudget({
         categoryId: "exp-transport",
-        monthKey: "2026-11",
+        period: BUDGET_PERIODS.monthly,
+        periodKey: "2026-11",
         limitAmount: 300000,
+        budgetType: BUDGET_TYPES.recurring,
       });
 
       await expect(
@@ -175,8 +244,10 @@ describe("budgets service", () => {
     it("deletes a budget", async () => {
       const budget = await createBudget({
         categoryId: "exp-groceries",
-        monthKey: "2026-11",
+        period: BUDGET_PERIODS.monthly,
+        periodKey: "2026-11",
         limitAmount: 500000,
+        budgetType: BUDGET_TYPES.recurring,
       });
 
       await deleteBudget(budget.id);
@@ -185,59 +256,79 @@ describe("budgets service", () => {
     });
   });
 
-  describe("getBudgetByCategoryMonth", () => {
-    it("finds budget by category and month", async () => {
+  describe("getBudgetByCategoryPeriod", () => {
+    it("finds budget by category and period", async () => {
       await createBudget({
         categoryId: "exp-groceries",
-        monthKey: "2026-11",
+        period: BUDGET_PERIODS.monthly,
+        periodKey: "2026-11",
         limitAmount: 500000,
+        budgetType: BUDGET_TYPES.recurring,
       });
 
-      const found = await getBudgetByCategoryMonth("exp-groceries", "2026-11");
+      const found = await getBudgetByCategoryPeriod(
+        "exp-groceries",
+        BUDGET_PERIODS.monthly,
+        "2026-11"
+      );
       expect(found).not.toBeNull();
       expect(found.categoryId).toBe("exp-groceries");
-      expect(found.monthKey).toBe("2026-11");
+      expect(found.periodKey).toBe("2026-11");
     });
 
     it("returns null for non-existent budget", async () => {
-      const found = await getBudgetByCategoryMonth("exp-groceries", "2026-11");
+      const found = await getBudgetByCategoryPeriod(
+        "exp-groceries",
+        BUDGET_PERIODS.monthly,
+        "2026-11"
+      );
       expect(found).toBeNull();
     });
   });
 
   describe("listBudgets", () => {
-    it("lists all budgets for a month", async () => {
+    it("lists all budgets for a period", async () => {
       await createBudget({
         categoryId: "exp-groceries",
-        monthKey: "2026-11",
+        period: BUDGET_PERIODS.monthly,
+        periodKey: "2026-11",
         limitAmount: 500000,
+        budgetType: BUDGET_TYPES.recurring,
       });
       await createBudget({
         categoryId: "exp-transport",
-        monthKey: "2026-11",
+        period: BUDGET_PERIODS.monthly,
+        periodKey: "2026-11",
         limitAmount: 300000,
+        budgetType: BUDGET_TYPES.recurring,
       });
       await createBudget({
         categoryId: "exp-groceries",
-        monthKey: "2026-10",
+        period: BUDGET_PERIODS.monthly,
+        periodKey: "2026-10",
         limitAmount: 400000,
+        budgetType: BUDGET_TYPES.recurring,
       });
 
-      const budgets = await listBudgets("2026-11");
+      const budgets = await listBudgets(BUDGET_PERIODS.monthly, "2026-11");
       expect(budgets.length).toBe(2);
-      expect(budgets.every((b) => b.monthKey === "2026-11")).toBe(true);
+      expect(budgets.every((b) => b.periodKey === "2026-11")).toBe(true);
     });
 
-    it("lists all budgets when no month specified", async () => {
+    it("lists all budgets when no period specified", async () => {
       await createBudget({
         categoryId: "exp-groceries",
-        monthKey: "2026-11",
+        period: BUDGET_PERIODS.monthly,
+        periodKey: "2026-11",
         limitAmount: 500000,
+        budgetType: BUDGET_TYPES.recurring,
       });
       await createBudget({
         categoryId: "exp-transport",
-        monthKey: "2026-10",
+        period: BUDGET_PERIODS.monthly,
+        periodKey: "2026-10",
         limitAmount: 300000,
+        budgetType: BUDGET_TYPES.recurring,
       });
 
       const budgets = await listBudgets();
@@ -247,10 +338,9 @@ describe("budgets service", () => {
 
   describe("calculateBudgetActuals", () => {
     it("calculates actual spending from expense transactions", async () => {
-      const monthKey = "2026-11";
-      const { year, month } = parseMonthKey(monthKey);
-      const from = new Date(year, month - 1, 1).toISOString();
-      const to = new Date(year, month, 0, 23, 59, 59, 999).toISOString();
+      const periodKey = "2026-11";
+      const from = new Date(2026, 10, 1).toISOString();
+      const to = new Date(2026, 11, 0, 23, 59, 59, 999).toISOString();
 
       // Add expense transactions
       await db.transactions.bulkAdd([
@@ -311,7 +401,7 @@ describe("budgets service", () => {
       ]);
 
       const transactions = await db.transactions.toArray();
-      const actuals = calculateBudgetActuals(transactions, monthKey);
+      const actuals = calculateBudgetActuals(transactions, periodKey, BUDGET_PERIODS.monthly);
 
       expect(actuals.get("exp-groceries")).toBe(150000);
       expect(actuals.get("exp-transport")).toBe(200000);
@@ -320,11 +410,10 @@ describe("budgets service", () => {
       expect(actuals.get("exp-transfer-fees")).toBeUndefined();
     });
 
-    it("excludes transactions outside the month", async () => {
-      const monthKey = "2026-11";
-      const { year, month } = parseMonthKey(monthKey);
-      const from = new Date(year, month - 1, 1).toISOString();
-      const prevMonth = new Date(year, month - 2, 15).toISOString();
+    it("excludes transactions outside the period", async () => {
+      const periodKey = "2026-11";
+      const from = new Date(2026, 10, 1).toISOString();
+      const prevMonth = new Date(2026, 9, 15).toISOString(); // October
 
       await db.transactions.bulkAdd([
         {
@@ -350,7 +439,7 @@ describe("budgets service", () => {
       ]);
 
       const transactions = await db.transactions.toArray();
-      const actuals = calculateBudgetActuals(transactions, monthKey);
+      const actuals = calculateBudgetActuals(transactions, periodKey, BUDGET_PERIODS.monthly);
 
       expect(actuals.get("exp-groceries")).toBe(100000);
     });
@@ -361,7 +450,7 @@ describe("budgets service", () => {
       const budget = {
         id: "budget1",
         categoryId: "exp-groceries",
-        monthKey: "2026-11",
+        periodKey: "2026-11",
         limitAmount: 500000,
       };
 

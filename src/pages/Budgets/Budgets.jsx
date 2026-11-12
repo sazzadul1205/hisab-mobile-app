@@ -8,7 +8,6 @@ import { Chip, ChipStrip } from "../../components/Chip";
 import { Button } from "../../components/Button";
 import { BudgetCalendar } from "../../components/BudgetCalendar";
 import { useBudgets } from "../../hooks/useBudgets";
-import { useCategories } from "../../hooks/useTransactions";
 import {
     deleteBudget,
     BUDGET_PERIODS,
@@ -176,12 +175,11 @@ function EmptyState({ onAdd }) {
 
 export default function Budgets() {
     const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const urlPeriod = searchParams.get("period") || BUDGET_PERIODS.monthly;
     const urlPeriodKey = searchParams.get("periodKey") || null;
 
     const [budgetingEnabled, setBudgetingEnabled] = useState(true);
-    const { categories, loading: catsLoading } = useCategories("expense");
     const {
         summaries,
         totals,
@@ -279,7 +277,7 @@ export default function Budgets() {
         );
     }
 
-    if (loading || catsLoading) {
+    if (loading) {
         return (
             <PhoneFrame>
                 <StatusBar />

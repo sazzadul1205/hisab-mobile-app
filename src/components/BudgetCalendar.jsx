@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { BUDGET_PERIODS, getPeriodKey, getPeriodDateRange } from "../services/budgets";
+import { BUDGET_PERIODS, getPeriodKey } from "../services/budgets";
 
 export function BudgetCalendar({
     budgets,
@@ -144,10 +144,6 @@ export function BudgetCalendar({
     };
 
     const renderWeekView = () => {
-        const year = displayDate.getFullYear();
-        const month = displayDate.getMonth() + 1;
-        const day = displayDate.getDate();
-        
         const startOfWeek = new Date(displayDate);
         startOfWeek.setDate(displayDate.getDate() - displayDate.getDay());
         
