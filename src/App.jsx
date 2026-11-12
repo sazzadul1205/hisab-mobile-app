@@ -41,6 +41,7 @@ import UserManual from "./pages/UserManual/UserManual";
 import Changelog from "./pages/Changelog/Changelog";
 import Reminders from "./pages/Reminders/Reminders";
 import Budgets from "./pages/Budgets/Budgets";
+import AddBudget from "./pages/AddBudget/AddBudget";
 
 export default function App() {
   return (
@@ -92,6 +93,8 @@ export default function App() {
               />
 
               <Route path="/budgets" element={<Budgets />} />
+              <Route path="/budgets/new" element={<AddBudget />} />
+              <Route path="/budgets/:id/edit" element={<AddBudget mode="edit" />} />
 
               <Route path="/reports" element={<Reports />} />
               <Route path="/import" element={<ImportStatement />} />

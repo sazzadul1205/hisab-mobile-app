@@ -1,14 +1,20 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { PhoneFrame, StatusBar, ScrollArea } from "../../components/PhoneFrame";
 import { PullToRefresh } from "../../components/PullToRefresh";
 import { IconButton } from "../../components/IconButton";
 import { BottomNav } from "../../components/BottomNav";
-import { AmountInput } from "../../components/AmountInput";
-import { CategoryPicker } from "../../components/CategoryPicker";
+import { Chip, ChipStrip } from "../../components/Chip";
+import { Button } from "../../components/Button";
+import { BudgetCalendar } from "../../components/BudgetCalendar";
 import { useBudgets } from "../../hooks/useBudgets";
 import { useCategories } from "../../hooks/useTransactions";
-import { createBudget, updateBudget, deleteBudget } from "../../services/budgets";
+import {
+    deleteBudget,
+    BUDGET_PERIODS,
+    PERIOD_LABELS,
+} from "../../services/budgets";
+import { getBudgetingEnabled } from "../../services/settings";
 import { formatBDTShort } from "../../lib/money";
 
 const STATUS_STYLES = {
@@ -23,6 +29,47 @@ const STATUS_LABELS = {
     over: "Over",
 };
 
+function DeleteModal({ onCancel, onConfirm, busy, error }) {
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+            <div className="w-full max-w-94.5 bg-(--card) rounded-[20px] p-5 shadow-2xl">
+                <div className="w-12 h-12 rounded-[14px] mx-auto mb-4 grid place-items-center bg-(--danger-soft) text-(--danger)">
+                    <svg
+                        viewBox="0 0 24 24"
+                        className="w-6 h-6 stroke-current fill-none stroke-[1.8] [stroke-linecap:round] [stroke-linejoin:round]"
+                    >
+                        <path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13" />
+                    </svg>
+                </div>
+                <h3 className="m-0 mb-2 text-center text-[17px] font-bold tracking-[-0.3px]">
+                    Delete this budget?
+                </h3>
+                <p className="m-0 mb-4 text-center text-[12.5px] text-(--muted) leading-[1.55]">
+                    This will remove the budget for this category and period.
+                </p>
+                {error && (
+                    <div className="text-[12px] font-semibold text-(--out) mb-3 text-center">
+                        {error}
+                    </div>
+                )}
+                <div className="flex gap-2.5">
+                    <Button
+                        variant="secondary"
+                        className="flex-[0_0_40%]"
+                        onClick={onCancel}
+                        disabled={busy}
+                    >
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={onConfirm} disabled={busy}>
+                        {busy ? "Deleting…" : "Delete"}
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function BudgetRow({ budget, onEdit, onDelete }) {
     const statusStyle = STATUS_STYLES[budget.status];
     const statusLabel = STATUS_LABELS[budget.status];
@@ -35,12 +82,14 @@ function BudgetRow({ budget, onEdit, onDelete }) {
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 text-[13px] font-semibold text-(--ink)">
                         {budget.categoryName}
-                        <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${statusStyle} bg-opacity-10`}>
+                        <span
+                            className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${statusStyle} bg-opacity-10`}
+                        >
                             {statusLabel}
                         </span>
                     </div>
                     <div className="flex items-center gap-2 mt-1.5 text-[12px] text-(--ink-2)">
-                        <span className="font-bold num {statusStyle}">{formatBDTShort(budget.spent)}</span>
+                        <span className="font-bold num">{formatBDTShort(budget.spent)}</span>
                         <span className="text-(--muted)">/</span>
                         <span className="font-bold num">{formatBDTShort(budget.limitAmount)}</span>
                     </div>
@@ -51,7 +100,10 @@ function BudgetRow({ budget, onEdit, onDelete }) {
                         className="p-1.5 rounded-lg text-(--muted) hover:text-(--ink) hover:bg-(--app) transition-colors"
                         aria-label="Edit budget"
                     >
-                        <svg viewBox="0 0 24 24" className="w-5 h-5 stroke-current fill-none stroke-2 [stroke-linecap:round] [stroke-linejoin:round]">
+                        <svg
+                            viewBox="0 0 24 24"
+                            className="w-5 h-5 stroke-current fill-none stroke-2 [stroke-linecap:round] [stroke-linejoin:round]"
+                        >
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                         </svg>
@@ -61,7 +113,10 @@ function BudgetRow({ budget, onEdit, onDelete }) {
                         className="p-1.5 rounded-lg text-(--muted) hover:text-(--out) hover:bg-(--app) transition-colors"
                         aria-label="Delete budget"
                     >
-                        <svg viewBox="0 0 24 24" className="w-5 h-5 stroke-current fill-none stroke-2 [stroke-linecap:round] [stroke-linejoin:round]">
+                        <svg
+                            viewBox="0 0 24 24"
+                            className="w-5 h-5 stroke-current fill-none stroke-2 [stroke-linecap:round] [stroke-linejoin:round]"
+                        >
                             <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                         </svg>
                     </button>
@@ -104,7 +159,7 @@ function EmptyState({ onAdd }) {
             </div>
             <b className="block text-[15px] font-bold mb-2">No budgets yet</b>
             <small className="block text-[12.5px] text-(--muted) leading-[1.6] max-w-[34ch] mx-auto mb-5">
-                Set a monthly spending limit for a category to track your expenses.
+                Set a spending limit for a category to track your expenses.
             </small>
             <button
                 onClick={onAdd}
@@ -119,132 +174,110 @@ function EmptyState({ onAdd }) {
     );
 }
 
-function BudgetForm({ budget, categories, onSubmit, onCancel }) {
-    const [categoryId, setCategoryId] = useState(budget?.categoryId ?? "");
-    const [limitAmount, setLimitAmount] = useState(
-        budget ? String(budget.limitAmount) : ""
-    );
-    const [error, setError] = useState("");
-
-    const expenseCategories = categories.filter((c) => c.type === "expense");
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError("");
-
-        if (!categoryId) {
-            setError("Please select a category");
-            return;
-        }
-        const amount = parseInt(limitAmount, 10);
-        if (!Number.isInteger(amount) || amount <= 0) {
-            setError("Please enter a valid amount");
-            return;
-        }
-
-        try {
-            await onSubmit({ categoryId, limitAmount: amount });
-        } catch (err) {
-            if (err.message === "BUDGET_EXISTS") {
-                setError("A budget for this category and month already exists");
-            } else if (err.message === "LIMIT_INVALID") {
-                setError("Amount must be a positive number");
-            } else {
-                setError("Failed to save budget");
-            }
-        }
-    };
-
-    const isEdit = !!budget;
-
-    return (
-        <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 space-y-4">
-            <h3 className="m-0 text-[16px] font-bold">
-                {isEdit ? "Edit budget" : "Add budget"}
-            </h3>
-
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label className="block text-[12px] font-semibold text-(--ink-2) mb-1.5">
-                        Category
-                    </label>
-                    <CategoryPicker
-                        categories={expenseCategories}
-                        value={categoryId}
-                        onChange={setCategoryId}
-                        placeholder="Select expense category"
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-[12px] font-semibold text-(--ink-2) mb-1.5">
-                        Monthly limit
-                    </label>
-                    <AmountInput
-                        value={limitAmount}
-                        onChange={setLimitAmount}
-                        placeholder="0"
-                        autoFocus
-                    />
-                </div>
-
-                {error && (
-                    <div className="text-[12px] text-(--out) bg-(--danger-soft) p-2.5 rounded-[10px]">
-                        {error}
-                    </div>
-                )}
-
-                <div className="flex gap-2 pt-2">
-                    <button
-                        type="button"
-                        onClick={onCancel}
-                        className="flex-1 p-3 rounded-xl font-semibold text-[14px] border border-(--line) bg-(--card) text-(--ink) cursor-pointer"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        className="flex-1 p-3 rounded-xl font-semibold text-[14px] border-0 bg-(--brand) text-white cursor-pointer"
-                    >
-                        {isEdit ? "Save" : "Add budget"}
-                    </button>
-                </div>
-            </form>
-        </div>
-    );
-}
-
 export default function Budgets() {
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const urlPeriod = searchParams.get("period") || BUDGET_PERIODS.monthly;
+    const urlPeriodKey = searchParams.get("periodKey") || null;
+
+    const [budgetingEnabled, setBudgetingEnabled] = useState(true);
     const { categories, loading: catsLoading } = useCategories("expense");
     const {
         summaries,
         totals,
         loading,
-        monthKey,
-        previousMonthKey,
-        nextMonthKey,
-        formatMonthKey,
-    } = useBudgets();
+        period,
+        periodKey,
+        previousPeriodKey,
+        nextPeriodKey,
+        formatPeriodKey,
+    } = useBudgets(urlPeriod, urlPeriodKey);
 
-    const [showForm, setShowForm] = useState(false);
-    const [editingBudget, setEditingBudget] = useState(null);
+    useEffect(() => {
+        getBudgetingEnabled().then(setBudgetingEnabled);
+    }, []);
 
-    const handleAdd = async (data) => {
-        await createBudget({ ...data, monthKey });
-        setShowForm(false);
+    const periodOptions = useMemo(() => [
+        { value: BUDGET_PERIODS.daily, label: PERIOD_LABELS.daily },
+        { value: BUDGET_PERIODS.weekly, label: PERIOD_LABELS.weekly },
+        { value: BUDGET_PERIODS.monthly, label: PERIOD_LABELS.monthly },
+    ], []);
+
+    const handlePeriodChange = (newPeriod) => {
+        const newPeriodKey = urlPeriodKey || new Date().toISOString().split("T")[0];
+        const params = new URLSearchParams(searchParams);
+        params.set("period", newPeriod);
+        params.set("periodKey", newPeriodKey);
+        navigate(`/budgets?${params.toString()}`);
     };
 
-    const handleEdit = async (data) => {
-        await updateBudget(editingBudget.id, data);
-        setEditingBudget(null);
+    const handlePeriodKeyChange = (newPeriodKey) => {
+        const params = new URLSearchParams(searchParams);
+        params.set("periodKey", newPeriodKey);
+        navigate(`/budgets?${params.toString()}`);
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm("Delete this budget?")) {
-            await deleteBudget(id);
+    const [deletingBudget, setDeletingBudget] = useState(null);
+    const [confirmDelete, setConfirmDelete] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState("");
+
+    const handleDelete = (id) => {
+        setDeletingBudget(id);
+        setDeleteError("");
+        setConfirmDelete(true);
+    };
+
+    const confirmDeleteHandler = async () => {
+        if (!deletingBudget) return;
+        setDeleting(true);
+        try {
+            await deleteBudget(deletingBudget);
+            setConfirmDelete(false);
+            setDeletingBudget(null);
+        } catch (err) {
+            console.error(err);
+            setDeleteError("Failed to delete budget");
+        } finally {
+            setDeleting(false);
         }
     };
+
+    const cancelDeleteHandler = () => {
+        if (deleting) return;
+        setConfirmDelete(false);
+        setDeletingBudget(null);
+    };
+
+    if (!budgetingEnabled) {
+        return (
+            <PhoneFrame>
+                <StatusBar />
+                <ScrollArea>
+                    <div className="flex flex-col items-center justify-center py-20 px-4">
+                        <div className="w-16 h-16 rounded-[22px] mx-auto mb-4 grid place-items-center bg-(--line) text-(--muted)">
+                            <svg viewBox="0 0 24 24" className="w-8 h-8 stroke-current fill-none stroke-[1.5]">
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <path d="M9 9h6M9 15h6" />
+                            </svg>
+                        </div>
+                        <h3 className="text-[18px] font-bold mb-2 text-(--ink)">Budgeting Disabled</h3>
+                        <p className="text-[13px] text-(--muted) text-center mb-6 max-w-[280px]">
+                            Enable budgeting in Settings to start tracking your spending limits.
+                        </p>
+                        <button
+                            onClick={() => navigate("/settings")}
+                            className="px-6 py-3 rounded-xl font-semibold text-[14px]
+                                       bg-[var(--brand)] text-white shadow-[0_4px_12px_-4px_var(--brand)]"
+                        >
+                            Go to Settings
+                        </button>
+                    </div>
+                </ScrollArea>
+                <BottomNav active="budgets" />
+            </PhoneFrame>
+        );
+    }
 
     if (loading || catsLoading) {
         return (
@@ -277,47 +310,76 @@ export default function Budgets() {
                             Budgets
                         </h2>
                         <div className="text-[12.5px] text-(--muted) mt-0.75">
-                            {formatMonthKey(monthKey)}
+                            {formatPeriodKey(periodKey)}
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
                         <IconButton
-                            label="Previous month"
+                            label="Previous period"
                             icon={<path d="M15 18l-6-6 6-6" />}
-                            onClick={() => navigate(`/budgets?month=${previousMonthKey}`)}
+                            onClick={() => handlePeriodKeyChange(previousPeriodKey)}
                         />
                         <IconButton
-                            label="Next month"
+                            label="Next period"
                             icon={<path d="M9 6l6 6-6 6" />}
-                            onClick={() => navigate(`/budgets?month=${nextMonthKey}`)}
+                            onClick={() => handlePeriodKeyChange(nextPeriodKey)}
                         />
                         <IconButton
                             label="Add budget"
                             icon={<path d="M12 5v14M5 12h14" />}
-                            onClick={() => setShowForm(true)}
+                            onClick={() => navigate("/budgets/new")}
                         />
                     </div>
                 </div>
+
+                <div className="px-4 pb-2">
+                    <ChipStrip>
+                        {periodOptions.map((p) => (
+                            <Chip
+                                key={p.value}
+                                on={period === p.value}
+                                onClick={() => handlePeriodChange(p.value)}
+                            >
+                                {p.label}
+                            </Chip>
+                        ))}
+                    </ChipStrip>
+                </div>
+
+                <BudgetCalendar
+                    budgets={summaries}
+                    period={period}
+                    periodKey={periodKey}
+                    onPeriodKeyChange={handlePeriodKeyChange}
+                />
 
                 <div className="stagger">
                     {totals.totalLimit > 0 && (
                         <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mb-3">
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="m-0 text-[14px] font-bold">Total</h3>
-                                <span className="text-[12px] text-(--muted)">{formatMonthKey(monthKey)}</span>
+                                <span className="text-[12px] text-(--muted)">
+                                    {formatPeriodKey(periodKey)}
+                                </span>
                             </div>
                             <div className="grid grid-cols-3 gap-3 text-center">
                                 <div>
                                     <div className="text-[11px] text-(--muted)">Budgeted</div>
-                                    <div className="text-[18px] font-bold num text-(--ink)">{formatBDTShort(totals.totalLimit)}</div>
+                                    <div className="text-[18px] font-bold num text-(--ink)">
+                                        {formatBDTShort(totals.totalLimit)}
+                                    </div>
                                 </div>
                                 <div>
                                     <div className="text-[11px] text-(--muted)">Spent</div>
-                                    <div className="text-[18px] font-bold num text-(--out)">{formatBDTShort(totals.totalSpent)}</div>
+                                    <div className="text-[18px] font-bold num text-(--out)">
+                                        {formatBDTShort(totals.totalSpent)}
+                                    </div>
                                 </div>
                                 <div>
                                     <div className="text-[11px] text-(--muted)">Remaining</div>
-                                    <div className={`text-[18px] font-bold num ${totals.totalRemaining >= 0 ? "text-(--in)" : "text-(--out)"}`}>
+                                    <div
+                                        className={`text-[18px] font-bold num ${totals.totalRemaining >= 0 ? "text-(--in)" : "text-(--out)"}`}
+                                    >
                                         {totals.totalRemaining >= 0
                                             ? formatBDTShort(totals.totalRemaining)
                                             : `−${formatBDTShort(Math.abs(totals.totalRemaining))}`}
@@ -337,36 +399,26 @@ export default function Budgets() {
                     )}
 
                     {summaries.length === 0 ? (
-                        <EmptyState onAdd={() => setShowForm(true)} />
+                        <EmptyState onAdd={() => navigate("/budgets/new")} />
                     ) : (
                         <div>
                             {summaries.map((b) => (
                                 <BudgetRow
                                     key={b.budgetId}
                                     budget={b}
-                                    onEdit={() => setEditingBudget(b)}
+                                    onEdit={() => navigate(`/budgets/${b.budgetId}/edit`)}
                                     onDelete={() => handleDelete(b.budgetId)}
                                 />
                             ))}
                         </div>
                     )}
 
-                    {showForm && (
-                        <BudgetForm
-                            categories={categories}
-                            onSubmit={handleAdd}
-                            onCancel={() => setShowForm(false)}
-                            monthKey={monthKey}
-                        />
-                    )}
-
-                    {editingBudget && (
-                        <BudgetForm
-                            budget={editingBudget}
-                            categories={categories}
-                            onSubmit={handleEdit}
-                            onCancel={() => setEditingBudget(null)}
-                            monthKey={monthKey}
+                    {confirmDelete && (
+                        <DeleteModal
+                            busy={deleting}
+                            error={deleteError}
+                            onCancel={cancelDeleteHandler}
+                            onConfirm={confirmDeleteHandler}
                         />
                     )}
                 </div>

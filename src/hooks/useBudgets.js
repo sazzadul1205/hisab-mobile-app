@@ -1,14 +1,15 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../db/db";
 import {
     listBudgets,
     calculateBudgetActuals,
     calculateBudgetSummary,
-    monthKeyFromDate,
-    previousMonthKey,
-    nextMonthKey,
-    formatMonthKey,
+    getPeriodKey,
+    getPreviousPeriodKey,
+    getNextPeriodKey,
+    formatPeriodKey,
+    BUDGET_PERIODS,
 } from "../services/budgets";
 import { decryptRecord, EncryptionNotReadyError } from "../services/encryption";
 
@@ -21,12 +22,12 @@ async function safeDecryptAll(tableName, rows) {
     }
 }
 
-export function useBudgets(monthKey) {
-    const resolvedMonthKey = monthKey ?? monthKeyFromDate();
+export function useBudgets(period = BUDGET_PERIODS.monthly, periodKey) {
+    const resolvedPeriodKey = periodKey ?? getPeriodKey(new Date(), period);
     const budgets = useLiveQuery(async () => {
-        const rows = await listBudgets(resolvedMonthKey);
+        const rows = await listBudgets(period, resolvedPeriodKey);
         return rows;
-    }, [resolvedMonthKey]);
+    }, [period, resolvedPeriodKey]);
 
     const transactions = useLiveQuery(async () => {
         const rows = await db.transactions.toArray();
@@ -40,7 +41,7 @@ export function useBudgets(monthKey) {
 
     const summaries = useMemo(() => {
         if (!budgets || !transactions) return [];
-        const actuals = calculateBudgetActuals(transactions, resolvedMonthKey);
+        const actuals = calculateBudgetActuals(transactions, resolvedPeriodKey, period);
         return budgets.map((b) => {
             const cat = categories?.find((c) => c.id === b.categoryId);
             return {
@@ -48,7 +49,7 @@ export function useBudgets(monthKey) {
                 categoryName: cat?.name ?? "Unknown",
             };
         });
-    }, [budgets, transactions, categories, resolvedMonthKey]);
+    }, [budgets, transactions, categories, resolvedPeriodKey, period]);
 
     const totals = useMemo(() => {
         if (!summaries.length) return { totalLimit: 0, totalSpent: 0, totalRemaining: 0 };
@@ -67,10 +68,11 @@ export function useBudgets(monthKey) {
         summaries,
         totals,
         loading: budgets === undefined || transactions === undefined,
-        monthKey: resolvedMonthKey,
-        previousMonthKey: previousMonthKey(resolvedMonthKey),
-        nextMonthKey: nextMonthKey(resolvedMonthKey),
-        formatMonthKey,
+        period,
+        periodKey: resolvedPeriodKey,
+        previousPeriodKey: getPreviousPeriodKey(resolvedPeriodKey, period),
+        nextPeriodKey: getNextPeriodKey(resolvedPeriodKey, period),
+        formatPeriodKey: (key) => formatPeriodKey(key, period),
     };
 }
 

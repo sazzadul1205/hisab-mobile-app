@@ -3,6 +3,8 @@
 
    v1: initial schema (accounts, transactions, categories, reconciliationRecords, importRecords, appSettings)
    v2: adds budgets table for monthly category budgets
+   v3: adds period support to budgets (daily, weekly, monthly, custom)
+   v4: adds [period+periodKey] index for efficient period queries
    ---------------------------------------------------------------- */
 
 import Dexie from "dexie";
@@ -38,6 +40,21 @@ db.version(2).stores({
 }).upgrade(async (tx) => {
     // Budgets table is new in v2, no data to migrate
     await tx.budgets.clear();
+});
+
+db.version(4).stores({
+    // id, categoryId, period (daily|weekly|monthly|custom), periodKey (YYYY-MM-DD|YYYY-WW|YYYY-MM), limitAmount, createdAt, updatedAt
+    budgets: "id, categoryId, period, periodKey, createdAt, [categoryId+period+periodKey], [period+periodKey]",
+}).upgrade(async (tx) => {
+    // Migrate existing monthly budgets to new schema
+    const oldBudgets = await tx.budgets.toArray();
+    for (const b of oldBudgets) {
+        await tx.budgets.put({
+            ...b,
+            period: "monthly",
+            periodKey: b.monthKey, // YYYY-MM format
+        });
+    }
 });
 
 /**

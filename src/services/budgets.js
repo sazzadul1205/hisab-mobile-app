@@ -1,5 +1,5 @@
 /* ----------------------------------------------------------------
-   Budget service — monthly category budgets.
+   Budget service — flexible period budgets (daily, weekly, monthly, custom).
    All amounts in minor units (paisa).
    ---------------------------------------------------------------- */
 
@@ -8,44 +8,249 @@ import { encryptRecord, decryptRecord } from "./encryption";
 
 const TABLE = "budgets";
 
-export function monthKeyFromDate(date = new Date()) {
+export const BUDGET_TYPES = {
+    recurring: "recurring",
+    onetime: "onetime",
+};
+
+export const BUDGET_PERIODS = {
+    daily: "daily",
+    weekly: "weekly",
+    monthly: "monthly",
+    custom: "custom",
+};
+
+export const PERIOD_LABELS = {
+    daily: "Daily",
+    weekly: "Weekly",
+    monthly: "Monthly",
+    custom: "Custom",
+};
+
+export const BUDGET_TYPE_LABELS = {
+    recurring: "Recurring",
+    onetime: "One-time",
+};
+
+/** Get period key for a date based on period type */
+export function getPeriodKey(date, period) {
     const d = new Date(date);
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    switch (period) {
+        case BUDGET_PERIODS.daily:
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        case BUDGET_PERIODS.weekly: {
+            const { year, week } = getISOWeek(d);
+            return `${year}-W${String(week).padStart(2, "0")}`;
+        }
+        case BUDGET_PERIODS.monthly:
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        case BUDGET_PERIODS.custom:
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        default:
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    }
 }
 
-export function parseMonthKey(key) {
-    const [year, month] = key.split("-").map(Number);
-    return { year, month };
+/** Get ISO week year and week number */
+function getISOWeek(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const week = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return { year: d.getUTCFullYear(), week };
 }
 
-export function formatMonthKey(key) {
-    const { year, month } = parseMonthKey(key);
-    const date = new Date(year, month - 1, 1);
-    return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+/** Get the start of the ISO week (Monday) for a given ISO year and week */
+function getISOWeekStart(isoYear, isoWeek) {
+    if (!isoYear || !isoWeek || isoWeek < 1 || isoWeek > 53) {
+        const now = new Date();
+        const { year, week } = getISOWeek(now);
+        return getISOWeekStart(year, week);
+    }
+    const jan4 = new Date(Date.UTC(isoYear, 0, 4));
+    const dayOfWeek = jan4.getUTCDay() || 7;
+    const weekStart = new Date(jan4);
+    weekStart.setUTCDate(jan4.getUTCDate() - dayOfWeek + 1 + (isoWeek - 1) * 7);
+    if (isNaN(weekStart.getTime())) {
+        const now = new Date();
+        const { year, week } = getISOWeek(now);
+        return getISOWeekStart(year, week);
+    }
+    return weekStart;
 }
 
-export function previousMonthKey(key) {
-    const { year, month } = parseMonthKey(key);
-    const date = new Date(year, month - 2, 1);
-    return monthKeyFromDate(date);
+/** Parse period key back to components */
+export function parsePeriodKey(periodKey, period) {
+    switch (period) {
+        case BUDGET_PERIODS.daily: {
+            const [year, month, day] = periodKey.split("-").map(Number);
+            return { year, month, day };
+        }
+        case BUDGET_PERIODS.weekly: {
+            const [year, week] = periodKey.split("-W").map(Number);
+            return { year, week: Number(week) };
+        }
+        case BUDGET_PERIODS.monthly: {
+            const [year, month] = periodKey.split("-").map(Number);
+            return { year, month };
+        }
+        case BUDGET_PERIODS.custom: {
+            const [year, month, day] = periodKey.split("-").map(Number);
+            return { year, month, day };
+        }
+        default:
+            return { year: new Date().getFullYear(), month: new Date().getMonth() + 1 };
+    }
 }
 
-export function nextMonthKey(key) {
-    const { year, month } = parseMonthKey(key);
-    const date = new Date(year, month, 1);
-    return monthKeyFromDate(date);
+/** Format period key for display */
+export function formatPeriodKey(periodKey, period) {
+    switch (period) {
+        case BUDGET_PERIODS.daily: {
+            const { year, month, day } = parsePeriodKey(periodKey, period);
+            return new Date(year, month - 1, day).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+        }
+        case BUDGET_PERIODS.weekly: {
+            const { year, week } = parsePeriodKey(periodKey, period);
+            const weekStart = getISOWeekStart(year, week);
+            const weekEnd = new Date(weekStart);
+            weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
+            return `${weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${weekEnd.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+        }
+        case BUDGET_PERIODS.monthly: {
+            const { year, month } = parsePeriodKey(periodKey, period);
+            return new Date(year, month - 1, 1).toLocaleString("en-US", { month: "long", year: "numeric" });
+        }
+        case BUDGET_PERIODS.custom: {
+            const { year, month, day } = parsePeriodKey(periodKey, period);
+            return new Date(year, month - 1, day).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        }
+        default:
+            return periodKey;
+    }
 }
 
-export async function createBudget({ categoryId, monthKey, limitAmount }) {
+/** Get date range for a period key */
+export function getPeriodDateRange(periodKey, period) {
+    if (!periodKey || !period) {
+        const now = new Date();
+        const defaultPeriodKey = getPeriodKey(now, BUDGET_PERIODS.monthly);
+        return getPeriodDateRange(defaultPeriodKey, BUDGET_PERIODS.monthly);
+    }
+    switch (period) {
+        case BUDGET_PERIODS.daily: {
+            const { year, month, day } = parsePeriodKey(periodKey, period);
+            if (!year || !month || !day) break;
+            const from = new Date(year, month - 1, day, 0, 0, 0, 0).toISOString();
+            const to = new Date(year, month - 1, day, 23, 59, 59, 999).toISOString();
+            return { from, to };
+        }
+        case BUDGET_PERIODS.weekly: {
+            const { year, week } = parsePeriodKey(periodKey, period);
+            if (!year || !week) break;
+            const weekStart = getISOWeekStart(year, week);
+            const weekEnd = new Date(weekStart);
+            weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
+            weekEnd.setUTCHours(23, 59, 59, 999);
+            return { from: weekStart.toISOString(), to: weekEnd.toISOString() };
+        }
+        case BUDGET_PERIODS.monthly: {
+            const { year, month } = parsePeriodKey(periodKey, period);
+            if (!year || !month) break;
+            const from = new Date(year, month - 1, 1, 0, 0, 0, 0).toISOString();
+            const to = new Date(year, month, 0, 23, 59, 59, 999).toISOString();
+            return { from, to };
+        }
+        case BUDGET_PERIODS.custom: {
+            const { year, month, day } = parsePeriodKey(periodKey, period);
+            if (!year || !month || !day) break;
+            const from = new Date(year, month - 1, day, 0, 0, 0, 0).toISOString();
+            const to = new Date(year, month - 1, day, 23, 59, 59, 999).toISOString();
+            return { from, to };
+        }
+    }
+    const now = new Date();
+    return { from: new Date(now.getFullYear(), now.getMonth(), 1).toISOString(), to: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999).toISOString() };
+}
+
+/** Get previous period key */
+export function getPreviousPeriodKey(periodKey, period) {
+    switch (period) {
+        case BUDGET_PERIODS.daily: {
+            const { year, month, day } = parsePeriodKey(periodKey, period);
+            const prev = new Date(year, month - 1, day - 1);
+            return getPeriodKey(prev, period);
+        }
+        case BUDGET_PERIODS.weekly: {
+            const { year, week } = parsePeriodKey(periodKey, period);
+            const prevWeek = week - 1;
+            if (prevWeek <= 0) {
+                const prevYear = year - 1;
+                const { week: weeksInPrevYear } = getISOWeek(new Date(prevYear, 11, 31));
+                return `${prevYear}-W${String(weeksInPrevYear).padStart(2, "0")}`;
+            }
+            return `${year}-W${String(prevWeek).padStart(2, "0")}`;
+        }
+        case BUDGET_PERIODS.monthly: {
+            const { year, month } = parsePeriodKey(periodKey, period);
+            const prev = new Date(year, month - 2, 1);
+            return getPeriodKey(prev, period);
+        }
+        case BUDGET_PERIODS.custom: {
+            const { year, month, day } = parsePeriodKey(periodKey, period);
+            const prev = new Date(year, month - 1, day - 1);
+            return getPeriodKey(prev, period);
+        }
+        default:
+            return periodKey;
+    }
+}
+
+/** Get next period key */
+export function getNextPeriodKey(periodKey, period) {
+    switch (period) {
+        case BUDGET_PERIODS.daily: {
+            const { year, month, day } = parsePeriodKey(periodKey, period);
+            const next = new Date(year, month - 1, day + 1);
+            return getPeriodKey(next, period);
+        }
+        case BUDGET_PERIODS.weekly: {
+            const { year, week } = parsePeriodKey(periodKey, period);
+            const { week: weeksInYear } = getISOWeek(new Date(year, 11, 31));
+            const nextWeek = week + 1;
+            if (nextWeek > weeksInYear) {
+                return `${year + 1}-W01`;
+            }
+            return `${year}-W${String(nextWeek).padStart(2, "0")}`;
+        }
+        case BUDGET_PERIODS.monthly: {
+            const { year, month } = parsePeriodKey(periodKey, period);
+            const next = new Date(year, month, 1);
+            return getPeriodKey(next, period);
+        }
+        case BUDGET_PERIODS.custom: {
+            const { year, month, day } = parsePeriodKey(periodKey, period);
+            const next = new Date(year, month - 1, day + 1);
+            return getPeriodKey(next, period);
+        }
+        default:
+            return periodKey;
+    }
+}
+
+export async function createBudget({ categoryId, period, periodKey, limitAmount, budgetType }) {
     if (!categoryId) throw new Error("CATEGORY_REQUIRED");
-    if (!monthKey) throw new Error("MONTH_REQUIRED");
+    if (!period) throw new Error("PERIOD_REQUIRED");
+    if (!periodKey) throw new Error("PERIOD_KEY_REQUIRED");
+    if (!budgetType) throw new Error("BUDGET_TYPE_REQUIRED");
     if (!Number.isInteger(limitAmount) || limitAmount <= 0) {
         throw new Error("LIMIT_INVALID");
     }
 
     const existing = await db.budgets
-        .where("[categoryId+monthKey]")
-        .equals([categoryId, monthKey])
+        .where("[categoryId+period+periodKey]")
+        .equals([categoryId, period, periodKey])
         .first();
     if (existing) throw new Error("BUDGET_EXISTS");
 
@@ -53,8 +258,10 @@ export async function createBudget({ categoryId, monthKey, limitAmount }) {
     const budget = {
         id: crypto.randomUUID(),
         categoryId,
-        monthKey,
+        period,
+        periodKey,
         limitAmount,
+        budgetType,
         createdAt: now,
         updatedAt: now,
     };
@@ -79,12 +286,13 @@ export async function updateBudget(id, patch) {
         }
     }
 
-    if (patch.categoryId || patch.monthKey) {
+    if (patch.categoryId || patch.period || patch.periodKey) {
         const categoryId = patch.categoryId ?? existing.categoryId;
-        const monthKey = patch.monthKey ?? existing.monthKey;
+        const period = patch.period ?? existing.period;
+        const periodKey = patch.periodKey ?? existing.periodKey;
         const duplicate = await db.budgets
-            .where("[categoryId+monthKey]")
-            .equals([categoryId, monthKey])
+            .where("[categoryId+period+periodKey]")
+            .equals([categoryId, period, periodKey])
             .first();
         if (duplicate && duplicate.id !== id) {
             throw new Error("BUDGET_EXISTS");
@@ -105,28 +313,28 @@ export async function getBudget(id) {
     return decryptRecord(TABLE, row);
 }
 
-export async function getBudgetByCategoryMonth(categoryId, monthKey) {
+export async function getBudgetByCategoryPeriod(categoryId, period, periodKey) {
     const row = await db.budgets
-        .where("[categoryId+monthKey]")
-        .equals([categoryId, monthKey])
+        .where("[categoryId+period+periodKey]")
+        .equals([categoryId, period, periodKey])
         .first();
     if (!row) return null;
     return decryptRecord(TABLE, row);
 }
 
-export async function listBudgets(monthKey) {
+export async function listBudgets(period, periodKey) {
     let query = db.budgets.orderBy("createdAt");
-    if (monthKey) {
-        query = db.budgets.where("monthKey").equals(monthKey);
+    if (period && periodKey) {
+        query = db.budgets.where("[period+periodKey]").equals([period, periodKey]);
+    } else if (period) {
+        query = db.budgets.where("period").equals(period);
     }
     const rows = await query.toArray();
     return Promise.all(rows.map((r) => decryptRecord(TABLE, r)));
 }
 
-export function calculateBudgetActuals(transactions, monthKey) {
-    const { year, month } = parseMonthKey(monthKey);
-    const from = new Date(year, month - 1, 1).toISOString();
-    const to = new Date(year, month, 0, 23, 59, 59, 999).toISOString();
+export function calculateBudgetActuals(transactions, periodKey, period) {
+    const { from, to } = getPeriodDateRange(periodKey, period);
 
     const actuals = new Map();
     for (const tx of transactions) {
@@ -150,8 +358,11 @@ export function calculateBudgetSummary(budget, actualAmount) {
     else if (usagePercent >= 80) status = "near";
 
     return {
+        id: budget.id,
         budgetId: budget.id,
         categoryId: budget.categoryId,
+        period: budget.period,
+        periodKey: budget.periodKey,
         limitAmount: budget.limitAmount,
         spent,
         remaining,

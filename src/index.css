@@ -666,3 +666,7 @@ body {
 .page-enter {
   animation: fadeIn 0.2s ease both;
 }
+
+.animate-slide-up {
+  animation: slideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}

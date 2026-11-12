@@ -31,7 +31,7 @@ export default defineConfig({
     command: 'npm run dev -- --port 5176',
     cwd: __dirname,
     url: 'http://localhost:5176',
-    reuseExistingServer: false,
+    reuseExistingServer: true,
     timeout: 120000,
   },
 });
