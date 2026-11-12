@@ -11,6 +11,7 @@ export async function clearAllTables() {
         db.categories.clear(),
         db.reconciliationRecords.clear(),
         db.importRecords.clear(),
+        db.budgets.clear(),
         db.appSettings.clear(),
     ]);
 }

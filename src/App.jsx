@@ -40,6 +40,7 @@ import ThemeSettings from "./pages/ThemeSettings/ThemeSettings";
 import UserManual from "./pages/UserManual/UserManual";
 import Changelog from "./pages/Changelog/Changelog";
 import Reminders from "./pages/Reminders/Reminders";
+import Budgets from "./pages/Budgets/Budgets";
 
 export default function App() {
   return (
@@ -89,6 +90,8 @@ export default function App() {
                 path="/categories/:id/edit"
                 element={<AddCategory mode="edit" />}
               />
+
+              <Route path="/budgets" element={<Budgets />} />
 
               <Route path="/reports" element={<Reports />} />
               <Route path="/import" element={<ImportStatement />} />

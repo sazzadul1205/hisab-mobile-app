@@ -8,6 +8,7 @@ import { BottomNav } from "../../components/BottomNav";
 import { TransactionRow } from "../../components/TransactionRow";
 import { useAccounts } from "../../hooks/useAccounts";
 import { useLookup } from "../../hooks/useTransactions";
+import { useBudgets } from "../../hooks/useBudgets";
 import { netCashFlow, expensesByCategory } from "../../services/calc";
 import { formatBDT, formatBDTShort } from "../../lib/money";
 
@@ -342,6 +343,117 @@ function CategoryBreakdown({ categories }) {
   );
 }
 
+const STATUS_STYLES = {
+  under: "text-(--in)",
+  near: "text-(--warn)",
+  over: "text-(--out)",
+};
+
+const STATUS_LABELS = {
+  under: "Under",
+  near: "Near limit",
+  over: "Over",
+};
+
+function BudgetSummary({ summaries, totals }) {
+  if (!summaries.length) return null;
+
+  const topItems = [...summaries]
+    .sort((a, b) => b.usagePercent - a.usagePercent)
+    .slice(0, 3);
+
+  return (
+    <div className="bg-(--card) border border-(--line) rounded-[18px] p-4 mt-3 shadow-[0_1px_2px_rgba(14,26,22,0.06)]">
+      <div className="flex items-center justify-between mb-3.5">
+        <h3 className="m-0 text-[14px] font-bold tracking-[-0.15px]">
+          Budget summary
+        </h3>
+        <Link
+          to="/budgets"
+          className="text-[12px] font-semibold text-(--brand) no-underline"
+        >
+          View all
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mb-4 text-center">
+        <div>
+          <div className="text-[11px] text-(--muted)">Budgeted</div>
+          <div className="text-[18px] font-bold num text-(--ink)">{formatBDTShort(totals.totalLimit)}</div>
+        </div>
+        <div>
+          <div className="text-[11px] text-(--muted)">Spent</div>
+          <div className="text-[18px] font-bold num text-(--out)">{formatBDTShort(totals.totalSpent)}</div>
+        </div>
+        <div>
+          <div className="text-[11px] text-(--muted)">Remaining</div>
+          <div className={`text-[18px] font-bold num ${totals.totalRemaining >= 0 ? "text-(--in)" : "text-(--out)"}`}>
+            {totals.totalRemaining >= 0
+              ? formatBDTShort(totals.totalRemaining)
+              : `−${formatBDTShort(Math.abs(totals.totalRemaining))}`}
+          </div>
+        </div>
+      </div>
+
+      <div className="h-2 rounded-full bg-(--line-2) overflow-hidden mb-4">
+        <div
+          className="h-full rounded-full"
+          style={{
+            width: `${totals.totalLimit > 0 ? Math.min(100, Math.round((totals.totalSpent / totals.totalLimit) * 100)) : 0}%`,
+            background: "var(--brand)",
+          }}
+        />
+      </div>
+
+      <div className="space-y-2.5">
+        {topItems.map((b) => (
+          <div key={b.budgetId} className="flex items-center justify-between">
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className="w-2 h-2 rounded-full shrink-0"
+                style={{ background: `var(--${b.status === "over" ? "out" : b.status === "near" ? "warn" : "in"})` }}
+              />
+              <div className="min-w-0">
+                <div className="text-[13px] font-semibold text-(--ink) truncate">{b.categoryName}</div>
+                <div className="text-[11px] text-(--muted) truncate">
+                  {formatBDTShort(b.spent)} / {formatBDTShort(b.limitAmount)}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-right">
+              <div className={`text-[11px] font-medium ${STATUS_STYLES[b.status]}`}>
+                {STATUS_LABELS[b.status]}
+              </div>
+              <div
+                className="w-24 h-1.5 rounded-full bg-(--line-2) overflow-hidden"
+              >
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${Math.min(100, b.usagePercent)}%`,
+                    background: `var(--${b.status === "over" ? "out" : b.status === "near" ? "warn" : "in"})`,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {summaries.length > 3 && (
+        <div className="text-center mt-3 pt-3 border-t border-(--line-2)">
+          <Link
+            to="/budgets"
+            className="text-[12px] font-semibold text-(--brand) no-underline"
+          >
+            View all {summaries.length} budgets
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function RecentActivity({ items, accountMap, categoryMap }) {
   const navigate = useNavigate();
   return (
@@ -483,6 +595,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { accounts, transactions, combined, loading: aLoad } = useAccounts();
   const { accountMap, categoryMap, loading: lookupLoading } = useLookup();
+  const { summaries, totals, loading: budgetsLoading } = useBudgets();
 
   // ALL hooks before any early return
   const today = useMemo(() => computeTodayFlow(transactions), [transactions]);
@@ -499,7 +612,7 @@ export default function Dashboard() {
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const dateLabel = format(now, "EEEE, d MMMM");
 
-  if (aLoad || lookupLoading) return <DashboardSkeleton />;
+  if (aLoad || lookupLoading || budgetsLoading) return <DashboardSkeleton />;
 
   if (accounts.length === 0) {
     return <OnboardingEmpty onAdd={() => navigate("/accounts/new")} />;
@@ -540,6 +653,7 @@ export default function Dashboard() {
           <BalanceCard total={combined} today={today} activeCount={activeCount} />
           <QuickActions />
           <WeeklyChart data={week} />
+          {summaries.length > 0 && <BudgetSummary summaries={summaries} totals={totals} />}
           {categories.length > 0 && <CategoryBreakdown categories={categories} />}
           {recent.length > 0 ? (
             <RecentActivity

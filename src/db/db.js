@@ -1,11 +1,8 @@
 /* ----------------------------------------------------------------
    Dexie schema for Hisab.
 
-   Not yet imported by any UI. Phase 3 wires pages to these tables.
-   For Phase 1 this file just declares the shape so services and
-   future import code know what to expect.
-
-   All amounts are stored as integer minor units (paisa).
+   v1: initial schema (accounts, transactions, categories, reconciliationRecords, importRecords, appSettings)
+   v2: adds budgets table for monthly category budgets
    ---------------------------------------------------------------- */
 
 import Dexie from "dexie";
@@ -33,6 +30,14 @@ db.version(1).stores({
     // key-value for autoLockDuration, biometricUnlockEnabled, etc.
     // (auth secrets live separately — never mixed with app settings)
     appSettings: "key",
+});
+
+db.version(2).stores({
+    // id, categoryId, monthKey (YYYY-MM), limitAmount, createdAt, updatedAt
+    budgets: "id, categoryId, monthKey, createdAt, [categoryId+monthKey]",
+}).upgrade(async (tx) => {
+    // Budgets table is new in v2, no data to migrate
+    await tx.budgets.clear();
 });
 
 /**

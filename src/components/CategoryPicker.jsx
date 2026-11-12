@@ -40,7 +40,7 @@ export function CategoryPicker({ categories, selected }) {
                 {getCategoryIcon(c.id)}
               </svg>
             </span>
-            {c.label}
+            {c.name}
           </button>
         );
       })}

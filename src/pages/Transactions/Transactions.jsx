@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { format } from "date-fns";
+import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths } from "date-fns";
 import { PhoneFrame, StatusBar } from "../../components/PhoneFrame";
 import { PullToRefresh } from "../../components/PullToRefresh";
 import { IconButton } from "../../components/IconButton";
@@ -11,13 +11,35 @@ import { Chip, ChipStrip } from "../../components/Chip";
 import { TransactionRow } from "../../components/TransactionRow";
 import { BootScreen } from "../../auth/RouteGuards";
 import { useTransactions, useLookup } from "../../hooks/useTransactions";
-import { formatBDT } from "../../lib/money";
+import { formatBDT, parseMoney } from "../../lib/money";
+import { Modal } from "../../components/Modal";
+import { AmountInput } from "../../components/AmountInput";
+import { DateTimeInput } from "../../components/DateTimeInput";
+import { AccountSelect } from "../../components/AccountSelect";
+import { CategoryPicker } from "../../components/CategoryPicker";
+import { Button } from "../../components/Button";
 
 const FILTERS = [
   { value: "all", label: "All" },
   { value: "income", label: "Income" },
   { value: "expense", label: "Expense" },
   { value: "transfer", label: "Transfer" },
+];
+
+const DATE_PRESETS = [
+  { value: "all", label: "All time" },
+  { value: "today", label: "Today" },
+  { value: "week", label: "This week" },
+  { value: "month", label: "This month" },
+  { value: "prevMonth", label: "Previous month" },
+  { value: "custom", label: "Custom range" },
+];
+
+const SORT_OPTIONS = [
+  { value: "dateDesc", label: "Newest first" },
+  { value: "dateAsc", label: "Oldest first" },
+  { value: "amountDesc", label: "Highest amount" },
+  { value: "amountAsc", label: "Lowest amount" },
 ];
 
 const TYPE_TONE = { income: "in", expense: "out", transfer: "tr" };
@@ -65,18 +87,233 @@ function groupByDay(transactions) {
     }));
 }
 
+function FilterSheet({
+  isOpen,
+  onClose,
+  accounts,
+  categories,
+  filters,
+  onChange,
+  onClear,
+}) {
+  const [datePreset, setDatePreset] = useState(filters.datePreset || "all");
+  const [customFrom, setCustomFrom] = useState(filters.customFrom || "");
+  const [customTo, setCustomTo] = useState(filters.customTo || "");
+  const [accountId, setAccountId] = useState(filters.accountId || "");
+  const [categoryId, setCategoryId] = useState(filters.categoryId || "");
+  const [minAmount, setMinAmount] = useState(filters.minAmount || "");
+  const [maxAmount, setMaxAmount] = useState(filters.maxAmount || "");
+  const [sortBy, setSortBy] = useState(filters.sortBy || "dateDesc");
+  const [showCustom, setShowCustom] = useState(datePreset === "custom");
+
+  const applyFilters = useCallback(() => {
+    const newFilters = {
+      ...filters,
+      datePreset,
+      customFrom: showCustom ? customFrom : "",
+      customTo: showCustom ? customTo : "",
+      accountId,
+      categoryId,
+      minAmount: minAmount ? parseMoney(minAmount) : null,
+      maxAmount: maxAmount ? parseMoney(maxAmount) : null,
+      sortBy,
+    };
+    onChange(newFilters);
+    onClose();
+  }, [filters, datePreset, showCustom, customFrom, customTo, accountId, categoryId, minAmount, maxAmount, sortBy, onChange, onClose]);
+
+  const handleDatePresetChange = (value) => {
+    setDatePreset(value);
+    setShowCustom(value === "custom");
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="Filters" size="full">
+      <div className="space-y-6 pb-8">
+        <div>
+          <h3 className="text-[12px] font-semibold text-(--muted) uppercase tracking-wide mb-3">Date range</h3>
+          <ChipStrip>
+            {DATE_PRESETS.map((p) => (
+              <Chip
+                key={p.value}
+                on={datePreset === p.value}
+                onClick={() => handleDatePresetChange(p.value)}
+              >
+                {p.label}
+              </Chip>
+            ))}
+          </ChipStrip>
+          {showCustom && (
+            <div className="grid grid-cols-2 gap-3 mt-4">
+              <DateTimeInput
+                label="From"
+                value={customFrom}
+                onChange={setCustomFrom}
+                type="date"
+              />
+              <DateTimeInput
+                label="To"
+                value={customTo}
+                onChange={setCustomTo}
+                type="date"
+              />
+            </div>
+          )}
+        </div>
+
+        <div>
+          <h3 className="text-[12px] font-semibold text-(--muted) uppercase tracking-wide mb-3">Account</h3>
+          <AccountSelect
+            accounts={accounts}
+            value={accountId}
+            onChange={setAccountId}
+            placeholder="All accounts"
+            includeEmpty
+          />
+        </div>
+
+        <div>
+          <h3 className="text-[12px] font-semibold text-(--muted) uppercase tracking-wide mb-3">Category</h3>
+          <CategoryPicker
+            categories={categories}
+            value={categoryId}
+            onChange={setCategoryId}
+            placeholder="All categories"
+            includeEmpty
+          />
+        </div>
+
+        <div>
+          <h3 className="text-[12px] font-semibold text-(--muted) uppercase tracking-wide mb-3">Amount range</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <AmountInput
+              label="Min"
+              value={minAmount}
+              onChange={setMinAmount}
+              placeholder="0"
+            />
+            <AmountInput
+              label="Max"
+              value={maxAmount}
+              onChange={setMaxAmount}
+              placeholder="No limit"
+            />
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-[12px] font-semibold text-(--muted) uppercase tracking-wide mb-3">Sort by</h3>
+          <ChipStrip>
+            {SORT_OPTIONS.map((s) => (
+              <Chip
+                key={s.value}
+                on={sortBy === s.value}
+                onClick={() => setSortBy(s.value)}
+              >
+                {s.label}
+              </Chip>
+            ))}
+          </ChipStrip>
+        </div>
+
+        <div className="flex gap-2 pt-4 border-t border-(--line)">
+          <Button variant="ghost" onClick={onClear} className="flex-1">
+            Clear all
+          </Button>
+          <Button onClick={applyFilters} className="flex-1">
+            Apply
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+function FilterChips({ filters, onRemove, activeCount }) {
+  const chips = [];
+  
+  if (filters.type && filters.type !== "all") {
+    chips.push({ key: "type", label: filters.type, onRemove: () => onRemove("type") });
+  }
+  if (filters.datePreset && filters.datePreset !== "all") {
+    const preset = DATE_PRESETS.find((p) => p.value === filters.datePreset);
+    chips.push({ key: "date", label: preset?.label ?? filters.datePreset, onRemove: () => onRemove("date") });
+  }
+  if (filters.accountId) {
+    chips.push({ key: "account", label: `Account: ${filters.accountId}`, onRemove: () => onRemove("account") });
+  }
+  if (filters.categoryId) {
+    chips.push({ key: "category", label: `Category: ${filters.categoryId}`, onRemove: () => onRemove("category") });
+  }
+  if (filters.minAmount != null) {
+    chips.push({ key: "minAmount", label: `Min: ${formatBDT(filters.minAmount)}`, onRemove: () => onRemove("minAmount") });
+  }
+  if (filters.maxAmount != null) {
+    chips.push({ key: "maxAmount", label: `Max: ${formatBDT(filters.maxAmount)}`, onRemove: () => onRemove("maxAmount") });
+  }
+  if (filters.sortBy && filters.sortBy !== "dateDesc") {
+    const sort = SORT_OPTIONS.find((s) => s.value === filters.sortBy);
+    chips.push({ key: "sort", label: `Sort: ${sort?.label ?? filters.sortBy}`, onRemove: () => onRemove("sort") });
+  }
+
+  if (chips.length === 0) return null;
+
+  return (
+    <div className="flex items-center gap-2 mb-3 flex-wrap">
+      <span className="text-[11px] font-semibold text-(--muted)">Active filters:</span>
+      {chips.map((c) => (
+        <Chip
+          key={c.key}
+          onClick={c.onRemove}
+          className="cursor-pointer"
+          style={{ fontSize: "11px" }}
+        >
+          {c.label}
+        </Chip>
+      ))}
+      {activeCount > chips.length && (
+        <Chip ghost onClick={onRemove} style={{ fontSize: "11px" }}>
+          +{activeCount - chips.length} more
+        </Chip>
+      )}
+      <Chip ghost onClick={onRemove} style={{ fontSize: "11px" }}>
+        Clear all
+      </Chip>
+    </div>
+  );
+}
+
 export default function Transactions() {
   const navigate = useNavigate();
   const { transactions, loading } = useTransactions();
   const { accountMap, categoryMap, loading: lookupLoading } = useLookup();
   const [activeType, setActiveType] = useState("all");
   const [search, setSearch] = useState("");
+  const [showFilterSheet, setShowFilterSheet] = useState(false);
+  const [filters, setFilters] = useState({
+    type: "all",
+    datePreset: "all",
+    customFrom: "",
+    customTo: "",
+    accountId: "",
+    categoryId: "",
+    minAmount: null,
+    maxAmount: null,
+    sortBy: "dateDesc",
+  });
+
+  const accounts = useMemo(() => [...accountMap.values()], [accountMap]);
+  const categories = useMemo(() => [...categoryMap.values()], [categoryMap]);
 
   const filtered = useMemo(() => {
     let list = transactions;
+
+    // Type filter
     if (activeType !== "all") {
       list = list.filter((t) => t.type === activeType);
     }
+
+    // Search
     const q = search.trim().toLowerCase();
     if (q) {
       list = list.filter((t) => {
@@ -94,10 +331,130 @@ export default function Transactions() {
         );
       });
     }
+
+    // Advanced filters
+    if (filters.accountId) {
+      list = list.filter(
+        (t) => t.accountId === filters.accountId || t.destinationAccountId === filters.accountId
+      );
+    }
+    if (filters.categoryId) {
+      list = list.filter((t) => t.categoryId === filters.categoryId);
+    }
+    if (filters.minAmount != null) {
+      list = list.filter((t) => t.amount >= filters.minAmount);
+    }
+    if (filters.maxAmount != null) {
+      list = list.filter((t) => t.amount <= filters.maxAmount);
+    }
+
+    // Date range
+    if (filters.datePreset !== "all") {
+      const now = new Date();
+      let from, to;
+      switch (filters.datePreset) {
+        case "today":
+          from = startOfDay(now).toISOString();
+          to = endOfDay(now).toISOString();
+          break;
+        case "week":
+          from = startOfWeek(now, { weekStartsOn: 0 }).toISOString();
+          to = endOfWeek(now, { weekStartsOn: 0 }).toISOString();
+          break;
+        case "month":
+          from = startOfMonth(now).toISOString();
+          to = endOfMonth(now).toISOString();
+          break;
+        case "prevMonth": {
+          const prevMonth = subMonths(now, 1);
+          from = startOfMonth(prevMonth).toISOString();
+          to = endOfMonth(prevMonth).toISOString();
+          break;
+        }
+        case "custom":
+          if (filters.customFrom) from = new Date(filters.customFrom).toISOString();
+          if (filters.customTo) to = new Date(filters.customTo).toISOString();
+          break;
+      }
+      if (from) list = list.filter((t) => t.date >= from);
+      if (to) list = list.filter((t) => t.date <= to);
+    }
+
+    // Sort
+    switch (filters.sortBy) {
+      case "dateAsc":
+        list.sort((a, b) => a.date.localeCompare(b.date));
+        break;
+      case "amountDesc":
+        list.sort((a, b) => b.amount - a.amount);
+        break;
+      case "amountAsc":
+        list.sort((a, b) => a.amount - b.amount);
+        break;
+      case "dateDesc":
+      default:
+        list.sort((a, b) => b.date.localeCompare(a.date));
+        break;
+    }
+
     return list;
-  }, [transactions, activeType, search, accountMap, categoryMap]);
+  }, [transactions, activeType, search, accountMap, categoryMap, filters]);
 
   const groups = useMemo(() => groupByDay(filtered), [filtered]);
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (activeType !== "all") count++;
+    if (filters.datePreset !== "all") count++;
+    if (filters.accountId) count++;
+    if (filters.categoryId) count++;
+    if (filters.minAmount != null) count++;
+    if (filters.maxAmount != null) count++;
+    if (filters.sortBy !== "dateDesc") count++;
+    return count;
+  }, [activeType, filters]);
+
+  const handleClearFilters = () => {
+    setActiveType("all");
+    setSearch("");
+    setFilters({
+      type: "all",
+      datePreset: "all",
+      customFrom: "",
+      customTo: "",
+      accountId: "",
+      categoryId: "",
+      minAmount: null,
+      maxAmount: null,
+      sortBy: "dateDesc",
+    });
+  };
+
+  const handleRemoveFilter = (key) => {
+    switch (key) {
+      case "type":
+        setActiveType("all");
+        break;
+      case "date":
+        setFilters((f) => ({ ...f, datePreset: "all", customFrom: "", customTo: "" }));
+        break;
+      case "account":
+        setFilters((f) => ({ ...f, accountId: "" }));
+        break;
+      case "category":
+        setFilters((f) => ({ ...f, categoryId: "" }));
+        break;
+      case "minAmount":
+        setFilters((f) => ({ ...f, minAmount: null }));
+        break;
+      case "maxAmount":
+        setFilters((f) => ({ ...f, maxAmount: null }));
+        break;
+      case "sort":
+        setFilters((f) => ({ ...f, sortBy: "dateDesc" }));
+        break;
+    }
+  };
 
   if (loading || lookupLoading) return <BootScreen />;
 
@@ -106,8 +463,6 @@ export default function Transactions() {
       <StatusBar />
       <PullToRefresh
         onRefresh={async () => {
-          // Dexie useLiveQuery re-runs automatically on DB changes.
-          // This delay gives the user visual feedback of a refresh.
           await new Promise((res) => setTimeout(res, 800));
         }}
       >
@@ -121,8 +476,9 @@ export default function Transactions() {
             </div>
           </div>
           <IconButton
-            label="Sort and filter"
+            label="Filters"
             icon={<path d="M4 6h16M7 12h10M10 18h4" />}
+            onClick={() => setShowFilterSheet(true)}
           />
         </div>
 
@@ -142,8 +498,23 @@ export default function Transactions() {
               {f.label}
             </Chip>
           ))}
-          <Chip ghost>Filters</Chip>
         </ChipStrip>
+
+        <FilterChips
+          filters={filters}
+          onRemove={handleRemoveFilter}
+          activeCount={activeFilterCount}
+        />
+
+        <FilterSheet
+          isOpen={showFilterSheet}
+          onClose={() => setShowFilterSheet(false)}
+          accounts={accounts}
+          categories={categories}
+          filters={filters}
+          onChange={setFilters}
+          onClear={handleClearFilters}
+        />
 
         {groups.length === 0 ? (
           <div className="text-center py-10 px-4">

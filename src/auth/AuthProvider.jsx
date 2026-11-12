@@ -140,6 +140,8 @@ export function AuthProvider({ children }) {
       recordSuccess();
       setStatus("unlocked");
       kickMigration();
+      // Ensure categories are seeded on every unlock
+      await seedDefaultCategories();
       return dekBytes;
     },
     [vaultMeta, kickMigration],
