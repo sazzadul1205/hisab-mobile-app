@@ -78,22 +78,22 @@ Internet may be needed to initially install the PWA or receive a future applicat
 
 The repository documentation and inspected service/page files indicate that the product already has the following foundation. Confirm each item against the current branch before modifying it.
 
-| Area | Existing baseline |
-| --- | --- |
-| Platform | React + Vite installable PWA |
-| Privacy | Local-first; no user account or cloud data workflow |
-| Security | PIN-based access, encryption/key derivation documentation and auto-lock settings |
-| Accounts | Cash, bKash, Nagad and bank-style accounts |
-| Ledger | Income, expense and internal transfer |
-| Categories | Income and expense categories |
-| Reports | Dashboard, monthly/reporting summaries and category breakdowns |
-| Imports | Local CSV parsing, supported-format handling and duplicate detection |
-| Exports | CSV export with formula-injection mitigation |
-| Backup | Encrypted backup and restore |
-| Reconciliation | Recorded balance compared with actual balance |
-| Calculations | Pure calculation helpers and integer minor-unit money handling |
-| Storage | Local storage abstraction with storage estimates/counts |
-| Reminders | Settings exist, but the Reminders page currently appears to be a placeholder awaiting removal of Firebase-dependent assumptions |
+| Area           | Existing baseline                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Platform       | React + Vite installable PWA                                                                                                    |
+| Privacy        | Local-first; no user account or cloud data workflow                                                                             |
+| Security       | PIN-based access, encryption/key derivation documentation and auto-lock settings                                                |
+| Accounts       | Cash, bKash, Nagad and bank-style accounts                                                                                      |
+| Ledger         | Income, expense and internal transfer                                                                                           |
+| Categories     | Income and expense categories                                                                                                   |
+| Reports        | Dashboard, monthly/reporting summaries and category breakdowns                                                                  |
+| Imports        | Local CSV parsing, supported-format handling and duplicate detection                                                            |
+| Exports        | CSV export with formula-injection mitigation                                                                                    |
+| Backup         | Encrypted backup and restore                                                                                                    |
+| Reconciliation | Recorded balance compared with actual balance                                                                                   |
+| Calculations   | Pure calculation helpers and integer minor-unit money handling                                                                  |
+| Storage        | Local storage abstraction with storage estimates/counts                                                                         |
+| Reminders      | Settings exist, but the Reminders page currently appears to be a placeholder awaiting removal of Firebase-dependent assumptions |
 
 ### Important baseline checks
 
@@ -109,41 +109,41 @@ Preserve the current navigation where possible. Add features as clear sections o
 ### Suggested information architecture
 
 - **Dashboard**
-    - Combined balance
-    - Account summary
-    - Current-month income and expenses
-    - Budget progress
-    - Recent transactions
-    - Savings-goal progress
+  - Combined balance
+  - Account summary
+  - Current-month income and expenses
+  - Budget progress
+  - Recent transactions
+  - Savings-goal progress
 - **Transactions**
-    - All transactions
-    - Search and filters
-    - Transaction details
-    - Add income / expense / transfer
+  - All transactions
+  - Search and filters
+  - Transaction details
+  - Add income / expense / transfer
 - **Budgets**
-    - Current month
-    - Budget list by category
-    - Budget history
+  - Current month
+  - Budget list by category
+  - Budget history
 - **Recurring**
-    - Recurring templates
-    - Due/overdue templates
-    - Create transaction from template
+  - Recurring templates
+  - Due/overdue templates
+  - Create transaction from template
 - **Goals**
-    - Savings goals
-    - Goal details and progress
+  - Savings goals
+  - Goal details and progress
 - **Reports**
-    - Monthly reports
-    - Yearly report
-    - Account comparison
+  - Monthly reports
+  - Yearly report
+  - Account comparison
 - **Accounts**
-    - Account list and details
-    - Reconciliation
+  - Account list and details
+  - Reconciliation
 - **Tools / Settings**
-    - Import / export
-    - Backup / restore
-    - Data integrity check
-    - Local reminders
-    - Security and app settings
+  - Import / export
+  - Backup / restore
+  - Data integrity check
+  - Local reminders
+  - Security and app settings
 
 This is a logical grouping, not a mandate to create all-new routes. Fit it to the existing router and mobile navigation patterns.
 
@@ -183,14 +183,14 @@ Allow the user to set a monthly spending limit for an expense category and see a
 
 Use the existing persistence conventions. A logical model could contain:
 
-| Field | Meaning |
-| --- | --- |
-| id | Stable local identifier |
-| categoryId | Expense category |
-| month | Month key such as YYYY-MM |
-| limitAmount | Integer minor units |
-| createdAt | Creation timestamp |
-| updatedAt | Last update timestamp |
+| Field       | Meaning                   |
+| ----------- | ------------------------- |
+| id          | Stable local identifier   |
+| categoryId  | Expense category          |
+| month       | Month key such as YYYY-MM |
+| limitAmount | Integer minor units       |
+| createdAt   | Creation timestamp        |
+| updatedAt   | Last update timestamp     |
 
 A unique constraint or equivalent validation should prevent duplicate budgets for the same category and month.
 
@@ -214,14 +214,14 @@ Use a consistent date-boundary convention with the existing transaction date han
 
 ### Acceptance criteria
 
-- [ ]  User can create one budget for a category/month.
-- [ ]  Duplicate category/month budgets are prevented.
-- [ ]  Actuals match the ledger for the selected month.
-- [ ]  Editing/deleting transactions recalculates actuals.
-- [ ]  Transfers are excluded except for transfer fees represented as expenses.
-- [ ]  Month navigation shows the correct historical period.
-- [ ]  Exceeding a budget never blocks a transaction.
-- [ ]  Budgets persist across app restarts and work offline.
+- [ ] User can create one budget for a category/month.
+- [ ] Duplicate category/month budgets are prevented.
+- [ ] Actuals match the ledger for the selected month.
+- [ ] Editing/deleting transactions recalculates actuals.
+- [ ] Transfers are excluded except for transfer fees represented as expenses.
+- [ ] Month navigation shows the correct historical period.
+- [ ] Exceeding a budget never blocks a transaction.
+- [ ] Budgets persist across app restarts and work offline.
 
 ## 5.2 Recurring transaction templates
 
@@ -251,22 +251,22 @@ Internal transfers are excluded from the first iteration unless the current tran
 
 ### Template fields
 
-| Field | Meaning |
-| --- | --- |
-| id | Stable local identifier |
-| type | Income or expense |
-| title | Human-readable label, e.g. Salary or Rent |
-| amount | Suggested amount in minor units |
-| accountId | Destination account for income or source account for expense |
-| categoryId | Relevant category |
-| note | Optional default note |
-| frequency | Weekly, monthly or yearly |
-| interval | Optional repeat interval if needed |
-| startDate | First schedule date |
-| nextDueDate | Next scheduled occurrence |
-| endDate | Optional final date |
-| isPaused | Whether schedule is paused |
-| createdAt / updatedAt | Audit timestamps |
+| Field                 | Meaning                                                      |
+| --------------------- | ------------------------------------------------------------ |
+| id                    | Stable local identifier                                      |
+| type                  | Income or expense                                            |
+| title                 | Human-readable label, e.g. Salary or Rent                    |
+| amount                | Suggested amount in minor units                              |
+| accountId             | Destination account for income or source account for expense |
+| categoryId            | Relevant category                                            |
+| note                  | Optional default note                                        |
+| frequency             | Weekly, monthly or yearly                                    |
+| interval              | Optional repeat interval if needed                           |
+| startDate             | First schedule date                                          |
+| nextDueDate           | Next scheduled occurrence                                    |
+| endDate               | Optional final date                                          |
+| isPaused              | Whether schedule is paused                                   |
+| createdAt / updatedAt | Audit timestamps                                             |
 
 Do not add fields that duplicate data already represented in the existing model unless required.
 
@@ -299,13 +299,13 @@ Use a stable occurrence identifier derived from the template ID and scheduled oc
 
 ### Acceptance criteria
 
-- [ ]  User can create, edit, pause, resume and archive a template.
-- [ ]  Weekly, monthly and yearly date calculations pass boundary tests.
-- [ ]  No transaction is created without user confirmation.
-- [ ]  Confirming the same occurrence twice creates only one transaction.
-- [ ]  Skipping advances the schedule without creating a transaction.
-- [ ]  Editing a template does not mutate previously saved transactions.
-- [ ]  All functionality works offline.
+- [ ] User can create, edit, pause, resume and archive a template.
+- [ ] Weekly, monthly and yearly date calculations pass boundary tests.
+- [ ] No transaction is created without user confirmation.
+- [ ] Confirming the same occurrence twice creates only one transaction.
+- [ ] Skipping advances the schedule without creating a transaction.
+- [ ] Editing a template does not mutate previously saved transactions.
+- [ ] All functionality works offline.
 
 ## 5.3 Savings goals
 
@@ -334,15 +334,15 @@ An optional future enhancement may allow a goal to be associated with an account
 
 ### Suggested goal fields
 
-| Field | Meaning |
-| --- | --- |
-| id | Stable identifier |
-| name | Goal title |
-| targetAmount | Target in minor units |
-| targetDate | Optional target date |
-| savedAmount | Derived from goal contribution records |
-| status | Active, paused, completed or archived |
-| createdAt / updatedAt | Timestamps |
+| Field                 | Meaning                                |
+| --------------------- | -------------------------------------- |
+| id                    | Stable identifier                      |
+| name                  | Goal title                             |
+| targetAmount          | Target in minor units                  |
+| targetDate            | Optional target date                   |
+| savedAmount           | Derived from goal contribution records |
+| status                | Active, paused, completed or archived  |
+| createdAt / updatedAt | Timestamps                             |
 
 Goal contribution fields may include id, goalId, amount, date and optional note.
 
@@ -358,12 +358,12 @@ Goal contribution fields may include id, goalId, amount, date and optional note.
 
 ### Acceptance criteria
 
-- [ ]  User can create and edit a goal.
-- [ ]  User can add and remove a contribution with confirmation.
-- [ ]  Goal progress is calculated correctly.
-- [ ]  Goal activity never changes ledger or account balances.
-- [ ]  Paused/completed/archived states are distinguishable.
-- [ ]  Goal data persists offline.
+- [ ] User can create and edit a goal.
+- [ ] User can add and remove a contribution with confirmation.
+- [ ] Goal progress is calculated correctly.
+- [ ] Goal activity never changes ledger or account balances.
+- [ ] Paused/completed/archived states are distinguishable.
+- [ ] Goal data persists offline.
 
 ## 5.4 Advanced transaction search and filters
 
@@ -405,12 +405,12 @@ Support combining filters:
 
 ### Acceptance criteria
 
-- [ ]  Search and filters can be combined.
-- [ ]  Source/destination account filtering works for transfers.
-- [ ]  Amount and date boundaries work correctly.
-- [ ]  Sorting is deterministic when two records share the same date/amount.
-- [ ]  Reset restores the unfiltered list.
-- [ ]  Search and filtering work offline.
+- [ ] Search and filters can be combined.
+- [ ] Source/destination account filtering works for transfers.
+- [ ] Amount and date boundaries work correctly.
+- [ ] Sorting is deterministic when two records share the same date/amount.
+- [ ] Reset restores the unfiltered list.
+- [ ] Search and filtering work offline.
 
 ## 5.5 Yearly financial report
 
@@ -449,12 +449,12 @@ Provide a clear annual view of money received, spent and retained.
 
 ### Acceptance criteria
 
-- [ ]  Annual totals match the sum of monthly totals.
-- [ ]  Monthly totals match transaction-level data.
-- [ ]  Transfer principal is excluded.
-- [ ]  Transfer fees are included as expenses.
-- [ ]  Empty years render correctly.
-- [ ]  Changing a transaction updates the report.
+- [ ] Annual totals match the sum of monthly totals.
+- [ ] Monthly totals match transaction-level data.
+- [ ] Transfer principal is excluded.
+- [ ] Transfer fees are included as expenses.
+- [ ] Empty years render correctly.
+- [ ] Changing a transaction updates the report.
 
 ## 5.6 Account comparison and balance overview
 
@@ -484,11 +484,11 @@ Help the user understand where their money is held without changing existing acc
 
 ### Acceptance criteria
 
-- [ ]  Each account balance matches ledger calculation.
-- [ ]  Combined balance matches the existing combined-balance function.
-- [ ]  Archived accounts are clearly separated.
-- [ ]  Reconciliation status is not presented as live provider data.
-- [ ]  Account comparison works offline.
+- [ ] Each account balance matches ledger calculation.
+- [ ] Combined balance matches the existing combined-balance function.
+- [ ] Archived accounts are clearly separated.
+- [ ] Reconciliation status is not presented as live provider data.
+- [ ] Account comparison works offline.
 
 ## 5.7 Backup restore preview and safety
 
@@ -525,12 +525,12 @@ The current restore behavior must be inspected before deciding whether v1.2 keep
 
 ### Acceptance criteria
 
-- [ ]  Preview is shown before restore is committed.
-- [ ]  Wrong password leaves local data unchanged.
-- [ ]  Corrupt or unsupported backup leaves local data unchanged.
-- [ ]  User must explicitly confirm destructive replacement.
-- [ ]  Restore failure cannot leave partial data.
-- [ ]  Existing backup compatibility is tested.
+- [ ] Preview is shown before restore is committed.
+- [ ] Wrong password leaves local data unchanged.
+- [ ] Corrupt or unsupported backup leaves local data unchanged.
+- [ ] User must explicitly confirm destructive replacement.
+- [ ] Restore failure cannot leave partial data.
+- [ ] Existing backup compatibility is tested.
 
 ## 5.8 Local data integrity checker
 
@@ -568,12 +568,12 @@ Only implement checks supported by the actual data model. Do not invent a repair
 
 ### Acceptance criteria
 
-- [ ]  Scan runs locally.
-- [ ]  Scan does not mutate records.
-- [ ]  Known invalid fixtures are detected by tests.
-- [ ]  Valid data produces a clear healthy state.
-- [ ]  Diagnostic output avoids PINs, keys, notes and full financial records.
-- [ ]  User can exit without changing data.
+- [ ] Scan runs locally.
+- [ ] Scan does not mutate records.
+- [ ] Known invalid fixtures are detected by tests.
+- [ ] Valid data produces a clear healthy state.
+- [ ] Diagnostic output avoids PINs, keys, notes and full financial records.
+- [ ] User can exit without changing data.
 
 ## 5.9 Local reminders and recurring due notifications
 
@@ -601,12 +601,12 @@ The inspected Reminders page currently appears to return no UI and includes a Fi
 
 ### Acceptance criteria
 
-- [ ]  Reminder preferences persist locally.
-- [ ]  In-app due reminders work without notification permission.
-- [ ]  Permission is requested only after user action.
-- [ ]  Unsupported/denied notifications degrade gracefully.
-- [ ]  No remote reminder service is introduced.
-- [ ]  App works offline with reminders disabled or enabled.
+- [ ] Reminder preferences persist locally.
+- [ ] In-app due reminders work without notification permission.
+- [ ] Permission is requested only after user action.
+- [ ] Unsupported/denied notifications degrade gracefully.
+- [ ] No remote reminder service is introduced.
+- [ ] App works offline with reminders disabled or enabled.
 
 ## 5.10 Tags for transactions
 
@@ -627,10 +627,10 @@ Allow flexible labels beyond the fixed category system, such as “Work”, “F
 
 ### Acceptance criteria
 
-- [ ]  Tags can be created, renamed and removed safely.
-- [ ]  A transaction can have multiple tags.
-- [ ]  Tag filtering combines correctly with other filters.
-- [ ]  Tags do not affect balances or reports.
+- [ ] Tags can be created, renamed and removed safely.
+- [ ] A transaction can have multiple tags.
+- [ ] Tag filtering combines correctly with other filters.
+- [ ] Tags do not affect balances or reports.
 
 ## 6. Dashboard changes
 
@@ -751,15 +751,15 @@ Transaction-to-tag relation may be a join store or an existing supported array r
 
 Use the architecture already present in the repository. The following responsibilities should remain separate even if the project uses different filenames.
 
-| Responsibility | Expected boundary |
-| --- | --- |
-| Pages/components | Render state, collect input and call application services |
-| Feature services | Budget, recurring, goals, report and integrity operations |
-| Calculation services | Pure money, date-range, budget and report calculations |
-| Storage/data access | Read/write local records and manage schema versions |
-| Security/encryption | Existing encryption and key-handling boundary |
-| PWA/service worker | Asset caching and supported offline behavior |
-| Tests | Verify calculations, persistence, migrations and user flows |
+| Responsibility       | Expected boundary                                           |
+| -------------------- | ----------------------------------------------------------- |
+| Pages/components     | Render state, collect input and call application services   |
+| Feature services     | Budget, recurring, goals, report and integrity operations   |
+| Calculation services | Pure money, date-range, budget and report calculations      |
+| Storage/data access  | Read/write local records and manage schema versions         |
+| Security/encryption  | Existing encryption and key-handling boundary               |
+| PWA/service worker   | Asset caching and supported offline behavior                |
+| Tests                | Verify calculations, persistence, migrations and user flows |
 
 Do not introduce a large state-management framework, repository layer or dependency-injection system unless the current application demonstrably needs it.
 
@@ -901,103 +901,103 @@ v1.2 is ready only when all required P0 items pass.
 
 ### Product behavior
 
-- [ ]  Advanced transaction search and filters work.
-- [ ]  Monthly category budgets work and derive totals from the ledger.
-- [ ]  Recurring templates require explicit confirmation before transaction creation.
-- [ ]  Recurring occurrence creation is duplicate-safe.
-- [ ]  Backup restore preview is available.
-- [ ]  Integrity checker is read-only and local.
+- [ ] Advanced transaction search and filters work.
+- [ ] Monthly category budgets work and derive totals from the ledger.
+- [ ] Recurring templates require explicit confirmation before transaction creation.
+- [ ] Recurring occurrence creation is duplicate-safe.
+- [ ] Backup restore preview is available.
+- [ ] Integrity checker is read-only and local.
 
 ### Planned P1 features
 
-- [ ]  Savings goals work without altering account balances.
-- [ ]  Yearly reports match saved transactions.
-- [ ]  Account comparison matches existing calculation logic.
-- [ ]  Local reminders work without Firebase/cloud services, with graceful fallbacks.
+- [ ] Savings goals work without altering account balances.
+- [ ] Yearly reports match saved transactions.
+- [ ] Account comparison matches existing calculation logic.
+- [ ] Local reminders work without Firebase/cloud services, with graceful fallbacks.
 
 ### Optional P2
 
-- [ ]  Tags work without changing category or balance semantics.
+- [ ] Tags work without changing category or balance semantics.
 
 ### Privacy and reliability
 
-- [ ]  No backend, cloud sync or financial-provider API has been introduced.
-- [ ]  New feature data uses the existing protected local storage boundary.
-- [ ]  Existing v1.1 data migrates safely.
-- [ ]  Existing backups remain compatible or a documented migration path exists.
-- [ ]  Failed imports/restores/migrations do not partially mutate data.
-- [ ]  No sensitive data is logged or transmitted.
-- [ ]  Existing test suite and new tests pass.
-- [ ]  Core features work offline after installation.
+- [ ] No backend, cloud sync or financial-provider API has been introduced.
+- [ ] New feature data uses the existing protected local storage boundary.
+- [ ] Existing v1.1 data migrates safely.
+- [ ] Existing backups remain compatible or a documented migration path exists.
+- [ ] Failed imports/restores/migrations do not partially mutate data.
+- [ ] No sensitive data is logged or transmitted.
+- [ ] Existing test suite and new tests pass.
+- [ ] Core features work offline after installation.
 
 ### Documentation and release
 
-- [ ]  README reflects actual v1.2 behavior.
-- [ ]  Architecture and PWA documentation are updated where needed.
-- [ ]  SRS/acceptance documentation is updated or linked to this specification.
-- [ ]  Changelog lists user-visible changes and migration notes.
-- [ ]  Package/app version is aligned with the actual release history.
-- [ ]  Known limitations are documented.
-- [ ]  Production build succeeds.
-- [ ]  Manual smoke test is complete.
+- [ ] README reflects actual v1.2 behavior.
+- [ ] Architecture and PWA documentation are updated where needed.
+- [ ] SRS/acceptance documentation is updated or linked to this specification.
+- [ ] Changelog lists user-visible changes and migration notes.
+- [ ] Package/app version is aligned with the actual release history.
+- [ ] Known limitations are documented.
+- [ ] Production build succeeds.
+- [ ] Manual smoke test is complete.
 
 ## 14. Delivery phases and definition of done
 
 ### Phase 0 — Repository verification and design lock
 
-- [ ]  Read all project instructions and architecture docs.
-- [ ]  Confirm actual v1.1 baseline and current version number.
-- [ ]  Map current routes, services, storage schema and test commands.
-- [ ]  Audit Firebase usage and reminder dependencies.
-- [ ]  Write a short implementation note for any required schema migration.
-- [ ]  Confirm no unresolved data-loss/security risk.
+- [ ] Read all project instructions and architecture docs.
+- [ ] Confirm actual v1.1 baseline and current version number.
+- [ ] Map current routes, services, storage schema and test commands.
+- [ ] Audit Firebase usage and reminder dependencies.
+- [ ] Write a short implementation note for any required schema migration.
+- [ ] Confirm no unresolved data-loss/security risk.
 
 **Exit condition:** the implementation plan matches the real codebase and schema changes are understood.
 
 ### Phase 1 — Core usability and budgets
 
-- [ ]  Advanced transaction filters.
-- [ ]  Monthly category budgets.
-- [ ]  Budget calculation tests.
-- [ ]  Dashboard budget summary.
+- [ ] Advanced transaction filters.
+- [ ] Monthly category budgets.
+- [ ] Budget calculation tests.
+- [ ] Dashboard budget summary.
 
 **Exit condition:** history is easier to navigate and budget values match the ledger.
 
 ### Phase 2 — Recurring workflows
 
-- [ ]  Recurring templates.
-- [ ]  Due/overdue list.
-- [ ]  Confirm/skip/pause/archive behavior.
-- [ ]  Idempotency protection.
-- [ ]  Schedule boundary tests.
+- [ ] Recurring templates.
+- [ ] Due/overdue list.
+- [ ] Confirm/skip/pause/archive behavior.
+- [ ] Idempotency protection.
+- [ ] Schedule boundary tests.
 
 **Exit condition:** no recurring transaction is created without confirmation and no occurrence can be duplicated.
 
 ### Phase 3 — Reliability and planning
 
-- [ ]  Backup preview.
-- [ ]  Local data integrity checker.
-- [ ]  Savings goals.
-- [ ]  Migration and backup compatibility tests.
+- [ ] Backup preview.
+- [ ] Local data integrity checker.
+- [ ] Savings goals.
+- [ ] Migration and backup compatibility tests.
 
 **Exit condition:** users can inspect restore and data health safely, and goals do not alter ledger balances.
 
 ### Phase 4 — Insights and reminders
 
-- [ ]  Yearly report.
-- [ ]  Account comparison.
-- [ ]  Local reminder experience.
-- [ ]  Remove unused Firebase dependency/configuration only if confirmed unused.
+- [ ] Yearly report.
+- [ ] Account comparison.
+- [ ] Local reminder experience.
+- [ ] Remove unused Firebase dependency/configuration only if confirmed unused.
 
 **Exit condition:** reports reconcile to ledger data and reminders work without remote services.
 
 ### Phase 5 — Stabilization and release
 
-- [ ]  Regression and security tests.
-- [ ]  Offline and device checks.
-- [ ]  Accessibility pass.
-- [ ]  Documentation and changelog.
-- [ ]  Version alignment and production build.
+- [ ] Regression and security tests.
+- [ ] Offline and device checks.
+- [ ] Accessibility pass.
+- [ ] Documentation and changelog.
+- [ ] Version alignment and production build.
 
 **Exit condition:** all P0 requirements pass, no known data-loss issue remains, and limitations are documented.
 
@@ -1022,38 +1022,37 @@ Do not block unrelated work on decisions that do not affect it. Do block any fea
 The following prompt can be copied into Kilo Code, DeepSeek or another coding agent after this document is saved.
 
 > You are working on the Hisab repository: [https://github.com/sazzadul1205/hisab-mobile-app](https://github.com/sazzadul1205/hisab-mobile-app).
-> 
-> 
+>
 > Read this entire Notion document, the repository README, architecture/PWA/security docs, changelog, package manifest, tests and all project instruction files ([AGENTS.md](http://AGENTS.md), [Agent.md](http://Agent.md) or equivalent) before editing.
-> 
+>
 > Implement Hisab v1.2 according to this specification. The product must remain a private, local-first, offline-capable React + Vite PWA. Use JavaScript, not TypeScript. Do not add a backend, accounts, cloud sync, Firebase/remote push, financial-provider APIs, remote AI or analytics transmission.
-> 
+>
 > First inspect and report the actual current code structure, storage engine/schema, encryption boundary, route structure, test commands, current version and existing implementations. Compare them with this document. Identify conflicts and data-migration risks before coding.
-> 
+>
 > Work in small, reviewable phases. Start with Phase 0, then implement one feature slice at a time. Before a schema change, explain the proposed migration and backup compatibility impact. Never rewrite or discard existing user data. Reuse existing services and UI patterns; avoid unnecessary refactors and overengineering.
-> 
+>
 > Financial calculations must use integer minor units or the existing exact-money representation. Reuse existing calculation helpers. Recurring templates must never create transactions without explicit user confirmation, and confirming one occurrence more than once must not create duplicates. Savings-goal contributions must not alter account balances. Backup preview and integrity scan must be local; integrity scan is read-only by default.
-> 
+>
 > For each phase:
-> 
+>
 > 1. State the files/modules you intend to change and why.
 > 2. Implement only that phase.
 > 3. Add/update unit, storage, migration and UI tests.
 > 4. Run the relevant test suite and production build.
 > 5. Report exact commands, results, changed files, unresolved issues and manual checks still required.
 > 6. Update documentation and changelog.
-> 
+>
 > Do not claim success if a test was not run. Do not silently change requirements. If this document and the actual code conflict, stop and explain the conflict with evidence before making a destructive or architecture-level change.
-> 
+>
 > Begin with repository inspection and a Phase 0 implementation plan. Do not start implementing all features in one unreviewed batch.
-> 
 
 ## 17. Change log for this specification
 
-| Revision | Change |
-| --- | --- |
+| Revision   | Change                                                                                                                                                                                                   |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | v1.2 draft | Initial detailed product, UX, architecture, migration, security, testing and delivery plan based on the current Hisab product description, inspected repository documentation and selected source files. |
 
 ---
 
 **Final product principle:** Hisab should become more capable at helping a person manage their money, not more dependent on the internet. Privacy, data integrity, transparent calculations and user control take priority over feature count.
+.
