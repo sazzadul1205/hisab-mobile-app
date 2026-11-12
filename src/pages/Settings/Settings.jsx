@@ -6,14 +6,16 @@ import { SectionLabel } from "../../components/SectionLabel";
 import { ListItem } from "../../components/ListItem";
 import { Chevron } from "../../components/Chevron";
 import { Note } from "../../components/Note";
+import { Switch } from "../../components/Switch";
 import { useAuth } from "../../auth/authContext";
-import { formatAutoLock } from "../../services/settings";
+import { formatAutoLock, getBudgetingEnabled, setBudgetingEnabled } from "../../services/settings";
 import { getStorageEstimate, formatBytes } from "../../services/storage";
 
 export default function Settings() {
   const navigate = useNavigate();
   const { autoLockMs } = useAuth();
   const [storageLabel, setStorageLabel] = useState("—");
+  const [budgetingEnabled, setBudgetingEnabledState] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -22,10 +24,19 @@ export default function Settings() {
       if (est.supported) setStorageLabel(`${formatBytes(est.usage)} used`);
       else setStorageLabel("Estimate unavailable");
     });
+    getBudgetingEnabled().then((enabled) => {
+      if (cancelled) return;
+      setBudgetingEnabledState(enabled);
+    });
     return () => {
       cancelled = true;
     };
   }, []);
+
+  const handleBudgetingToggle = async (enabled) => {
+    setBudgetingEnabledState(enabled);
+    await setBudgetingEnabled(enabled);
+  };
 
   return (
     <PhoneFrame>
@@ -97,6 +108,13 @@ export default function Settings() {
               subtitle="Colors and appearance"
               trailing={<Chevron />}
             />
+          </div>
+          <div className="px-4 py-3 flex items-center justify-between">
+            <div>
+              <div className="text-[14px] font-semibold text-(--ink)">Enable Budgeting</div>
+              <div className="text-[11px] text-(--muted) mt-0.5">Set spending limits for categories</div>
+            </div>
+            <Switch checked={budgetingEnabled} onChange={handleBudgetingToggle} />
           </div>
           <div onClick={() => navigate("/settings/manual")}>
             <ListItem

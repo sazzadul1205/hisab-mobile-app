@@ -70,6 +70,19 @@ export async function setLastImportAccountId(id) {
    ---------------------------------------------------------------- */
 export const REMINDER_KEY = "reminders";
 
+export const BUDGETING_KEY = "budgeting-enabled";
+
+export const DEFAULT_BUDGETING_ENABLED = true;
+
+export async function getBudgetingEnabled() {
+    const row = await db.appSettings.get(BUDGETING_KEY);
+    return row?.value !== false;
+}
+
+export async function setBudgetingEnabled(enabled) {
+    await db.appSettings.put({ key: BUDGETING_KEY, value: enabled });
+}
+
 export const DEFAULT_REMINDER_SETTINGS = {
     enabled: false,
     morning: 8, // 08:00
