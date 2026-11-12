@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 export function AmountInput({ value, onChange, hint, autoFocus }) {
   const displayValue = value ?? "";
   const width = Math.max(3, displayValue.length + 1);
